@@ -36,7 +36,7 @@ class CategoryDynamicRailsSection extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '為你推薦',
+              'For you',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
@@ -45,21 +45,21 @@ class CategoryDynamicRailsSection extends ConsumerWidget {
             ),
             const SizedBox(height: 10),
             _RailBlock(
-              title: '適合你',
+              title: 'For you',
               async: forYouAsync,
-              emptyHint: '無資料（請檢查 Firestore featured_lists/$forYouId）',
+              emptyHint: 'No data (check Firestore featured_lists/$forYouId)',
             ),
             const SizedBox(height: 14),
             _RailBlock(
-              title: '新上架',
+              title: 'New',
               async: newAsync,
-              emptyHint: '無資料（請檢查 Firestore featured_lists/$newId）',
+              emptyHint: 'No data (check Firestore featured_lists/$newId)',
             ),
             const SizedBox(height: 14),
             _RailBlock(
-              title: '最多人解鎖',
+              title: 'Popular',
               async: hotAsync,
-              emptyHint: '無資料（請檢查 Firestore featured_lists/$hotId）',
+              emptyHint: 'No data (check Firestore featured_lists/$hotId)',
             ),
           ],
         );

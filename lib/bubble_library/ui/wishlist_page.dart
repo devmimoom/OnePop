@@ -19,10 +19,10 @@ class WishlistPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('未購買收藏'),
+        title: const Text('Wishlist'),
         actions: [
           IconButton(
-            tooltip: '重新整理',
+            tooltip: 'Refresh',
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(localWishlistNotifierProvider).refresh(),
           ),
@@ -55,7 +55,7 @@ class WishlistPage extends ConsumerWidget {
                         .compareTo((a['item'] as WishlistItem).addedAt));
 
               if (list.isEmpty) {
-                return const Center(child: Text('目前沒有收藏的未購買商品'));
+                return const Center(child: Text('No wishlist items yet.'));
               }
 
               return ListView.separated(
@@ -83,7 +83,7 @@ class WishlistPage extends ConsumerWidget {
                                         fontSize: 16, fontWeight: FontWeight.w900)),
                               ),
                               IconButton(
-                                tooltip: '最愛',
+                                tooltip: 'Favorite',
                                 icon: Icon(w.isFavorite
                                     ? Icons.star
                                     : Icons.star_border),
@@ -106,7 +106,7 @@ class WishlistPage extends ConsumerWidget {
                             children: [
                               OutlinedButton.icon(
                                 icon: const Icon(Icons.visibility),
-                                label: const Text('試讀'),
+                                label: const Text('Preview'),
                                 onPressed: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -121,7 +121,7 @@ class WishlistPage extends ConsumerWidget {
                               const SizedBox(width: 10),
                               ElevatedButton.icon(
                                 icon: const Icon(Icons.shopping_bag_outlined),
-                                label: const Text('去購買'),
+                                label: const Text('Buy'),
                                 onPressed: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -132,7 +132,7 @@ class WishlistPage extends ConsumerWidget {
                               ),
                               const Spacer(),
                               IconButton(
-                                tooltip: '移除收藏',
+                                tooltip: 'Remove from wishlist',
                                 icon: const Icon(Icons.delete_outline),
                                 onPressed: () => ref
                                     .read(localWishlistNotifierProvider)

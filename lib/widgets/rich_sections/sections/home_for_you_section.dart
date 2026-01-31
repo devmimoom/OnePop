@@ -38,7 +38,7 @@ class HomeForYouSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('為你推薦',
+          Text('For you',
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
@@ -57,7 +57,7 @@ class HomeForYouSection extends ConsumerWidget {
                       );
 
                       if (picks.isEmpty) {
-                        return Text('目前還沒有可推薦的內容',
+                        return Text('No recommendations yet.',
                             style: TextStyle(color: tokens.textSecondary));
                       }
 
@@ -289,7 +289,7 @@ class _ForYouCard extends StatelessWidget {
                     const Spacer(),
                     Align(
                       alignment: Alignment.bottomRight,
-                      child: Text('查看 ›',
+                      child: Text('View ›',
                           style: TextStyle(
                               color: tokens.primary,
                               fontSize: 12,

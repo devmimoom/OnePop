@@ -25,7 +25,7 @@ class CategoryNetflixRails extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _title(context, '探索'),
+        _title(context, 'Explore'),
         const SizedBox(height: 10),
 
         // 適合你（只有登入才可能有資料）
@@ -47,7 +47,7 @@ class CategoryNetflixRails extends ConsumerWidget {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _railTitle(context, '適合你'),
+                        _railTitle(context, 'For you'),
                         _rail(context, forYou),
                         const SizedBox(height: 18),
                       ],
@@ -72,7 +72,7 @@ class CategoryNetflixRails extends ConsumerWidget {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _railTitle(context, '新上架'),
+                    _railTitle(context, 'New'),
                     _rail(context, newList.take(10).toList()),
                     const SizedBox(height: 18),
                   ],
@@ -89,7 +89,7 @@ class CategoryNetflixRails extends ConsumerWidget {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _railTitle(context, '熱門'),
+                    _railTitle(context, 'Popular'),
                     _rail(context, hot.take(10).toList()),
                     const SizedBox(height: 18),
                   ],
@@ -106,7 +106,7 @@ class CategoryNetflixRails extends ConsumerWidget {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _railTitle(context, '精選'),
+                    _railTitle(context, 'Picks'),
                     _rail(context, wk.take(10).toList()),
                   ],
                 ),
@@ -192,7 +192,7 @@ class CategoryNetflixRails extends ConsumerWidget {
                         const Spacer(),
                         Align(
                           alignment: Alignment.bottomRight,
-                          child: Text('查看 ›',
+                          child: Text('View ›',
                               style: TextStyle(
                                   color: tokens.primary,
                                   fontWeight: FontWeight.w800)),

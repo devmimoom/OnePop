@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -69,39 +67,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   final _historyKey = GlobalKey<SearchHistorySectionState>();
 
   List<String> _recentCache = const [];
-
-  int _trendSeed = DateTime.now().millisecondsSinceEpoch;
-
-  void _shuffleTrends() {
-    setState(() => _trendSeed = DateTime.now().millisecondsSinceEpoch);
-  }
-
-  List<String> _trendKeywords() {
-    final base = <String>[
-      'AI',
-      '宇宙',
-      '美學',
-      '健身',
-      '理財',
-      '心理學',
-      '自我成長',
-      '習慣養成',
-      '學習方法',
-      '效率',
-      '睡眠',
-      '飲食',
-      '職場',
-      '親子',
-      '情緒',
-      '冥想',
-      '記憶法',
-      '專注力',
-      '時間管理',
-      '英語',
-    ];
-    base.shuffle(_PseudoRandom(_trendSeed));
-    return base.take(10).toList();
-  }
 
   @override
   void initState() {
@@ -353,7 +318,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 required void Function(String v) onToggle,
               }) {
                 if (items.isEmpty) {
-                  return Text('（沒有可用選項）',
+                  return Text('(No options)',
                       style: TextStyle(color: tokens.textSecondary));
                 }
                 return Wrap(
@@ -386,7 +351,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   children: [
                     Row(
                       children: [
-                        Text('篩選',
+                        Text('Filters',
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w900,
@@ -395,7 +360,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         TextButton(
                           onPressed: () => setState(
                               () => draft = const _SearchFilterState()),
-                          child: const Text('清除'),
+                          child: const Text('Clear'),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
@@ -404,7 +369,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                 draft;
                             Navigator.of(context).pop();
                           },
-                          child: const Text('套用'),
+                          child: const Text('Apply'),
                         ),
                       ],
                     ),
@@ -415,9 +380,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       onChanged: (v) => setState(() {
                         draft = draft.copyWith(onlyPurchased: v);
                       }),
-                      title: Text('只看已購買',
+                      title: Text('Purchased only',
                           style: TextStyle(color: tokens.textPrimary)),
-                      subtitle: Text('未登入時不影響結果',
+                      subtitle: Text('Sign in to filter by purchase',
                           style: TextStyle(color: tokens.textSecondary)),
                     ),
                     SwitchListTile.adaptive(
@@ -426,13 +391,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       onChanged: (v) => setState(() {
                         draft = draft.copyWith(onlyPushing: v);
                       }),
-                      title: Text('只看推播中',
+                      title: Text('Notifications on only',
                           style: TextStyle(color: tokens.textPrimary)),
-                      subtitle: Text('需已購買且已開推播',
+                      subtitle: Text('Purchased and notifications enabled',
                           style: TextStyle(color: tokens.textSecondary)),
                     ),
                     const SizedBox(height: 12),
-                    Text('類別（topicId）',
+                    Text('Category (topicId)',
                         style: TextStyle(
                             fontWeight: FontWeight.w900,
                             color: tokens.textPrimary)),
@@ -447,7 +412,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       },
                     ),
                     const SizedBox(height: 14),
-                    Text('等級（level）',
+                    Text('Level',
                         style: TextStyle(
                             fontWeight: FontWeight.w900,
                             color: tokens.textPrimary)),
@@ -509,7 +474,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   autofocus: true,
                   style: TextStyle(color: tokens.textPrimary),
                   decoration: InputDecoration(
-                    hintText: '搜尋產品 / 主題…',
+                    hintText: 'Search products or topics…',
                     hintStyle: TextStyle(color: tokens.textSecondary),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -546,10 +511,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               data: (productsRaw) {
                 // query empty → show history + suggestions
                 if (query.isEmpty) {
-                  final trends = _trendKeywords();
                   final wishAsync = _watchWishlistSafe(ref);
-                  final wish = wishAsync.value ?? const <dynamic>[];
-                  final lib = libAsync.value ?? const <dynamic>[];
+                  final wish = wishAsync.valueOrNull ?? const <dynamic>[];
+                  final lib = libAsync.valueOrNull ?? const <dynamic>[];
 
                   Map<String, dynamic> productsMapDyn = {};
                   try {
@@ -582,11 +546,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         onRefresh: _loadRecentCache,
                         onTap: (q) => _submitSearch(q),
                       ),
-                      SearchTrendingSection(
-                        keywords: trends,
-                        onRefresh: _shuffleTrends,
-                        onTap: (q) => _submitSearch(q),
-                      ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
                         child: SearchSuggestionsSection(
@@ -600,7 +559,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
                 final products = productsRaw.cast<dynamic>();
 
-                final lib = libAsync.value ?? const <dynamic>[];
+                final lib = libAsync.valueOrNull ?? const <dynamic>[];
                 final purchasedSetOld = _purchasedSetFromLib(lib);
                 final pushingSetOld = _pushingSetFromLib(lib);
 
@@ -680,28 +639,28 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       children: [
                         FilterChip(
                           selected: ownedFilter == SearchOwnedFilter.purchased,
-                          label: const Text('已購買'),
+                          label: const Text('Purchased'),
                           onSelected: (v) => ref.read(searchOwnedFilterProvider.notifier).state =
                               v ? SearchOwnedFilter.purchased : SearchOwnedFilter.all,
                         ),
                         const SizedBox(width: 8),
                         FilterChip(
                           selected: ownedFilter == SearchOwnedFilter.notPurchased,
-                          label: const Text('未購買'),
+                          label: const Text('Not purchased'),
                           onSelected: (v) => ref.read(searchOwnedFilterProvider.notifier).state =
                               v ? SearchOwnedFilter.notPurchased : SearchOwnedFilter.all,
                         ),
                         const SizedBox(width: 8),
                         FilterChip(
                           selected: pushFilter == SearchPushFilter.pushingOnly,
-                          label: const Text('推播中'),
+                          label: const Text('Notifications on'),
                           onSelected: (v) => ref.read(searchPushFilterProvider.notifier).state =
                               v ? SearchPushFilter.pushingOnly : SearchPushFilter.all,
                         ),
                         const SizedBox(width: 8),
                         FilterChip(
                           selected: wishFilter == SearchWishFilter.wishedOnly,
-                          label: const Text('願望清單'),
+                          label: const Text('Wishlist'),
                           onSelected: (v) => ref.read(searchWishFilterProvider.notifier).state =
                               v ? SearchWishFilter.wishedOnly : SearchWishFilter.all,
                         ),
@@ -728,11 +687,16 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           horizontal: 12, vertical: 10),
                       child: Row(
                         children: [
-                          OutlinedButton.icon(
-                            onPressed: () => _openFilterSheet(
-                                context: context, products: products),
-                            icon: const Icon(Icons.tune),
-                            label: Text(hasActive ? '篩選（已套用）' : '篩選'),
+                          Flexible(
+                            child: OutlinedButton.icon(
+                              onPressed: () => _openFilterSheet(
+                                  context: context, products: products),
+                              icon: const Icon(Icons.tune),
+                              label: Text(
+                                hasActive ? 'Filters (applied)' : 'Filters',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
@@ -748,15 +712,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                   items: const [
                                     DropdownMenuItem(
                                       value: SearchSort.relevant,
-                                      child: Text('排序：相關'),
+                                      child: Text('Sort: Relevance'),
                                     ),
                                     DropdownMenuItem(
                                       value: SearchSort.title,
-                                      child: Text('排序：標題'),
+                                      child: Text('Sort: Title'),
                                     ),
                                     DropdownMenuItem(
                                       value: SearchSort.level,
-                                      child: Text('排序：等級'),
+                                      child: Text('Sort: Level'),
                                     ),
                                   ],
                                   onChanged: (v) {
@@ -781,7 +745,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       filterBar(),
                       Expanded(
                         child: Center(
-                          child: Text('找不到「$query」的結果',
+                          child: Text('No results for "$query"',
                               style: TextStyle(
                                   fontSize: 16, color: tokens.textSecondary)),
                         ),
@@ -796,7 +760,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       filterBar(),
                       Expanded(
                         child: Center(
-                          child: Text('已套用篩選，但沒有符合的結果',
+                          child: Text('Filters applied, but no matching results',
                               style: TextStyle(
                                   fontSize: 16, color: tokens.textSecondary)),
                         ),
@@ -844,14 +808,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                     ),
                                     if (isPurchased)
                                       _pill(
-                                          '已購買',
+                                          'Purchased',
                                           tokens.primary
                                               .withValues(alpha: 0.16),
                                           tokens.primary),
                                     if (isPushing) ...[
                                       const SizedBox(width: 6),
                                       _pill(
-                                          '推播中',
+                                          'Notifications on',
                                           tokens.primary
                                               .withValues(alpha: 0.12),
                                           tokens.primary),
@@ -882,7 +846,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('搜尋錯誤:',
+                        Text('Search error:',
                             style: TextStyle(
                                 color: tokens.textPrimary,
                                 fontWeight: FontWeight.bold)),
@@ -959,7 +923,7 @@ class SearchForYouSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text('你可能想找',
+                Text('You might like',
                     style: TextStyle(
                       color: tokens.textPrimary,
                       fontWeight: FontWeight.w900,
@@ -969,7 +933,7 @@ class SearchForYouSection extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onRefresh,
                   icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('更新'),
+                  label: const Text('Refresh'),
                 ),
               ],
             ),
@@ -995,84 +959,6 @@ class SearchForYouSection extends StatelessWidget {
       ),
     );
   }
-}
-
-class SearchTrendingSection extends StatelessWidget {
-  final List<String> keywords;
-  final VoidCallback onRefresh;
-  final void Function(String q) onTap;
-
-  const SearchTrendingSection({
-    super.key,
-    required this.keywords,
-    required this.onRefresh,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.tokens;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-      child: AppCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text('本週趨勢',
-                    style: TextStyle(
-                      color: tokens.textPrimary,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 16,
-                    )),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: onRefresh,
-                  icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('換一批'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: keywords
-                  .map((k) => ActionChip(
-                        label: Text(k),
-                        onPressed: () => onTap(k),
-                        backgroundColor: tokens.chipBg,
-                        labelStyle: TextStyle(
-                          color: tokens.textPrimary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        side: BorderSide(color: tokens.cardBorder),
-                      ))
-                  .toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PseudoRandom implements Random {
-  int _seed;
-  _PseudoRandom(this._seed);
-
-  @override
-  int nextInt(int max) {
-    _seed = (_seed * 1103515245 + 12345) & 0x7fffffff;
-    return _seed % max;
-  }
-
-  @override
-  double nextDouble() => nextInt(1 << 20) / (1 << 20);
-
-  @override
-  bool nextBool() => nextInt(2) == 0;
 }
 
 class _LevelChip extends StatelessWidget {
@@ -1086,7 +972,7 @@ class _LevelChip extends StatelessWidget {
     String label;
     switch (current) {
       case SearchLevelFilter.all:
-        label = '等級';
+        label = 'Level';
         break;
       case SearchLevelFilter.l1:
         label = 'L1';
@@ -1111,7 +997,7 @@ class _LevelChip extends StatelessWidget {
     return PopupMenuButton<SearchLevelFilter>(
       onSelected: onChange,
       itemBuilder: (_) => const [
-        PopupMenuItem(value: SearchLevelFilter.all, child: Text('全部')),
+        PopupMenuItem(value: SearchLevelFilter.all, child: Text('All')),
         PopupMenuItem(value: SearchLevelFilter.l1, child: Text('L1')),
         PopupMenuItem(value: SearchLevelFilter.l2, child: Text('L2')),
         PopupMenuItem(value: SearchLevelFilter.l3, child: Text('L3')),

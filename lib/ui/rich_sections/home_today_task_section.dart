@@ -159,7 +159,7 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
     } catch (_) {
       return AppCard(
         child: Text(
-          '登入後可顯示今日任務：下一則推播倒數、今日完成狀態',
+          'Sign in to see today\'s task: next notification countdown and completion status.',
           style: TextStyle(color: tokens.textSecondary),
         ),
       );
@@ -172,7 +172,7 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('今日任務',
+          Text('Today\'s task',
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
@@ -195,7 +195,7 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
                       : (actualPushed / actualScheduled).clamp(0.0, 1.0);
 
                   final nextText =
-                      nextEntry == null ? '今天沒有更多推播' : _nextLine(nextEntry);
+                      nextEntry == null ? 'No more pushes today' : _nextLine(nextEntry);
 
                   final countdownText =
                       nextEntry == null ? '' : _countdown(nextEntry.when);
@@ -208,7 +208,7 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
                         children: [
                           Expanded(
                             child: Text(
-                              '今日推播：$actualPushed / $actualScheduled',
+                              'Today: $actualPushed / $actualScheduled',
                               style: TextStyle(
                                   color: tokens.textSecondary,
                                   fontWeight: FontWeight.w700),
@@ -226,7 +226,7 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
                                         Colors.white.withValues(alpha: 0.12)),
                               ),
                               child: Text(
-                                '今日已完成 ✅',
+                                'Today done ✅',
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 12,
@@ -311,7 +311,7 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
                                     ),
                                   ));
                                 },
-                          child: const Text('立即學 1 則'),
+                          child: const Text('Learn 1 now'),
                         ),
                       ),
                     ],
@@ -338,7 +338,7 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
   static String _nextLine(ScheduledPushEntry e) {
     final pid = e.payload['productId']?.toString() ?? '';
     final title = e.title.isNotEmpty ? e.title : pid;
-    return '下一則：${_fmtTime(e.when)} · $title';
+    return 'Next: ${_fmtTime(e.when)} · $title';
   }
 
   static String _countdown(DateTime when) {
@@ -347,9 +347,9 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
     final h = diff.inHours;
     final m = diff.inMinutes.remainder(60);
     final s = diff.inSeconds.remainder(60);
-    if (h > 0) return '倒數：${h}h ${m}m';
-    if (m > 0) return '倒數：${m}m';
-    return '倒數：${s}s';
+    if (h > 0) return '${h}h ${m}m';
+    if (m > 0) return '${m}m';
+    return '${s}s';
   }
 
 }

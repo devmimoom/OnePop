@@ -284,6 +284,46 @@ class V2Repository {
     }
   }
 
+  /// Parse list from Firestore: List<dynamic> or semicolon-separated string
+  List<String> _parseStringList(dynamic value) {
+    if (value == null) return [];
+    if (value is List) {
+      return value
+          .map((e) => e?.toString().trim())
+          .where((s) => s != null && s.isNotEmpty)
+          .cast<String>()
+          .toList();
+    }
+    if (value is String) {
+      return value.split(';').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+    }
+    return [];
+  }
+
+  /// Fetch search suggestions from ui/search_suggestions_v1
+  /// Returns fallback if doc missing or empty
+  Future<({List<String> suggested, List<String> trending})> fetchSearchSuggestions() async {
+    const fallbackSuggested = ['flutter UI design', 'flashcards app', 'notification habits'];
+    const fallbackTrending = ['AI', 'Space', 'Aesthetics', 'Health', 'Finance', 'Mindset'];
+
+    try {
+      final doc = await _firestore.collection(Col.ui).doc('search_suggestions_v1').get();
+      if (!doc.exists || doc.data() == null) {
+        return (suggested: fallbackSuggested, trending: fallbackTrending);
+      }
+      final data = doc.data()!;
+      final suggested = _parseStringList(data['suggested']);
+      final trending = _parseStringList(data['trending']);
+      return (
+        suggested: suggested.isNotEmpty ? suggested : fallbackSuggested,
+        trending: trending.isNotEmpty ? trending : fallbackTrending,
+      );
+    } catch (e) {
+      debugPrint('Error fetching search suggestions: $e');
+      return (suggested: fallbackSuggested, trending: fallbackTrending);
+    }
+  }
+
   // 根據區段獲取主題
   Future<List<Topic>> fetchTopicsForSegment(Segment segment) async {
     try {

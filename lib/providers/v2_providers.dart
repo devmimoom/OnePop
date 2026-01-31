@@ -69,6 +69,11 @@ final previewItemsProvider =
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
+final searchSuggestionsProvider =
+    FutureProvider<({List<String> suggested, List<String> trending})>((ref) async {
+  return ref.watch(v2RepoProvider).fetchSearchSuggestions();
+});
+
 final searchResultsProvider = FutureProvider<List<Product>>((ref) async {
   final q = ref.watch(searchQueryProvider).trim();
   if (q.isEmpty) return [];

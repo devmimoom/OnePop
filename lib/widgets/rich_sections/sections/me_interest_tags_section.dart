@@ -69,7 +69,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
         children: [
           Row(
             children: [
-              Text('興趣標籤',
+              Text('Interest tags',
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
@@ -83,7 +83,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                         if (next != null) await _save(next);
                       },
                 icon: const Icon(Icons.edit, size: 18),
-                label: const Text('編輯'),
+                label: const Text('Edit'),
               ),
             ],
           ),
@@ -91,7 +91,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
           if (_loading)
             const Center(child: CircularProgressIndicator())
           else if (_tags.isEmpty)
-            Text('先選幾個標籤，我會用來做推薦與排序',
+            Text('Pick a few tags for better recommendations.',
                 style: TextStyle(color: tokens.textSecondary))
           else
             Wrap(
@@ -100,7 +100,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
               children: _tags.map((t) => _chip(context, t)).toList(),
             ),
           const SizedBox(height: 14),
-          Text('建議你可以選',
+          Text('Suggested for you',
               style: TextStyle(
                   color: tokens.textSecondary, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
@@ -116,7 +116,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                           .toList();
 
                       if (suggested.isEmpty) {
-                        return Text('你目前收藏較少，先從下面熱門標籤開始也可以',
+                        return Text('Few items saved. Try popular tags below.',
                             style: TextStyle(color: tokens.textSecondary));
                       }
 
@@ -226,25 +226,25 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
     // 內建 + 自訂
     final builtin = <String>[
       'AI',
-      '宇宙',
-      '美學',
-      '理財',
-      '健康',
-      '心理',
-      '親子',
-      '生產力',
-      '程式',
-      '職涯',
-      '閱讀',
-      '溝通',
-      '英文',
-      '寫作',
-      '習慣',
-      '冥想',
-      '營養',
-      '運動',
-      '設計',
-      '創業',
+      'Space',
+      'Aesthetics',
+      'Finance',
+      'Health',
+      'Psychology',
+      'Parenting',
+      'Productivity',
+      'Coding',
+      'Career',
+      'Reading',
+      'Communication',
+      'English',
+      'Writing',
+      'Habits',
+      'Meditation',
+      'Nutrition',
+      'Fitness',
+      'Design',
+      'Entrepreneurship',
     ];
 
     final all = {...builtin, ..._custom}.toList()..sort();
@@ -290,7 +290,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('編輯興趣標籤',
+                    Text('Edit interest tags',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.w900,
@@ -301,7 +301,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                         runSpacing: 10,
                         children: all.map(chip).toList()),
                     const SizedBox(height: 14),
-                    Text('新增自訂標籤',
+                    Text('Add custom tag',
                         style: TextStyle(
                             color: tokens.textSecondary,
                             fontWeight: FontWeight.w700)),
@@ -313,7 +313,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                             controller: controller,
                             style: TextStyle(color: tokens.textPrimary),
                             decoration: InputDecoration(
-                              hintText: '例如：睡前學習、通勤碎片…',
+                              hintText: 'e.g. bedtime, commute…',
                               hintStyle: TextStyle(color: tokens.textSecondary),
                               filled: true,
                               // ✅ 修復深色主題輸入框透明背景重疊問題：使用不透明背景
@@ -344,7 +344,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                                     {...builtin, ...fresh}.toList()..sort());
                             });
                           },
-                          child: const Text('加入'),
+                          child: const Text('Add'),
                         )
                       ],
                     ),
@@ -354,7 +354,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () => setModal(() => selected.clear()),
-                            child: const Text('清除'),
+                            child: const Text('Clear'),
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -362,7 +362,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                           child: ElevatedButton(
                             onPressed: () => Navigator.of(context)
                                 .pop(selected.toList()..sort()),
-                            child: const Text('儲存'),
+                            child: const Text('Save'),
                           ),
                         ),
                       ],

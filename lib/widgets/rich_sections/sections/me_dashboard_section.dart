@@ -28,13 +28,13 @@ class MeDashboardSection extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('學習儀表板',
+            Text('Learning dashboard',
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
                     color: tokens.textPrimary)),
             const SizedBox(height: 8),
-            Text('登入後可看到：已購買/最愛/推播中/最近開啟與偏好類別',
+            Text('Sign in to see: purchased, favorites, notifications, recent opens, and preferences',
                 style: TextStyle(color: tokens.textSecondary)),
           ],
         ),
@@ -51,7 +51,7 @@ class MeDashboardSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('學習儀表板',
+          Text('Learning dashboard',
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
@@ -170,14 +170,14 @@ class MeDashboardSection extends ConsumerWidget {
                           _kpiRow(
                             context,
                             items: [
-                              _Kpi('已購買', purchased.length),
-                              _Kpi('願望清單', wishlist.length),
-                              _Kpi('最愛', favIds.length),
-                              _Kpi('推播中', pushingCount),
+                              _Kpi('Owned', purchased.length),
+                              _Kpi('Wishlist', wishlist.length),
+                              _Kpi('Favorites', favIds.length),
+                              _Kpi('Push', pushingCount),
                             ],
                           ),
                           const SizedBox(height: 14),
-                          Text('小目標',
+                          Text('Goals',
                               style: TextStyle(
                                   color: tokens.textSecondary,
                                   fontWeight: FontWeight.w700)),
@@ -192,12 +192,12 @@ class MeDashboardSection extends ConsumerWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                              '收藏/解鎖 $totalOwnedOrSaved / $goal（可之後改成 streak 或本週學習量）',
+                              'Saved/unlocked $totalOwnedOrSaved / $goal',
                               style: TextStyle(
                                   color: tokens.textSecondary, fontSize: 12)),
                           const SizedBox(height: 16),
                           if (recentTop.isNotEmpty) ...[
-                            Text('最近開啟',
+                            Text('Recently opened',
                                 style: TextStyle(
                                     color: tokens.textSecondary,
                                     fontWeight: FontWeight.w700)),
@@ -220,7 +220,7 @@ class MeDashboardSection extends ConsumerWidget {
                             const SizedBox(height: 14),
                           ],
                           if (top3.isNotEmpty) ...[
-                            Text('你最常看的類別',
+                            Text('Your top categories',
                                 style: TextStyle(
                                     color: tokens.textSecondary,
                                     fontWeight: FontWeight.w700)),
@@ -287,9 +287,9 @@ class MeDashboardSection extends ConsumerWidget {
     final pushing = globalPushEnabled && itemPushEnabled;
 
     final parts = <String>[];
-    if (opened != null) parts.add('上次：${whenText(opened)}');
-    if (purchased != null) parts.add('購買：${whenText(purchased)}');
-    parts.add(pushing ? '推播中' : '推播關閉');
+    if (opened != null) parts.add('Last: ${whenText(opened)}');
+    if (purchased != null) parts.add('Purchased: ${whenText(purchased)}');
+    parts.add(pushing ? 'Pushing' : 'Push off');
     return parts.join(' · ');
   }
 

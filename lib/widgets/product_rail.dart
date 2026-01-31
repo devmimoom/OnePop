@@ -83,7 +83,7 @@ class ProductRail extends StatelessWidget {
                       Icon(Icons.arrow_forward, 
                           color: tokens.primary, size: 32),
                       const SizedBox(height: 8),
-                      Text('查看全部',
+                      Text('View all',
                           style: TextStyle(
                               color: tokens.primary,
                               fontWeight: FontWeight.w700)),
@@ -209,8 +209,8 @@ class ProductRail extends StatelessWidget {
                                 SizedBox(height: size == ProductRailSize.small ? 1 : 2),
                                 Text(
                                   dt == null
-                                      ? '即將上架'
-                                      : '上架：${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}',
+                                      ? 'Coming soon'
+                                      : 'Release: ${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: tokens.textSecondary.withValues(alpha: 0.7),

@@ -33,7 +33,14 @@ class DetailPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: tokens.bg,
       appBar: AppBar(
-        title: const Text('Detail'),
+        title: itemAsync.when(
+          data: (item) => Text(
+            item.anchor.isNotEmpty ? item.anchor : 'Detail',
+            overflow: TextOverflow.ellipsis,
+          ),
+          loading: () => const Text('Detail'),
+          error: (_, __) => const Text('Detail'),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -50,7 +57,7 @@ class DetailPage extends ConsumerWidget {
               try {
                 uid = ref.read(uidProvider);
               } catch (_) {
-                return const Center(child: Text('請先登入以使用此功能'));
+                return const Center(child: Text('Sign in to use this feature.'));
               }
 
               final repo = ref.read(libraryRepoProvider);
@@ -90,7 +97,7 @@ class DetailPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('今日一句',
+                        const Text('Quote of the day',
                             style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w900)),
                         const SizedBox(height: 8),
@@ -108,18 +115,18 @@ class DetailPage extends ConsumerWidget {
                                     ClipboardData(text: item.content));
                                 // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('已複製')));
+                                    const SnackBar(content: Text('Copied.')));
                               },
                               icon: const Icon(Icons.copy, size: 18),
-                              label: const Text('複製'),
+                              label: const Text('Copy'),
                             ),
                             TextButton.icon(
                               onPressed: () {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('可在此串接分享功能')));
+                                    const SnackBar(content: Text('Share (coming soon)')));
                               },
                               icon: const Icon(Icons.share, size: 18),
-                              label: const Text('分享'),
+                              label: const Text('Share'),
                             ),
                             const Spacer(),
                             IconButton(
@@ -138,7 +145,7 @@ class DetailPage extends ConsumerWidget {
                                   // 收藏：獲取產品名稱並保存到本地
                                   final productsMap = await ref.read(productsMapProvider.future);
                                   final product = productsMap[item.productId];
-                                  final productName = product?.title ?? '未知產品';
+                                  final productName = product?.title ?? 'Unknown product';
                                   
                                   await FavoriteSentencesStore.add(
                                     uid,
@@ -177,7 +184,7 @@ class DetailPage extends ConsumerWidget {
                         if (product == null) {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('無法獲取產品資訊')),
+                              const SnackBar(content: Text('Could not load product info.')),
                             );
                           }
                           return;
@@ -197,19 +204,19 @@ class DetailPage extends ConsumerWidget {
                           ref.invalidate(libraryProductsProvider);
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('已標記為完成')),
+                              const SnackBar(content: Text('Marked as complete.')),
                             );
                           }
                         } catch (e) {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('操作失敗: $e')),
+                              SnackBar(content: Text('Action failed: $e')),
                             );
                           }
                         }
                       },
                       icon: const Icon(Icons.check),
-                      label: const Text('完成'),
+                      label: const Text('Done'),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -219,12 +226,12 @@ class DetailPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('深度解析',
+                        const Text('Deep dive',
                             style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w900)),
                         const SizedBox(height: 10),
                         if (item.deepAnalysis.isEmpty)
-                          Text('目前沒有內容',
+                          Text('No content',
                               style: TextStyle(color: tokens.textSecondary))
                         else
                           Text(item.deepAnalysis,
@@ -241,12 +248,12 @@ class DetailPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('延伸閱讀',
+                        const Text('Further reading',
                             style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w900)),
                         const SizedBox(height: 10),
                         if (urls.isEmpty)
-                          Text('目前沒有連結',
+                          Text('No links',
                               style: TextStyle(color: tokens.textSecondary))
                         else
                           ...urls.map((u) => Padding(
@@ -261,7 +268,7 @@ class DetailPage extends ConsumerWidget {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
-                                              content: Text('無法開啟此連結')),
+                                              content: Text('Could not open link')),
                                         );
                                       }
                                     }

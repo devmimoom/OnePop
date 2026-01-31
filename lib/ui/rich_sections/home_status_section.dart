@@ -40,24 +40,24 @@ class HomeStatusSection extends ConsumerWidget {
     }
 
     final streakText = streakAsync.when(
-      data: (s) => '$s 天',
+      data: (s) => '$s days',
       loading: () => '…',
       error: (_, __) => '—',
     );
 
     final weeklyText = weeklyAsync.when(
-      data: (w) => '$w/7 天',
+      data: (w) => '$w/7 days',
       loading: () => '…',
       error: (_, __) => '—',
     );
 
     return Row(
       children: [
-        pill('連續天數', streakText, Icons.local_fire_department),
+        pill('Streak', streakText, Icons.local_fire_department),
         const SizedBox(width: 10),
-        pill('本週學習', weeklyText, Icons.insights),
+        pill('This week', weeklyText, Icons.insights),
         const SizedBox(width: 10),
-        pill('常看類別', 'AI', Icons.auto_awesome), // 先保留示意
+        pill('Top category', 'AI', Icons.auto_awesome),
       ],
     );
   }

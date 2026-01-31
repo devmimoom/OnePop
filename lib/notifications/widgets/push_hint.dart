@@ -11,13 +11,13 @@ String pushHintFor(UserLibraryProduct lp) {
   String slotLabel(String s) {
     switch (s) {
       case 'morning':
-        return '早';
+        return 'AM';
       case 'noon':
-        return '午';
+        return 'Noon';
       case 'evening':
-        return '晚';
+        return 'Evening';
       case 'night':
-        return '夜';
+        return 'Night';
       default:
         return s;
     }
@@ -31,14 +31,14 @@ String pushHintFor(UserLibraryProduct lp) {
       final list = List<TimeOfDay>.from(cfg.customTimes);
       list.sort((a, b) => (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute));
       final shown = list.take(5).map(tod).join('、');
-      return '自訂 $shown';
+      return 'Custom $shown';
     }
 
     // preset
     final slots = cfg.presetSlots.isEmpty ? ['night'] : cfg.presetSlots;
     final shown = slots.take(4).map(slotLabel).join('·');
-    return '時段 $shown';
+    return 'Slot $shown';
   }
 
-  return '頻率 $freq/天 · $mode · ${timesText()}';
+  return '$freq/day · $mode · ${timesText()}';
 }

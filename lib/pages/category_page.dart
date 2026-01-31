@@ -21,7 +21,7 @@ class CategoryPage extends ConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('分類',
+          Text('Categories',
               style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
@@ -37,7 +37,7 @@ class CategoryPage extends ConsumerWidget {
                 ? const AppCard(
                     child: Padding(
                       padding: EdgeInsets.all(16),
-                      child: Text('區段: 無資料（請檢查 Firestore ui/segments_v1）',
+                      child: Text('No segments. Check Firestore ui/segments_v1.',
                           style: TextStyle(color: Colors.red)),
                     ),
                   )
@@ -97,7 +97,7 @@ class CategoryPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('區段錯誤:',
+                    const Text('Segments error:',
                         style: TextStyle(
                             color: Colors.red, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
@@ -118,7 +118,7 @@ class CategoryPage extends ConsumerWidget {
                 ? const AppCard(
                     child: Padding(
                       padding: EdgeInsets.all(16),
-                      child: Text('主題: 無資料（請檢查 Firestore topics）',
+                      child: Text('No topics. Check Firestore topics.',
                           style: TextStyle(color: Colors.orange)),
                     ),
                   )
@@ -146,7 +146,7 @@ class CategoryPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('主題錯誤:',
+                    const Text('Topics error:',
                         style: TextStyle(
                             color: Colors.red, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),

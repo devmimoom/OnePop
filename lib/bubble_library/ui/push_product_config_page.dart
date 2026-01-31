@@ -24,8 +24,8 @@ class PushProductConfigPage extends ConsumerWidget {
       uid = ref.read(uidProvider);
     } catch (_) {
       return Scaffold(
-        appBar: AppBar(title: const Text('商品推播設定')),
-        body: const Center(child: Text('請先登入以使用此功能')),
+        appBar: AppBar(title: const Text('Product notifications')),
+        body: const Center(child: Text('Sign in to use this feature.')),
       );
     }
 
@@ -34,7 +34,7 @@ class PushProductConfigPage extends ConsumerWidget {
     final globalAsync = ref.watch(globalPushSettingsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('商品推播設定')),
+      appBar: AppBar(title: const Text('Product notifications')),
       body: productsAsync.when(
         data: (products) => globalAsync.when(
           data: (global) => libAsync.when(
@@ -78,14 +78,14 @@ class PushProductConfigPage extends ConsumerWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('已全部完成！',
+                                    Text('All done!',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w900,
                                         color: context.tokens.primary,
                                       ),
                                     ),
                                     Text(
-                                      '完成時間：${lp.completedAt!.month}/${lp.completedAt!.day} ${lp.completedAt!.hour}:${lp.completedAt!.minute.toString().padLeft(2, '0')}',
+                                      'Completed: ${lp.completedAt!.month}/${lp.completedAt!.day} ${lp.completedAt!.hour}:${lp.completedAt!.minute.toString().padLeft(2, '0')}',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: context.tokens.textSecondary,
@@ -105,7 +105,7 @@ class PushProductConfigPage extends ConsumerWidget {
                           child: OutlinedButton.icon(
                             onPressed: () => _showRestartDialog(context, ref, uid!, productId, title),
                             icon: const Icon(Icons.restart_alt),
-                            label: const Text('重新開始'),
+                            label: const Text('Start over'),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
@@ -125,7 +125,7 @@ class PushProductConfigPage extends ConsumerWidget {
                           await PushOrchestrator.rescheduleNextDays(
                               ref: ref, days: 3);
                         },
-                        title: const Text('推播中'),
+                        title: const Text('Notifications on'),
                       ),
                     ],
                   ),
@@ -135,7 +135,7 @@ class PushProductConfigPage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('頻率（每產品每日最多 5 次）',
+                      const Text('Frequency (max 5 per day per product)',
                           style: TextStyle(fontWeight: FontWeight.w900)),
                       const SizedBox(height: 10),
                       DropdownButton<int>(
@@ -146,7 +146,7 @@ class PushProductConfigPage extends ConsumerWidget {
                             : null,
                         items: const [1, 2, 3, 4, 5]
                             .map((e) => DropdownMenuItem(
-                                value: e, child: Text('$e 次/天')))
+                                value: e, child: Text('$e per day')))
                             .toList(),
                         onChanged: (v) async {
                           if (v == null) return;
@@ -187,7 +187,7 @@ class PushProductConfigPage extends ConsumerWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '提醒：總頻率超過全域上限',
+                                      'Total frequency exceeds global cap.',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         color: Colors.amber.shade800,
@@ -196,7 +196,7 @@ class PushProductConfigPage extends ConsumerWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      '目前所有商品總頻率為 $totalFreq 次/天，超過全域上限 ${global.dailyTotalCap} 次/天。部分推播將不會發送。',
+                                      'All products total $totalFreq per day, above global cap ${global.dailyTotalCap}. Some notifications may not be sent.',
                                       style: TextStyle(
                                         color: Colors.amber.shade800,
                                         fontSize: 12,
@@ -210,7 +210,7 @@ class PushProductConfigPage extends ConsumerWidget {
                         ),
                       ],
                       const Divider(),
-                      const Text('時間模式',
+                      const Text('Time mode',
                           style: TextStyle(fontWeight: FontWeight.w900)),
                       RadioListTile<PushTimeMode>(
                         value: PushTimeMode.preset,
@@ -226,7 +226,7 @@ class PushProductConfigPage extends ConsumerWidget {
                           await PushOrchestrator.rescheduleNextDays(
                               ref: ref, days: 3);
                         },
-                        title: const Text('情境預設（推薦）'),
+                        title: const Text('Preset (recommended)'),
                       ),
                       if (cfg.timeMode == PushTimeMode.preset)
                         _presetSlots(ref, uid!, productId, cfg),
@@ -253,13 +253,13 @@ class PushProductConfigPage extends ConsumerWidget {
                           await PushOrchestrator.rescheduleNextDays(
                               ref: ref, days: 3);
                         },
-                        title: const Text('自訂時間'),
+                        title: const Text('Custom times'),
                       ),
                       if (cfg.timeMode == PushTimeMode.custom)
                         _customTimes(context, ref, uid!, productId, cfg),
                       const Divider(),
                       // 內容策略已隱藏，待之後開發
-                      const Text('最短間隔（分鐘）',
+                      const Text('Minimum interval (minutes)',
                           style: TextStyle(fontWeight: FontWeight.w900)),
                       DropdownButton<int>(
                         value: cfg.minIntervalMinutes,
@@ -315,7 +315,7 @@ class PushProductConfigPage extends ConsumerWidget {
             final selected = cfg.presetSlots.contains(s);
             return FilterChip(
               selected: selected,
-              label: Text('$s 點'),
+              label: Text('$s:00'),
               onSelected: (v) async {
                 final newSlots = List<String>.from(cfg.presetSlots);
                 if (v) {
@@ -380,7 +380,7 @@ class PushProductConfigPage extends ConsumerWidget {
               await PushOrchestrator.rescheduleNextDays(ref: ref, days: 3);
             },
             icon: const Icon(Icons.add),
-            label: const Text('新增時間（最多 5）'),
+            label: const Text('Add time (max 5)'),
           ),
         ),
         ...cfg.customTimes.map((t) => ListTile(
@@ -428,16 +428,16 @@ class PushProductConfigPage extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('重新開始學習？'),
-        content: Text('這將清除「$productTitle」的所有學習記錄，並重新啟用推播。\n\n確定要繼續嗎？'),
+        title: const Text('Start over?'),
+        content: Text('This will clear all learning progress for "$productTitle" and re-enable notifications.\n\nContinue?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('取消'),
+            child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('確定重新開始'),
+            child: const Text('Start over'),
           ),
         ],
       ),
@@ -501,7 +501,7 @@ class PushProductConfigPage extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('已重新開始，推播已重新排程，學習歷史已清除')),
+          const SnackBar(content: Text('Started over. Notifications rescheduled and learning history cleared.')),
         );
       }
     } catch (e) {
@@ -510,7 +510,7 @@ class PushProductConfigPage extends ConsumerWidget {
       }
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('重置失敗: $e')),
+          SnackBar(content: Text('Reset failed: $e')),
         );
       }
     }

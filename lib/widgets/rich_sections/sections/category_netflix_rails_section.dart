@@ -28,7 +28,7 @@ class CategoryNetflixRailsSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('探索推薦',
+        Text('Explore',
             style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
@@ -53,13 +53,13 @@ class CategoryNetflixRailsSection extends ConsumerWidget {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('你最近常看',
+                          Text('Recently viewed',
                               style: TextStyle(
                                   color: tokens.textSecondary,
                                   fontWeight: FontWeight.w800)),
                           const SizedBox(height: 8),
                           if (recentTopics.isEmpty)
-                            Text('先開啟幾個商品，我會把常看的類別放在這裡',
+                            Text('Open a few products and your top categories will show here',
                                 style: TextStyle(color: tokens.textSecondary))
                           else
                             Wrap(
@@ -78,13 +78,13 @@ class CategoryNetflixRailsSection extends ConsumerWidget {
                                   .toList(),
                             ),
                           const SizedBox(height: 14),
-                          Text('你可能想試',
+                          Text('You might like',
                               style: TextStyle(
                                   color: tokens.textSecondary,
                                   fontWeight: FontWeight.w800)),
                           const SizedBox(height: 8),
                           if (maybeTry.isEmpty)
-                            Text('收藏/願望清單再多一點，這裡會變成「擴展興趣圈」',
+                            Text('Add more to wishlist and we\'ll expand your recommendations',
                                 style: TextStyle(color: tokens.textSecondary))
                           else
                             Wrap(
@@ -128,7 +128,7 @@ class CategoryNetflixRailsSection extends ConsumerWidget {
         const SizedBox(height: 18),
 
         // 學習路徑 / 入門包（先做 UI + 真 topics；不需後端）
-        _sectionTitle(context, '入門包'),
+        _sectionTitle(context, 'Starter pack'),
         const SizedBox(height: 10),
         AppCard(
           padding: const EdgeInsets.all(14),
@@ -136,7 +136,7 @@ class CategoryNetflixRailsSection extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                segSelected == null ? '從你目前的分類開始' : '從「${segSelected.title}」開始',
+                segSelected == null ? 'Start from your category' : 'Start from "${segSelected.title}"',
                 style: TextStyle(
                     color: tokens.textPrimary, fontWeight: FontWeight.w900),
               ),
@@ -144,7 +144,7 @@ class CategoryNetflixRailsSection extends ConsumerWidget {
               topicsAsync.when(
                 data: (ts) {
                   if (ts.isEmpty) {
-                    return Text('此分類目前沒有 topics（請檢查 Firestore topics）',
+                    return Text('No topics in this category. Check Firestore topics.',
                         style: TextStyle(color: tokens.textSecondary));
                   }
                   final top = ts.take(3).toList();
@@ -199,7 +199,7 @@ class CategoryNetflixRailsSection extends ConsumerWidget {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Text('入門包讀取錯誤：$e',
+                error: (e, _) => Text('Load error: $e',
                     style: TextStyle(color: tokens.textSecondary)),
               ),
             ],

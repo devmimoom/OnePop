@@ -34,7 +34,7 @@ class HomePage extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(
-                          'Banner: 無資料（請檢查 Firestore featured_lists/home_banners）',
+                          'No banner data. Check Firestore featured_lists/home_banners.',
                           style: TextStyle(color: tokens.textSecondary)),
                     ),
                   )
@@ -62,7 +62,7 @@ class HomePage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Banner 錯誤:',
+                    Text('Banner error:',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.bold)),
@@ -81,19 +81,20 @@ class HomePage extends ConsumerWidget {
           ),
           const SizedBox(height: 18),
 
-          const _Section(title: '熱門爆款'),
+          const _Section(title: 'Top Picks'),
           hot.when(
             data: (ps) => ps.isEmpty
                 ? AppCard(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Text('熱門爆款: 無資料',
+                      child: Text('No data for Top Picks.',
                           style: TextStyle(color: tokens.textSecondary)),
                     ),
                   )
                 : ProductRail(
                     products: ps,
                     size: ProductRailSize.large,
+                    ctaText: 'View',
                   ),
             loading: () => const SizedBox(
                 height: 210, child: Center(child: CircularProgressIndicator())),
@@ -103,7 +104,7 @@ class HomePage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('熱門爆款錯誤:',
+                    Text('Top Picks error:',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.bold)),
@@ -123,21 +124,21 @@ class HomePage extends ConsumerWidget {
           const SizedBox(height: 18),
 
           // ✅ 新上架
-          const _Section(title: '新上架'),
+          const _Section(title: 'New Arrivals'),
           newArrivals.when(
             data: (ps) => ps.isEmpty
                 ? AppCard(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(
-                          '新上架: 無資料',
+                          'No new arrivals.',
                           style: TextStyle(color: tokens.textSecondary)),
                     ),
                   )
                 : ProductRail(
                     products: ps,
                     size: ProductRailSize.large,
-                    ctaText: '立即查看',
+                    ctaText: 'View',
                   ),
             loading: () => const SizedBox(
                 height: 232, child: Center(child: CircularProgressIndicator())),
@@ -147,7 +148,7 @@ class HomePage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('新上架錯誤:',
+                    Text('New Arrivals error:',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.bold)),
@@ -167,14 +168,14 @@ class HomePage extends ConsumerWidget {
           const SizedBox(height: 18),
 
           // ✅ 即將上架
-          const _Section(title: '即將上架'),
+          const _Section(title: 'Coming Soon'),
           comingSoon.when(
             data: (ps) => ps.isEmpty
                 ? AppCard(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(
-                          '即將上架: 無資料',
+                          'No coming soon items.',
                           style: TextStyle(color: tokens.textSecondary)),
                     ),
                   )
@@ -193,7 +194,7 @@ class HomePage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('即將上架錯誤:',
+                    Text('Coming Soon error:',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.bold)),
@@ -216,19 +217,20 @@ class HomePage extends ConsumerWidget {
           const HomeForYouSection(),
           const SizedBox(height: 18),
 
-          const _Section(title: '本週精選'),
+          const _Section(title: 'Featured'),
           weekly.when(
             data: (ps) => ps.isEmpty
                 ? AppCard(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Text('本週精選: 無資料',
+                      child: Text('No featured items.',
                           style: TextStyle(color: tokens.textSecondary)),
                     ),
                   )
                 : ProductRail(
                     products: ps,
                     size: ProductRailSize.large,
+                    ctaText: 'View',
                   ),
             loading: () => const SizedBox(
                 height: 210, child: Center(child: CircularProgressIndicator())),
@@ -238,7 +240,7 @@ class HomePage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('本週精選錯誤:',
+                    Text('Featured error:',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.bold)),

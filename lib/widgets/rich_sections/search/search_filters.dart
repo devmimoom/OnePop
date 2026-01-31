@@ -44,22 +44,22 @@ class SearchFilters {
 
   String summaryText() {
     final parts = <String>[];
-    if (purchasedOnly) parts.add('已購買');
-    if (wishlistOnly) parts.add('未購買收藏');
-    if (pushingOnly) parts.add('推播中');
-    if (trialOnly) parts.add('可試讀');
+    if (purchasedOnly) parts.add('Purchased');
+    if (wishlistOnly) parts.add('Wishlist');
+    if (pushingOnly) parts.add('Pushing');
+    if (trialOnly) parts.add('Trial');
     if (levels.isNotEmpty) parts.add(levels.join(','));
-    return parts.isEmpty ? '篩選' : parts.join(' · ');
+    return parts.isEmpty ? 'Filters' : parts.join(' · ');
   }
 
   String sortText() {
     switch (sort) {
       case SearchSort.relevance:
-        return '最相關';
+        return 'Most relevant';
       case SearchSort.newest:
-        return '最新';
+        return 'Newest';
       case SearchSort.titleAZ:
-        return '名稱 A→Z';
+        return 'Title A-Z';
     }
   }
 }

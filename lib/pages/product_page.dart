@@ -39,7 +39,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
     return Scaffold(
       backgroundColor: tokens.bg,
       appBar: AppBar(
-        title: const Text('產品'),
+        title: const Text('Product'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -47,7 +47,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
             data: (wish) {
               final isWish = wish.any((e) => e.productId == widget.productId);
               return IconButton(
-                tooltip: isWish ? '取消收藏' : '加入收藏',
+                tooltip: isWish ? 'Remove from favorites' : 'Add to favorites',
                 icon: Icon(isWish ? Icons.bookmark : Icons.bookmark_outline),
                 onPressed: () async {
                   await ref.read(localWishlistNotifierProvider).toggleCollect(widget.productId);
@@ -55,7 +55,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(isWish ? '已從收藏移除' : '已加入收藏'),
+                        content: Text(isWish ? 'Removed from favorites.' : 'Added to favorites.'),
                         duration: const Duration(seconds: 1),
                       ),
                     );
@@ -70,7 +70,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
       ),
       body: prod.when(
         data: (p) {
-          if (p == null) return const Center(child: Text('商品不存在或未上架'));
+          if (p == null) return const Center(child: Text('Product not found or not yet available.'));
           final now = DateTime.now();
           final releaseAt = p.releaseAt;
           final isComingSoon = comingSoonSet.contains(widget.productId) ||
@@ -137,7 +137,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                                   const Icon(Icons.lock_clock, size: 18),
                                   const SizedBox(width: 8),
                                   Text(
-                                    '即將上架：目前不可購買',
+                                    'Coming soon. Not available for purchase yet.',
                                     style: TextStyle(
                                       color: tokens.textPrimary,
                                       fontWeight: FontWeight.w800,
@@ -175,7 +175,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                     .toList(),
               ),
               const SizedBox(height: 20),
-              Text('│ 試讀卡片',
+              Text('│ Preview',
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -229,7 +229,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
               ),
               if ((p.contentArchitecture ?? '').isNotEmpty) ...[
                 const SizedBox(height: 20),
-                Text('│ 內容架構',
+                Text('│ Content structure',
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -285,7 +285,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                       
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('已解鎖，可啟用橫幅推播')),
+                          const SnackBar(content: Text('Unlocked. You can enable banner notifications.')),
                         );
                       }
                     }
@@ -310,7 +310,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                         Expanded(
                           child: OutlinedButton.icon(
                             icon: Icon(isWish ? Icons.favorite : Icons.favorite_border),
-                            label: Text(isWish ? '已加入願望清單' : '加入願望清單'),
+                            label: Text(isWish ? 'In wishlist' : 'Add to wishlist'),
                             onPressed: (uid == null)
                                 ? null
                                 : () async {
@@ -318,14 +318,14 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                                       await ref.read(localWishlistNotifierProvider).remove(widget.productId);
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('已從願望清單移除')),
+                                          const SnackBar(content: Text('Removed from wishlist.')),
                                         );
                                       }
                                     } else {
                                       await ref.read(localWishlistNotifierProvider).toggleCollect(widget.productId);
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('已加入願望清單')),
+                                          const SnackBar(content: Text('Added to wishlist.')),
                                         );
                                       }
                                     }
@@ -372,7 +372,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                       icon: Icon(hasRemind
                           ? Icons.notifications_active
                           : Icons.notifications_active_outlined),
-                      label: Text(hasRemind ? '已設定提醒（點一下取消）' : '上架時提醒我'),
+                      label: Text(hasRemind ? 'Reminder set (tap to cancel)' : 'Notify me when available'),
                       onPressed: (uid == null)
                           ? null
                           : () async {
@@ -385,7 +385,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
 
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('已取消上架提醒')),
+                                    const SnackBar(content: Text('Reminder cancelled.')),
                                   );
                                 }
                                 // 讓 FutureBuilder 重新讀
@@ -412,8 +412,8 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                               await ns.schedule(
                                 id: notifId,
                                 when: remindAt,
-                                title: '泡泡上架提醒',
-                                body: '「${p.title}」已準備上架，回來看看吧！',
+                                title: 'Bubble available',
+                                body: '${p.title} is now available. Come take a look!',
                                 payload: {
                                   'type': 'coming_soon_remind',
                                   'productId': widget.productId,
@@ -423,10 +423,10 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                               if (context.mounted) {
                                 final dateText = (releaseAt != null)
                                     ? '${remindAt.year}-${remindAt.month.toString().padLeft(2, '0')}-${remindAt.day.toString().padLeft(2, '0')} ${remindAt.hour.toString().padLeft(2, '0')}:${remindAt.minute.toString().padLeft(2, '0')}'
-                                    : '明天 ${remindAt.hour.toString().padLeft(2, '0')}:${remindAt.minute.toString().padLeft(2, '0')}（示意）';
+                                    : 'Tomorrow ${remindAt.hour.toString().padLeft(2, '0')}:${remindAt.minute.toString().padLeft(2, '0')}';
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('已設定提醒：$dateText'),
+                                    content: Text('Reminder set: $dateText'),
                                   ),
                                 );
                               }
@@ -452,7 +452,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('讀取失敗:',
+                  Text('Load failed:',
                       style: TextStyle(
                           color: tokens.textPrimary,
                           fontWeight: FontWeight.bold)),

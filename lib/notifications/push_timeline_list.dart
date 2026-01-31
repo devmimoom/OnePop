@@ -36,7 +36,7 @@ class PushTimelineList extends ConsumerWidget {
     try {
       uid = ref.read(uidProvider);
     } catch (_) {
-      return const Center(child: Text('請先登入'));
+      return const Center(child: Text('Sign in first.'));
     }
 
     final metaMode = ref.watch(timelineMetaModeProvider);
@@ -55,7 +55,7 @@ class PushTimelineList extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
         child: Row(
           children: [
-            const Text('未來 3 天時間表',
+            const Text('Next 3 days schedule',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
             const SizedBox(width: 8),
             Expanded(
@@ -69,11 +69,11 @@ class PushTimelineList extends ConsumerWidget {
                     ),
                     ButtonSegment(
                       value: TimelineMetaMode.push,
-                      label: Text('推播', style: TextStyle(fontSize: 11)),
+                      label: Text('Push', style: TextStyle(fontSize: 11)),
                     ),
                     ButtonSegment(
                       value: TimelineMetaMode.nth,
-                      label: Text('第N', style: TextStyle(fontSize: 11)),
+                      label: Text('#N', style: TextStyle(fontSize: 11)),
                     ),
                   ],
                   selected: {metaMode},
@@ -88,14 +88,14 @@ class PushTimelineList extends ConsumerWidget {
               iconSize: 20,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              tooltip: '重排未來 3 天',
+              tooltip: 'Reschedule next 3 days',
               icon: const Icon(Icons.refresh),
               onPressed: () async {
                 // 透過單一入口重排，內部會自動刷新 scheduledCacheProvider
                 await PushOrchestrator.rescheduleNextDays(ref: ref, days: 3);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('已重排未來 3 天推播')),
+                    const SnackBar(content: Text('Rescheduled next 3 days.')),
                   );
                 }
               },
@@ -122,7 +122,7 @@ class PushTimelineList extends ConsumerWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                const Text('未來 3 天時間表',
+                const Text('Next 3 days schedule',
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
                 const SizedBox(width: 8),
                 Expanded(
@@ -136,11 +136,11 @@ class PushTimelineList extends ConsumerWidget {
                         ),
                         ButtonSegment(
                           value: TimelineMetaMode.push,
-                          label: Text('推播', style: TextStyle(fontSize: 11)),
+                          label: Text('Push', style: TextStyle(fontSize: 11)),
                         ),
                         ButtonSegment(
                           value: TimelineMetaMode.nth,
-                          label: Text('第N', style: TextStyle(fontSize: 11)),
+                          label: Text('#N', style: TextStyle(fontSize: 11)),
                         ),
                       ],
                       selected: {metaMode},
@@ -156,14 +156,14 @@ class PushTimelineList extends ConsumerWidget {
                   iconSize: 20,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  tooltip: '重排',
+                  tooltip: 'Reschedule',
                   icon: const Icon(Icons.refresh),
                   onPressed: () async {
                     // 透過單一入口重排，內部會自動刷新 scheduledCacheProvider
                     await PushOrchestrator.rescheduleNextDays(ref: ref, days: 3);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('已重排未來 3 天推播')),
+                        const SnackBar(content: Text('Rescheduled next 3 days.')),
                       );
                     }
                   },
@@ -172,7 +172,7 @@ class PushTimelineList extends ConsumerWidget {
                   iconSize: 20,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  tooltip: '關閉',
+                  tooltip: 'Close',
                   icon: const Icon(Icons.close),
                   onPressed: onClose ?? () => Navigator.of(context).pop(),
                 ),
@@ -203,11 +203,11 @@ class PushTimelineList extends ConsumerWidget {
                           final pushingProducts = lib.where((e) => !e.isHidden && e.pushEnabled).toList();
                           String emptyMessage;
                           if (!globalPush.enabled) {
-                            emptyMessage = '全域推播已關閉\n請在「推播中心」開啟推播功能';
+                            emptyMessage = 'Global notifications off.\nEnable them in Notification settings.';
                           } else if (pushingProducts.isEmpty) {
-                            emptyMessage = '目前沒有推播中的商品\n請在「推播中心」啟用商品的推播功能';
+                            emptyMessage = 'No products with notifications on.\nEnable them in Notification settings.';
                           } else {
-                            emptyMessage = '目前沒有已排程的推播\n可能是勿擾時段或日期設定限制';
+                            emptyMessage = 'No scheduled notifications.\nCheck quiet hours or date settings.';
                           }
                           
                           return Column(
@@ -352,7 +352,7 @@ class PushTimelineList extends ConsumerWidget {
 
                               // preview：優先使用 body 第二行，否則用第一行
                               final lines = entry.body.split('\n');
-                              final preview = lines.length >= 2
+                              final rawPreview = lines.length >= 2
                                   ? lines[1]
                                   : lines.first;
 
@@ -362,6 +362,11 @@ class PushTimelineList extends ConsumerWidget {
                                   0;
 
                               final productTitle = productsMap[productId]?.title ?? productId;
+                              // B: 優先使用 entry.title（錨點／產品名），否則 productTitle
+                              final displayTitle = entry.title.trim().isNotEmpty
+                                  ? entry.title
+                                  : productTitle;
+
                               final lp = libMap[productId] as UserLibraryProduct?;
 
                               String metaText() {
@@ -372,8 +377,36 @@ class PushTimelineList extends ConsumerWidget {
                                     return lp != null ? pushHintFor(lp) : '';
                                   case TimelineMetaMode.nth:
                                     return r.seqInDayForProduct != null
-                                        ? '第 ${r.seqInDayForProduct} 則'
+                                        ? '#${r.seqInDayForProduct}'
                                         : '';
+                                }
+                              }
+
+                              // C: preview 為空或過短時用 Day N · 產品名 或 #N；與前一筆相同時用 Day N 或 #N
+                              String displayPreview;
+                              if (rawPreview.trim().isEmpty) {
+                                displayPreview = day > 0
+                                    ? 'Day $day · $productTitle'
+                                    : (r.seqInDayForProduct != null
+                                        ? 'Content #${r.seqInDayForProduct}'
+                                        : productTitle);
+                              } else {
+                                final prevPreview = () {
+                                  if (i == 0) return null;
+                                  final prev = rows[i - 1];
+                                  if (prev.isHeader || prev.item == null) return null;
+                                  final prevEntry = prev.item as ScheduledPushEntry;
+                                  final prevLines = prevEntry.body.split('\n');
+                                  return prevLines.length >= 2 ? prevLines[1] : prevLines.first;
+                                }();
+                                if (prevPreview != null && rawPreview == prevPreview) {
+                                  displayPreview = day > 0
+                                      ? 'Day $day'
+                                      : (r.seqInDayForProduct != null
+                                          ? '#${r.seqInDayForProduct}'
+                                          : rawPreview);
+                                } else {
+                                  displayPreview = rawPreview;
                                 }
                               }
 
@@ -387,9 +420,10 @@ class PushTimelineList extends ConsumerWidget {
                               return tlTimelineRow(
                                 context: context,
                                 when: when,
-                                title: productTitle,
-                                preview: preview,
+                                title: displayTitle,
+                                preview: displayPreview,
                                 metaText: metaText(),
+                                dayN: day > 0 ? day : null,
                                 saved: saved,
                                 seqInDay: r.seqInDayForProduct,
                                 isFirst: prevIsHeader,
@@ -413,7 +447,7 @@ class PushTimelineList extends ConsumerWidget {
                                         children: [
                                           OutlinedButton.icon(
                                             icon: const Icon(Icons.visibility, size: 16),
-                                            label: const Text('補看'),
+                                            label: const Text('View'),
                                             style: OutlinedButton.styleFrom(
                                               padding: const EdgeInsets.symmetric(
                                                 horizontal: 12,
@@ -438,7 +472,7 @@ class PushTimelineList extends ConsumerWidget {
                                           ),
                                           ElevatedButton.icon(
                                             icon: const Icon(Icons.skip_next, size: 16),
-                                            label: const Text('跳過'),
+                                            label: const Text('Skip'),
                                             style: ElevatedButton.styleFrom(
                                               padding: const EdgeInsets.symmetric(
                                                 horizontal: 12,
@@ -452,7 +486,7 @@ class PushTimelineList extends ConsumerWidget {
                                                   ref: ref, days: 3);
                                               if (context.mounted) {
                                                 ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text('已跳過下一則並重排')),
+                                                  const SnackBar(content: Text('Skipped and rescheduled.')),
                                                 );
                                               }
                                             },

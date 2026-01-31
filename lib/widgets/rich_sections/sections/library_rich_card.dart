@@ -87,7 +87,7 @@ class LibraryRichCard extends StatelessWidget {
                           if (totalItems != null) ...[
                             const SizedBox(height: 4),
                             Text(
-                              '共 $totalItems 則',
+                              '$totalItems items',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: tokens.textSecondary,

@@ -93,7 +93,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
     return Scaffold(
       backgroundColor: tokens.bg,
       appBar: AppBar(
-        title: const Text('內容卡片'),
+        title: const Text('Content'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -136,9 +136,9 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
                                     spacing: 8,
                                     children: [
                                       _chip(widget.isWishlistPreview
-                                          ? '試讀模式'
-                                          : '泡泡庫'),
-                                      _chip('卡片 ${showItems.length}'),
+                                          ? 'Preview'
+                                          : 'Library'),
+                                      _chip('${showItems.length} cards'),
                                     ],
                                   ),
                                 ],
@@ -275,7 +275,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
     try {
       ref.read(uidProvider);
     } catch (_) {
-      return const Center(child: Text('請先登入'));
+      return const Center(child: Text('Sign in first.'));
     }
 
     String ellipsize(String s, int max) =>
@@ -326,13 +326,13 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
                   ? Icons.check_circle
                   : Icons.check_circle_outline),
               onPressed: null,
-              tooltip: (saved?.learned ?? false) ? '已學習' : '待學習',
+              tooltip: (saved?.learned ?? false) ? 'Learned' : 'To learn',
             ),
             IconButton(
               icon: Icon(
                   (saved?.favorite ?? false) ? Icons.star : Icons.star_border),
               onPressed: null,
-              tooltip: (saved?.favorite ?? false) ? '已收藏' : '未收藏',
+              tooltip: (saved?.favorite ?? false) ? 'Saved' : 'Not saved',
             ),
           ],
         ),

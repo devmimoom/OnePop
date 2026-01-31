@@ -65,13 +65,14 @@ Widget tlTimelineRow({
   required DateTime when,
   required String title,
   required String preview,
-  required String metaText, // ✅ 新增
+  required String metaText,
   required dynamic saved, // SavedContent?
   required int? seqInDay,
   required bool isFirst,
   required bool isLast,
   required VoidCallback onTap,
-  Widget? trailing, // 可選：右下角操作區
+  Widget? trailing,
+  int? dayN, // Day N for "Day N · title" when > 0
 }) {
   final tokens = context.tokens;
   const axisWidth = 76.0;
@@ -112,7 +113,7 @@ Widget tlTimelineRow({
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      '${tlTimeOnly(when)}${seqInDay != null ? ' · 第 $seqInDay 則' : ''}',
+                      '${tlTimeOnly(when)}${seqInDay != null ? ' · #$seqInDay' : ''}',
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
                         color: tokens.textPrimary,
@@ -170,21 +171,29 @@ Widget tlTimelineRow({
                       runSpacing: 6,
                       children: [
                         if ((saved?.learned ?? false))
-                          tlTag(context, '已學會', Icons.check_circle),
-                        if ((saved?.favorite ?? false)) tlTag(context, '收藏', Icons.star),
+                          tlTag(context, 'Learned', Icons.check_circle),
+                        if ((saved?.favorite ?? false)) tlTag(context, 'Saved', Icons.star),
                       ],
                     ),
                     if ((saved?.learned ?? false) ||
                         (saved?.favorite ?? false))
                       const SizedBox(height: 8),
-                    Text(title,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w900, fontSize: 16)),
+                    Text(
+                      (dayN != null && dayN > 0) ? 'Day $dayN · $title' : title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w900, fontSize: 16),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 6),
                     Text(
                       preview,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: tokens.textSecondary,
+                        fontSize: 13,
+                      ),
                     ),
                     if (trailing != null) ...[
                       const SizedBox(height: 10),

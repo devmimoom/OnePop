@@ -88,7 +88,7 @@ class NotificationService {
           actions: <DarwinNotificationAction>[
             DarwinNotificationAction.plain(
               actionLearned,
-              '完成',
+              'Done',
               options: <DarwinNotificationActionOption>{
                 DarwinNotificationActionOption.foreground,
               },
@@ -105,7 +105,7 @@ class NotificationService {
           actions: <DarwinNotificationAction>[
             DarwinNotificationAction.plain(
               actionRestart,
-              '重新學習',
+              'Start over',
               options: <DarwinNotificationActionOption>{
                 DarwinNotificationActionOption.foreground,
               },
@@ -530,7 +530,7 @@ class NotificationService {
       priority: Priority.high,
       styleInformation: BigTextStyleInformation(body),
       actions: const [
-        AndroidNotificationAction(actionLearned, '完成'),
+        AndroidNotificationAction(actionLearned, 'Done'),
       ],
     );
 
@@ -601,7 +601,7 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
       actions: [
-        AndroidNotificationAction(actionRestart, '重新學習'),
+        AndroidNotificationAction(actionRestart, 'Start over'),
       ],
     );
 
@@ -621,8 +621,8 @@ class NotificationService {
       final notificationId = DateTime.now().millisecondsSinceEpoch.remainder(1000000);
       await plugin.show(
         notificationId,
-        '恭喜完成！🎉',
-        '已完成「$productTitle」的所有內容學習！',
+        'All done! 🎉',
+        'You\'ve completed all content in "$productTitle"!',
         details,
         payload: jsonEncode(payload),
       );
@@ -715,7 +715,7 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
       actions: [
-        AndroidNotificationAction(actionRestart, '重新學習'),
+        AndroidNotificationAction(actionRestart, 'Start over'),
       ],
     );
 
@@ -731,8 +731,8 @@ class NotificationService {
       
       await plugin.zonedSchedule(
         notificationId,
-        '恭喜完成！🎉',
-        '已完成「$productTitle」的所有內容學習！',
+        'All done! 🎉',
+        'You\'ve completed all content in "$productTitle"!',
         tz.TZDateTime.from(scheduledTime, tz.local),
         const NotificationDetails(android: androidDetails, iOS: iosDetails),
         payload: jsonEncode(payload),
@@ -745,8 +745,8 @@ class NotificationService {
       // ✅ 同步更新 cache（保存 notification ID，以便重新學習時能正確取消）
       await _cache.add(ScheduledPushEntry(
         when: scheduledTime,
-        title: '恭喜完成！🎉',
-        body: '已完成「$productTitle」的所有內容學習！',
+title: 'All done! 🎉',
+      body: 'You\'ve completed all content in "$productTitle"!',
         payload: payload,
         notificationId: notificationId,
       ));
@@ -785,7 +785,7 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
       actions: [
-        AndroidNotificationAction(actionLearned, '完成'),
+        AndroidNotificationAction(actionLearned, 'Done'),
       ],
     );
 
@@ -807,8 +807,8 @@ class NotificationService {
     try {
       await plugin.show(
         999001, // 固定 id（測試時覆蓋同一則）
-        '學習泡泡🫧 30 秒',
-        '點「完成」標記為已學習。',
+        'Learning bubble 30 sec',
+        'Tap "Done" to mark as learned.',
         details,
         payload: jsonEncode(payload),
       );

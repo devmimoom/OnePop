@@ -68,14 +68,14 @@ class _MeAchievementsSectionState extends ConsumerState<MeAchievementsSection> {
         children: [
           Row(
             children: [
-              Text('里程碑 / 成就',
+              Text('Milestones',
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
                       color: tokens.textPrimary)),
               const Spacer(),
               IconButton(
-                tooltip: '重新整理',
+                tooltip: 'Refresh',
                 onPressed: _reloadLocal,
                 icon: const Icon(Icons.refresh),
               ),
@@ -126,43 +126,43 @@ class _MeAchievementsSectionState extends ConsumerState<MeAchievementsSection> {
 
                     final achievements = <_Ach>[
                       _Ach(
-                        title: '收藏家',
-                        desc: '累積收藏（已購買+願望）',
+                        title: 'Collector',
+                        desc: 'Collected (purchased + wishlist)',
                         current: purchased.length + wish.length,
                         targets: const [1, 5, 10, 30],
                         icon: Icons.inventory_2_outlined,
                       ),
                       _Ach(
-                        title: '推播玩家',
-                        desc: '啟用推播的主題數',
+                        title: 'Notification pro',
+                        desc: 'Topics with notifications on',
                         current: pushing,
                         targets: const [1, 3, 5, 10],
                         icon: Icons.notifications_active_outlined,
                       ),
                       _Ach(
-                        title: '最愛清單',
-                        desc: '加入最愛的主題數',
+                        title: 'Favorites',
+                        desc: 'Favorited topics count',
                         current: favIds.length,
                         targets: const [1, 3, 5, 10],
                         icon: Icons.star_border,
                       ),
                       _Ach(
-                        title: '懂你的人',
-                        desc: '設定興趣標籤',
+                        title: 'Personalized',
+                        desc: 'Set interest tags',
                         current: _tags.length,
                         targets: const [1, 3, 5, 10],
                         icon: Icons.local_offer_outlined,
                       ),
                       _Ach(
-                        title: '連續學習',
-                        desc: '連續學習天數（本機）',
+                        title: 'Streak',
+                        desc: 'Streak days (local)',
                         current: streak,
                         targets: const [1, 3, 7, 14, 30],
                         icon: Icons.bolt_outlined,
                       ),
                       _Ach(
-                        title: '學習累積',
-                        desc: '學習天數總計（本機）',
+                        title: 'Progress',
+                        desc: 'Total learning days (local)',
                         current: learnedDays,
                         targets: const [1, 7, 30, 60, 100],
                         icon: Icons.auto_graph_outlined,
@@ -186,7 +186,7 @@ class _MeAchievementsSectionState extends ConsumerState<MeAchievementsSection> {
             ),
           const SizedBox(height: 10),
           Text(
-            '提示：連續學習/學習累積 需要在「使用者真的學習」時呼叫 LearnLogStore.markLearnedToday()（我下一步給你最小插入點）',
+            'Tip: Streak and learning count require LearnLogStore.markLearnedToday() when user actually learns.',
             style: TextStyle(color: tokens.textSecondary, fontSize: 12),
           ),
         ],
@@ -254,7 +254,7 @@ class _MeAchievementsSectionState extends ConsumerState<MeAchievementsSection> {
                                 fontWeight: FontWeight.w900)),
                       ),
                       Text(
-                        done ? '完成' : '${a.current}/$target',
+                        done ? 'Done' : '${a.current}/$target',
                         style: TextStyle(
                             color: tokens.textSecondary, fontSize: 12),
                       ),

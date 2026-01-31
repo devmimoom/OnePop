@@ -22,7 +22,7 @@ class HomeContinueSection extends ConsumerWidget {
     } catch (_) {
       return AppCard(
         child: Text(
-          '登入後可顯示「繼續學習」：最近學過的 Topic、Day 進度與下一則推播',
+          'Sign in to see Continue: recent topics, day progress, and next notification.',
           style: TextStyle(color: context.tokens.textSecondary),
         ),
       );
@@ -39,7 +39,7 @@ class HomeContinueSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('繼續學習',
+          Text('Continue',
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
@@ -56,7 +56,7 @@ class HomeContinueSection extends ConsumerWidget {
                       .toList();
 
                   if (visible.isEmpty) {
-                    return Text('你還沒有已購買的 Topic，先去分類或搜尋逛逛吧～',
+                    return Text('No purchased topics yet. Browse categories or search.',
                         style: TextStyle(color: tokens.textSecondary));
                   }
 
@@ -171,10 +171,10 @@ class _ContinueCard extends StatelessWidget {
     final tokens = context.tokens;
 
     final nextLine = !pushEnabled
-        ? '推播已關閉'
+        ? 'Notifications off'
         : (nextEntry == null
-            ? '未來 3 天尚未排程'
-            : '下一則：${_fmtTime(nextEntry!.when)} · ${nextEntry!.title}${_extractDay(nextEntry!.body)}');
+            ? 'No schedule for next 3 days'
+            : 'Next: ${_fmtTime(nextEntry!.when)} · ${nextEntry!.title}${_extractDay(nextEntry!.body)}');
 
     return InkWell(
       onTap: onTap,
@@ -221,7 +221,7 @@ class _ContinueCard extends StatelessWidget {
                 gradient: tokens.buttonGradient,
                 borderRadius: BorderRadius.circular(999),
               ),
-              child: const Text('接著看',
+              child: const Text('Continue',
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,

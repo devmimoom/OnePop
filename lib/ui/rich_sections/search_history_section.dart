@@ -49,19 +49,19 @@ class SearchHistorySectionState extends State<SearchHistorySection> {
         Row(
           children: [
             const Expanded(
-                child: Text('歷史記錄',
+                child: Text('History',
                     style: TextStyle(fontWeight: FontWeight.w800))),
             if (_recent.isNotEmpty)
               IconButton(
                 onPressed: _clear,
                 icon: const Icon(Icons.delete_outline),
-                tooltip: '清除',
+                tooltip: 'Clear',
               ),
           ],
         ),
         const SizedBox(height: 8),
         if (_recent.isEmpty)
-          Text('還沒有搜尋紀錄', style: Theme.of(context).textTheme.bodySmall)
+          Text('No search history yet', style: Theme.of(context).textTheme.bodySmall)
         else
           Wrap(
             spacing: 8,

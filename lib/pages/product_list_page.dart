@@ -15,7 +15,7 @@ class ProductListPage extends ConsumerWidget {
     final tokens = context.tokens;
 
     return Scaffold(
-      appBar: AppBar(title: Text('商品 · $topicId')),
+      appBar: AppBar(title: Text('Products · $topicId')),
       backgroundColor: tokens.bg,
       body: products.when(
         data: (ps) => ps.isEmpty
@@ -29,7 +29,7 @@ class ProductListPage extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('此主題下無產品',
+                          Text('No products in this topic',
                               style: TextStyle(
                                   color: tokens.textPrimary,
                                   fontWeight: FontWeight.bold,
@@ -39,7 +39,7 @@ class ProductListPage extends ConsumerWidget {
                               style: TextStyle(
                                   color: tokens.textSecondary, fontSize: 14)),
                           const SizedBox(height: 8),
-                          Text('查詢條件:',
+                          Text('Query:',
                               style: TextStyle(
                                   color: tokens.textPrimary,
                                   fontWeight: FontWeight.w600,
@@ -56,7 +56,7 @@ class ProductListPage extends ConsumerWidget {
                                   color: tokens.textSecondary, fontSize: 12)),
                           const SizedBox(height: 12),
                           Text(
-                              '請檢查 Firestore products 集合中的文檔是否有 topicId 欄位且值為 "$topicId"',
+                              'Check that Firestore products have topicId set to "$topicId".',
                               style: TextStyle(
                                   color: tokens.textSecondary, fontSize: 12)),
                         ],
@@ -123,7 +123,7 @@ class ProductListPage extends ConsumerWidget {
                                 const Spacer(),
                                 Align(
                                     alignment: Alignment.bottomRight,
-                                    child: Text('查看 ›',
+                                    child: Text('View ›',
                                         style:
                                             TextStyle(color: tokens.primary))),
                               ],
@@ -146,7 +146,7 @@ class ProductListPage extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('讀取失敗:',
+                    Text('Load failed:',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.bold,
@@ -156,7 +156,7 @@ class ProductListPage extends ConsumerWidget {
                         style: TextStyle(
                             color: tokens.textSecondary, fontSize: 14)),
                     const SizedBox(height: 8),
-                    Text('錯誤訊息:',
+                    Text('Error:',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.w600,
@@ -170,7 +170,7 @@ class ProductListPage extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
-                    Text('查詢條件:',
+                    Text('Query:',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.w600,
@@ -189,19 +189,19 @@ class ProductListPage extends ConsumerWidget {
                         style: TextStyle(
                             color: tokens.textSecondary, fontSize: 12)),
                     const SizedBox(height: 8),
-                    Text('可能原因:',
+                    Text('Possible causes:',
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.w600,
                             fontSize: 12)),
                     const SizedBox(height: 4),
-                    Text('  • 缺少 Firestore 索引',
+                    Text('  • Missing Firestore index',
                         style: TextStyle(
                             color: tokens.textSecondary, fontSize: 12)),
-                    Text('  • 產品文檔缺少 topicId 欄位',
+                    Text('  • Product documents missing topicId',
                         style: TextStyle(
                             color: tokens.textSecondary, fontSize: 12)),
-                    Text('  • topicId 值不匹配',
+                    Text('  • topicId value mismatch',
                         style: TextStyle(
                             color: tokens.textSecondary, fontSize: 12)),
                   ],

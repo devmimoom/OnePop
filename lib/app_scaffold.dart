@@ -37,9 +37,9 @@ class MainScaffold4Tabs extends ConsumerWidget {
             index: index,
             children: const [
               HomePage(),
-              BubbleLibraryPage(),
               CategoryPage(),
               SearchPage(),
+              BubbleLibraryPage(),
               MePage(),
             ],
           ),
@@ -67,31 +67,31 @@ class MainScaffold4Tabs extends ConsumerWidget {
                 NavigationDestination(
                   icon: Icon(Icons.home_outlined, color: tokens.textSecondary),
                   selectedIcon: Icon(Icons.home, color: tokens.primary),
-                  label: '首頁',
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.grid_view_outlined,
+                      color: tokens.textSecondary),
+                  selectedIcon: Icon(Icons.grid_view, color: tokens.primary),
+                  label: 'Categories',
+                ),
+                NavigationDestination(
+                  icon:
+                      Icon(Icons.search_outlined, color: tokens.textSecondary),
+                  selectedIcon: Icon(Icons.search, color: tokens.primary),
+                  label: 'Search',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.library_books_outlined,
                       color: tokens.textSecondary),
                   selectedIcon:
                       Icon(Icons.library_books, color: tokens.primary),
-                  label: '泡泡庫',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.grid_view_outlined,
-                      color: tokens.textSecondary),
-                  selectedIcon: Icon(Icons.grid_view, color: tokens.primary),
-                  label: '分類',
-                ),
-                NavigationDestination(
-                  icon:
-                      Icon(Icons.search_outlined, color: tokens.textSecondary),
-                  selectedIcon: Icon(Icons.search, color: tokens.primary),
-                  label: '搜尋',
+                  label: 'Library',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.person_outline, color: tokens.textSecondary),
                   selectedIcon: Icon(Icons.person, color: tokens.primary),
-                  label: '我的',
+                  label: 'Me',
                 ),
               ],
             ),

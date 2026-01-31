@@ -10,7 +10,7 @@ class PushTimelinePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('未來 3 天時間表'),
+        title: const Text('Next 3 days schedule'),
       ),
       body: const PushTimelineList(showTopBar: true),
     );

@@ -53,8 +53,8 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
       ref.read(uidProvider);
     } catch (_) {
       return Scaffold(
-        appBar: AppBar(title: const Text('泡泡庫')),
-        body: const Center(child: Text('請先登入以使用泡泡庫功能')),
+        appBar: AppBar(title: const Text('Library')),
+        body: const Center(child: Text('Sign in to use the library.')),
       );
     }
 
@@ -65,7 +65,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('泡泡庫'),
+        title: const Text('Library'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -143,7 +143,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                   ),
                 ),
                 child: Text(
-                  '泡泡庫',
+                  'Library',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -155,11 +155,11 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Column(
                   children: [
-                    _drawerTile(tokens, LibraryView.purchased, Icons.inventory_2, '已購買產品'),
-                    _drawerTile(tokens, LibraryView.wishlist, Icons.bookmark_border, '未購買收藏'),
-                    _drawerTile(tokens, LibraryView.favorites, Icons.star_border, '我的最愛'),
-                    _drawerTile(tokens, LibraryView.history, Icons.history_edu, '學習歷史'),
-                    _drawerTile(tokens, LibraryView.favoriteSentences, Icons.format_quote, '收藏今日一句'),
+                    _drawerTile(tokens, LibraryView.purchased, Icons.inventory_2, 'Purchased'),
+                    _drawerTile(tokens, LibraryView.wishlist, Icons.bookmark_border, 'Wishlist'),
+                    _drawerTile(tokens, LibraryView.favorites, Icons.star_border, 'Favorites'),
+                    _drawerTile(tokens, LibraryView.history, Icons.history_edu, 'Learning history'),
+                    _drawerTile(tokens, LibraryView.favoriteSentences, Icons.format_quote, 'Saved quotes'),
                   ],
                 ),
               ),
@@ -249,7 +249,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
 
     String latestTitleText(ScheduledPushEntry e) {
       final day = extractDayFromBody(e.body);
-      return day == null ? '下一則：${e.title}' : '下一則：${e.title}（Day $day）';
+      return day == null ? 'Next: ${e.title}' : 'Next: ${e.title} (Day $day)';
     }
 
     final tokens = context.tokens;
@@ -263,7 +263,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                 size: 64, color: tokens.textSecondary.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
             Text(
-              '目前沒有已購買的商品',
+              'No purchased products yet.',
               style: TextStyle(
                   color: tokens.textPrimary, fontSize: 16),
             ),
@@ -309,13 +309,13 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                           color: tokens.textSecondary.withValues(alpha: 0.5)),
                       const SizedBox(height: 12),
                       Text(
-                        '沒有符合條件的已購買商品',
+                        'No purchased products match your filters.',
                         style: TextStyle(
                             color: tokens.textPrimary, fontSize: 16),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '試試調整篩選條件或清除篩選',
+                        'Try changing or clearing your filters.',
                         style: TextStyle(
                             color: tokens.textSecondary, fontSize: 14),
                       ),
@@ -345,10 +345,10 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
           totalItems: totalItems,
           nextPushText: lp.pushEnabled
               ? (entry == null
-                  ? '未來 3 天尚未排程'
-                  : '下一則：${fmtNextTime(entry.when)}')
-              : '推播已關閉',
-          latestTitle: entry == null ? '下一則：尚未排程' : latestTitleText(entry),
+                  ? 'No schedule for next 3 days'
+                  : 'Next: ${fmtNextTime(entry.when)}')
+              : 'Notifications off',
+          latestTitle: entry == null ? 'Next: Not scheduled' : latestTitleText(entry),
           headerTrailing: PopupMenuButton<String>(
             icon: Icon(Icons.more_horiz, color: tokens.textSecondary),
             onSelected: (v) async {
@@ -372,7 +372,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                   children: [
                     Icon(lp.isFavorite ? Icons.star : Icons.star_border),
                     const SizedBox(width: 10),
-                    Text(lp.isFavorite ? '移除最愛' : '加入最愛'),
+                    Text(lp.isFavorite ? 'Remove from favorites' : 'Add to favorites'),
                   ],
                 ),
               ),
@@ -382,7 +382,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                   children: [
                     Icon(Icons.notifications_active_outlined),
                     SizedBox(width: 10),
-                    Text('推播設定'),
+                    Text('Notification settings'),
                   ],
                 ),
               ),
@@ -392,15 +392,15 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
             await UserLearningStore().markLearnedTodayAndGlobal(lp.productId);
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('已記錄：今天完成 1 次學習')));
+                .showSnackBar(const SnackBar(content: Text('Logged: 1 learning session today.')));
           },
           onMakeUpToday: () {
             ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('補學今天（示意）')));
+                .showSnackBar(const SnackBar(content: Text('Make up today (demo)')));
           },
           onPreview3Days: () {
             ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('預覽未來 3 天（示意）')));
+                .showSnackBar(const SnackBar(content: Text('Preview next 3 days (demo)')));
             Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => PushProductConfigPage(productId: lp.productId),
             ));
@@ -461,19 +461,19 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
               _purchasedPushChip(
                 tokens,
                 PurchasedPushFilter.all,
-                '全部',
+                'All',
               ),
               const SizedBox(width: 8),
               _purchasedPushChip(
                 tokens,
                 PurchasedPushFilter.pushing,
-                '推播中',
+                'Notifications on',
               ),
               const SizedBox(width: 8),
               _purchasedPushChip(
                 tokens,
                 PurchasedPushFilter.off,
-                '已關閉',
+                'Off',
               ),
             ],
           ),
@@ -485,7 +485,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  '主題：',
+                  'Topic:',
                   style: TextStyle(
                     fontSize: 12,
                     color: tokens.textSecondary,
@@ -520,7 +520,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                 }),
                 const SizedBox(width: 12),
                 Text(
-                  '等級：',
+                  'Level:',
                   style: TextStyle(
                     fontSize: 12,
                     color: tokens.textSecondary,
@@ -560,7 +560,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
           // 關鍵字
           TextField(
             decoration: InputDecoration(
-              hintText: '搜尋產品標題',
+              hintText: 'Search product title',
               hintStyle: TextStyle(color: tokens.textSecondary),
               border: OutlineInputBorder(
                 borderSide: BorderSide(color: tokens.cardBorder),
@@ -585,7 +585,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                 });
               },
               child: Text(
-                '清除篩選',
+                'Clear filters',
                 style: TextStyle(color: tokens.primary),
               ),
             ),
@@ -658,13 +658,13 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                 size: 64, color: tokens.textSecondary.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
             Text(
-              '目前沒有未購買收藏',
+              'No wishlist items yet.',
               style: TextStyle(
                   color: tokens.textPrimary, fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              '到商品頁點「收藏」即可加入',
+              'Tap the bookmark on a product page to add it.',
               style: TextStyle(
                   color: tokens.textSecondary, fontSize: 14),
             ),
@@ -725,7 +725,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                                   fontSize: 16, fontWeight: FontWeight.w800)),
                         ),
                         IconButton(
-                          tooltip: '最愛',
+                          tooltip: 'Favorite',
                           icon: Icon(w.isFavorite
                               ? Icons.star
                               : Icons.star_border),
@@ -734,7 +734,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                               .toggleFavorite(w.productId),
                         ),
                         IconButton(
-                          tooltip: '移除收藏',
+                          tooltip: 'Remove from wishlist',
                           icon: const Icon(Icons.delete_outline),
                           onPressed: () => ref
                               .read(localWishlistNotifierProvider)
@@ -746,8 +746,8 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                     Wrap(
                       spacing: 8,
                       children: [
-                        chip('未購買'),
-                        chip('試讀可用'),
+                        chip('Not purchased'),
+                        chip('Preview available'),
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -762,7 +762,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                               ),
                             ));
                           },
-                          child: const Text('試讀'),
+                          child: const Text('Preview'),
                         ),
                         const SizedBox(width: 10),
                         ElevatedButton(
@@ -771,7 +771,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                               builder: (_) => ProductPage(productId: w.productId),
                             ));
                           },
-                          child: const Text('立即購買'),
+                          child: const Text('Buy now'),
                         ),
                       ],
                     ),
@@ -811,13 +811,13 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                 size: 64, color: tokens.textSecondary.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
             Text(
-              '目前沒有最愛',
+              'No favorites yet.',
               style: TextStyle(
                   color: tokens.textPrimary, fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              '點擊商品旁的 ⭐ 按鈕來加入最愛',
+              'Tap the star on a product to add it to favorites.',
               style: TextStyle(
                   color: tokens.textSecondary, fontSize: 14),
             ),
@@ -851,7 +851,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                   child: Text(title,
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w700))),
-              Text(isPurchased ? '已購買' : '未購買',
+              Text(isPurchased ? 'Purchased' : 'Not purchased',
                   style: TextStyle(color: tokens.textSecondary)),
             ],
           ),
@@ -884,7 +884,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                 if (snapshot.hasError) {
                   final tokens = context.tokens;
                   return Center(
-                    child: Text('載入錯誤: ${snapshot.error}',
+                    child: Text('Load error: ${snapshot.error}',
                         style: TextStyle(color: tokens.textSecondary)),
                   );
                 }
@@ -975,13 +975,13 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
               size: 64, color: tokens.textSecondary.withValues(alpha: 0.5)),
           const SizedBox(height: 16),
           Text(
-            '目前沒有學習歷史',
+            'No learning history yet.',
             style: TextStyle(
                 color: tokens.textPrimary, fontSize: 16),
           ),
           const SizedBox(height: 8),
           Text(
-            '開始學習內容後，記錄會顯示在這裡',
+            'Your progress will show here once you start learning.',
             style: TextStyle(
                 color: tokens.textSecondary, fontSize: 14),
           ),
@@ -1049,10 +1049,10 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
               ? Center(
                   child: Text(
                     _selectedProductIds.isNotEmpty
-                        ? '沒有符合條件的內容'
+                        ? 'No content matches your filters'
                         : showToLearn
-                            ? '目前沒有待學習的內容'
-                            : '目前沒有已學習的內容',
+                            ? 'No items to learn yet'
+                            : 'No learned items yet',
                     style: TextStyle(
                       color: tokens.textPrimary,
                       fontSize: 16,
@@ -1151,7 +1151,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                     children: [
                       _buildTabChip(
                         context,
-                        label: '待學習',
+                        label: 'To learn',
                         icon: Icons.schedule,
                         color: tokens.primary,
                         isSelected: _selectedHistoryTab == 0,
@@ -1160,7 +1160,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                       const SizedBox(width: 8),
                       _buildTabChip(
                         context,
-                        label: '已學習',
+                        label: 'Learned',
                         icon: Icons.check_circle,
                         color: tokens.primary,
                         isSelected: _selectedHistoryTab == 1,
@@ -1193,7 +1193,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                               _selectedProductIds.clear();
                             });
                           },
-                          child: const Text('清除篩選'),
+                          child: const Text('Clear filters'),
                         ),
                       ],
                     ),
@@ -1223,7 +1223,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
   ) {
     final tokens = context.tokens;
     final product = productsMap[productId];
-    final productTitle = product?.title ?? '未知產品';
+    final productTitle = product?.title ?? 'Unknown product';
     
     // 根據 showToLearn 過濾內容
     final filteredToLearn = showToLearn ? group['toLearn']! : <String>[];
@@ -1243,8 +1243,8 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     
     final displayCount = showToLearn ? filteredToLearn.length : filteredLearned.length;
     final subtitle = showToLearn
-        ? '待學習: $displayCount'
-        : '已學習: $displayCount';
+        ? 'To learn: $displayCount'
+        : 'Learned: $displayCount';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1258,7 +1258,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
             ),
           ),
           subtitle: Text(
-            '共 $displayCount 則 ($subtitle)',
+            '$displayCount items ($subtitle)',
             style: TextStyle(
               fontSize: 12,
               color: tokens.textSecondary,
@@ -1342,7 +1342,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
       error: (e, _) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: BubbleCard(
-          child: Text('載入錯誤: $e',
+          child: Text('Load error: $e',
               style: TextStyle(color: context.tokens.textSecondary)),
         ),
       ),
@@ -1357,7 +1357,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     ContentItem contentItem,
   ) {
     final product = productsMap[contentItem.productId];
-    final productTitle = product?.title ?? '未知產品';
+    final productTitle = product?.title ?? 'Unknown product';
     final tokens = context.tokens;
 
     return Padding(
@@ -1445,7 +1445,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                             : tokens.primary,
                       ),
                       label: Text(
-                        isLearned ? '標記待學習' : '標記已學習',
+                        isLearned ? 'Mark to learn' : 'Mark learned',
                         style: TextStyle(
                           fontSize: 12,
                           color: isLearned
@@ -1495,8 +1495,8 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
               right: 8,
               child: Tooltip(
                 message: isLearned
-                    ? '已學習：不會被優先選中推播，只有在沒有待學習內容時才會被選中'
-                    : '待學習：會被優先選中進行推播排程',
+                    ? 'Learned: Lower priority for notifications. Only chosen when no to-learn items.'
+                    : 'To learn: Higher priority for notification scheduling.',
                 waitDuration: const Duration(milliseconds: 500),
                 child: Container(
                   padding:
@@ -1521,7 +1521,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        isLearned ? '已學習' : '待學習',
+                        isLearned ? 'Learned' : 'To learn',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -1574,7 +1574,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     try {
       uid = ref.read(uidProvider);
     } catch (_) {
-      return const Center(child: Text('請先登入以使用此功能'));
+      return const Center(child: Text('Sign in to use this feature.'));
     }
 
     final productsAsync = ref.watch(productsMapProvider);
@@ -1591,7 +1591,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
             if (snapshot.hasError) {
               final tokens = context.tokens;
               return Center(
-                child: Text('載入錯誤: ${snapshot.error}',
+                child: Text('Load error: ${snapshot.error}',
                     style: TextStyle(color: tokens.textSecondary)),
               );
             }
@@ -1608,14 +1608,14 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                         size: 64, color: tokens.textSecondary.withValues(alpha: 0.5)),
                     const SizedBox(height: 16),
                     Text(
-                      '目前沒有收藏的今日一句',
+                      'No saved quotes yet.',
                       style: TextStyle(
                           color: tokens.textPrimary.withValues(alpha: 0.8),
                           fontSize: 16),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '在內容詳情頁點擊 ⭐ 按鈕來收藏',
+                      'Tap the star on a content page to save a quote.',
                       style: TextStyle(
                           color: tokens.textSecondary.withValues(alpha: 0.6),
                           fontSize: 14),
@@ -1638,11 +1638,11 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                   final now = DateTime.now();
                   final diff = now.difference(date);
                   if (diff.inDays == 0) {
-                    return '今天';
+                    return 'Today';
                   } else if (diff.inDays == 1) {
-                    return '昨天';
+                    return 'Yesterday';
                   } else if (diff.inDays < 7) {
-                    return '${diff.inDays} 天前';
+                    return '${diff.inDays} days ago';
                   } else {
                     return '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
                   }
@@ -1763,7 +1763,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                             // 刷新列表
                             setState(() {});
                           },
-                          tooltip: '取消收藏',
+                          tooltip: 'Remove from saved',
                         ),
                       ),
                     ],

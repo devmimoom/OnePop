@@ -23,11 +23,11 @@ class PushCenterPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('推播中心'),
+        title: const Text('Notifications'),
         actions: [
           IconButton(
             icon: const Icon(Icons.timeline),
-            tooltip: '未來 3 天時間表',
+            tooltip: 'Next 3 days schedule',
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const PushTimelinePage()),
             ),
@@ -42,7 +42,7 @@ class PushCenterPage extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        '總推播數超過每日上限（${result.totalEffectiveFreq} > ${result.dailyCap}），部分排程可能被裁切',
+                        'Total notifications exceed daily cap (${result.totalEffectiveFreq} > ${result.dailyCap}). Some may be skipped.',
                       ),
                     ),
                   );
@@ -52,17 +52,17 @@ class PushCenterPage extends ConsumerWidget {
                 final scheduled = await ref.read(scheduledCacheProvider.future);
                 if (!context.mounted) return;
                 final message = !global.enabled
-                    ? '推播已關閉，無法排程'
+                    ? 'Notifications are off. Cannot schedule.'
                     : scheduled.isEmpty
-                        ? '重排完成，但沒有產生排程（請檢查產品設定）'
-                        : '已重排未來 3 天推播（${scheduled.length} 則）';
+                        ? 'Rescheduled but no notifications generated. Check product settings.'
+                        : 'Rescheduled ${scheduled.length} notifications for the next 3 days.';
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(message)),
                 );
               } catch (e) {
                 if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('重排失敗: $e')),
+                    SnackBar(content: Text('Reschedule failed: $e')),
                   );
                 }
               }
@@ -70,12 +70,12 @@ class PushCenterPage extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.campaign),
-            tooltip: '試播一則',
+            tooltip: 'Send test notification',
             onPressed: () async {
               await NotificationService().showTestBubbleNotification();
               // ignore: use_build_context_synchronously
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('已發送測試通知')),
+                const SnackBar(content: Text('Test notification sent.')),
               );
             },
           ),
@@ -91,7 +91,7 @@ class PushCenterPage extends ConsumerWidget {
           ),
 
           const SizedBox(height: 12),
-          const Text('推播中',
+          const Text('Active',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
           const SizedBox(height: 10),
           productsAsync.when(
@@ -106,7 +106,7 @@ class PushCenterPage extends ConsumerWidget {
                   if (pushing.isEmpty && completed.isEmpty) {
                     final tokens = context.tokens;
                     return BubbleCard(
-                        child: Text('目前沒有推播中的商品',
+                        child: Text('No products with notifications on',
                             style: TextStyle(
                                 color: tokens.textSecondary)));
                   }
@@ -139,7 +139,7 @@ class PushCenterPage extends ConsumerWidget {
                                             fontWeight: FontWeight.w900)),
                                     const SizedBox(height: 6),
                                     Text(
-                                        '頻率：${lp.pushConfig.freqPerDay}/天｜模式：${lp.pushConfig.timeMode.name}',
+                                        '${lp.pushConfig.freqPerDay}/day · ${lp.pushConfig.timeMode.name}',
                                         style: TextStyle(
                                             color: Colors.white
                                                 .withValues(alpha: 0.75),
@@ -167,7 +167,7 @@ class PushCenterPage extends ConsumerWidget {
                                     size: 20, 
                                     color: context.tokens.primary),
                                   const SizedBox(width: 8),
-                                  Text('已全部完成',
+                                  Text('All done',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w800,
@@ -255,7 +255,7 @@ class PushCenterPage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('全域設定',
+          const Text('Global settings',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
           const SizedBox(height: 8),
           SwitchTheme(
@@ -286,12 +286,12 @@ class PushCenterPage extends ConsumerWidget {
                 );
                 await Future.wait([writeFuture, rescheduleFuture]);
               },
-              title: const Text('啟用推播'),
+              title: const Text('Enable notifications'),
             ),
           ),
           ListTile(
-            title: const Text('每日總上限（跨商品）'),
-            subtitle: Text('${g.dailyTotalCap} 則/天'),
+            title: const Text('Daily cap (all products)'),
+            subtitle: Text('${g.dailyTotalCap} per day'),
             trailing: DropdownButton<int>(
               value: g.dailyTotalCap,
               // ✅ 修復深色主題下拉選單透明背景重疊問題
@@ -303,7 +303,7 @@ class PushCenterPage extends ConsumerWidget {
                 final values = {...presets, g.dailyTotalCap}.toList()..sort();
                 return values.map((e) {
                   final label =
-                      presets.contains(e) ? '$e' : '$e（自訂）';
+                      presets.contains(e) ? '$e' : '$e (custom)';
                   return DropdownMenuItem(value: e, child: Text(label));
                 }).toList();
               })(),
@@ -322,14 +322,14 @@ class PushCenterPage extends ConsumerWidget {
                   // ignore: use_build_context_synchronously
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('每日上限已更新為 $v 則')),
+                      SnackBar(content: Text('Daily cap updated to $v.')),
                     );
                   }
                 } catch (e) {
                   // ignore: use_build_context_synchronously
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('更新失敗: $e')),
+                      SnackBar(content: Text('Update failed: $e')),
                     );
                   }
                 }
@@ -349,7 +349,7 @@ class PushCenterPage extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '若產品推播加總數量超過每日總上限，部分橫幅通知會被延後推播',
+                    'If total notifications exceed the daily cap, some may be delayed.',
                     style: TextStyle(
                       color: context.tokens.textSecondary,
                       fontSize: 12,
@@ -361,7 +361,7 @@ class PushCenterPage extends ConsumerWidget {
           ),
           // ✅ 勿擾 / 靜音時段（全域）
           ListTile(
-            title: const Text('勿擾時段（全域）'),
+            title: const Text('Quiet hours (global)'),
             subtitle: Text(
                 '${_fmtTod(g.quietHours.start)} – ${_fmtTod(g.quietHours.end)}'),
             trailing: const Icon(Icons.bedtime_outlined),
@@ -389,7 +389,7 @@ class PushCenterPage extends ConsumerWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                     content: Text(
-                        '已設定勿擾：${_fmtTod(start)} – ${_fmtTod(end)}')),
+                        'Quiet hours set: ${_fmtTod(start)} – ${_fmtTod(end)}')),
               );
             },
           ),
@@ -398,7 +398,7 @@ class PushCenterPage extends ConsumerWidget {
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               icon: const Icon(Icons.restore),
-              label: const Text('關閉勿擾'),
+              label: const Text('Turn off quiet hours'),
               onPressed: () async {
                 final next = g.copyWith(
                   quietHours: const TimeRange(
@@ -417,13 +417,13 @@ class PushCenterPage extends ConsumerWidget {
 
                 // ignore: use_build_context_synchronously
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('已關閉勿擾（00:00 – 00:00）')),
+                  const SnackBar(content: Text('Quiet hours turned off (00:00 – 00:00).')),
                 );
               },
             ),
           ),
           const SizedBox(height: 4),
-          Text('更改設定後會自動重排未來 3 天推播',
+          Text('Changes will auto-reschedule the next 3 days.',
               style: TextStyle(
                   color: context.tokens.textSecondary, fontSize: 12)),
         ],

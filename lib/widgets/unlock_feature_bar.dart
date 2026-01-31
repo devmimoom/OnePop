@@ -27,24 +27,24 @@ class UnlockProductBar extends ConsumerWidget {
     final isUnlocked = state.status == PaywallStatus.unlocked;
 
     final title = switch (state.status) {
-      PaywallStatus.unlocked => '已解鎖本產品',
-      PaywallStatus.purchasing => '處理中…',
-      PaywallStatus.error => '未完成購買',
-      _ => '解鎖本產品',
+      PaywallStatus.unlocked => 'Product unlocked',
+      PaywallStatus.purchasing => 'Processing…',
+      PaywallStatus.error => 'Purchase not completed',
+      _ => 'Unlock this product',
     };
 
     final subtitle = switch (state.status) {
-      PaywallStatus.unlocked => '可完整瀏覽詳情並加入橫幅學習',
-      PaywallStatus.purchasing => '正在與 App Store 確認',
-      PaywallStatus.error => state.errorMessage ?? '你可以再試一次，或使用恢復購買',
-      _ => '購買後可看完整詳情＋啟用橫幅推播',
+      PaywallStatus.unlocked => 'View full details and add to banner learning',
+      PaywallStatus.purchasing => 'Confirming with App Store',
+      PaywallStatus.error => state.errorMessage ?? 'Try again or use Restore',
+      _ => 'After purchase: full details and banner notifications',
     };
 
     final buttonText = switch (state.status) {
-      PaywallStatus.unlocked => '開始學習',
-      PaywallStatus.purchasing => '處理中…',
-      PaywallStatus.error => '再試一次',
-      _ => '$priceText 立即購買',
+      PaywallStatus.unlocked => 'Start learning',
+      PaywallStatus.purchasing => 'Processing…',
+      PaywallStatus.error => 'Try again',
+      _ => '$priceText Buy now',
     };
 
     final onPressed = isPurchasing
@@ -96,7 +96,7 @@ class UnlockProductBar extends ConsumerWidget {
                   GestureDetector(
                     onTap: isPurchasing ? null : ctrl.restore,
                     child: Text(
-                      '恢復購買',
+                      'Restore purchases',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                             color: Colors.white.withValues(alpha:0.70),
                             decoration: TextDecoration.underline,

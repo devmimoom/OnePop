@@ -132,12 +132,12 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('未來 3 天推播時間表',
+        const Text('Next 3 days schedule',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 10),
         BubbleCard(
           child: _upcoming.isEmpty
-              ? Text('尚未排程（請按右上角刷新重排）',
+              ? Text('Not scheduled. Tap refresh to reschedule.',
                   style: TextStyle(color: tokens.textSecondary))
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,7 +197,7 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
                                     await widget.onSkip!(e);
                                     await _loadAll(); // 跳過後重載 timeline
                                   },
-                                  child: const Text('跳過'),
+                                  child: const Text('Skip'),
                                 ),
                               const Icon(Icons.chevron_right),
                             ],
@@ -219,7 +219,7 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
                 ),
         ),
         const SizedBox(height: 12),
-        const Text('勿擾時段',
+        const Text('Quiet hours',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
         const SizedBox(height: 10),
         // ✅ 從 Firestore 讀取勿擾時段
@@ -239,11 +239,11 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
                   ),
                   OutlinedButton(
                       onPressed: () => _pickTime(isStart: true),
-                      child: const Text('開始')),
+                      child: const Text('Start')),
                   const SizedBox(width: 8),
                   OutlinedButton(
                       onPressed: () => _pickTime(isStart: false),
-                      child: const Text('結束')),
+                      child: const Text('End')),
                 ],
               ),
             );
@@ -254,7 +254,7 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
           error: (_, __) {
             final tokens = context.tokens;
             return BubbleCard(
-              child: Text('載入錯誤',
+              child: Text('Load error',
                   style: TextStyle(color: tokens.textSecondary)),
             );
           },
@@ -265,11 +265,11 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
             OutlinedButton.icon(
               onPressed: _loadAll,
               icon: const Icon(Icons.refresh),
-              label: const Text('更新時間表'),
+              label: const Text('Refresh schedule'),
             ),
             const SizedBox(width: 10),
             Text(
-              '（資料來源：本機排程快取）',
+              '(Source: local schedule cache)',
               style: TextStyle(
                   color: context.tokens.textSecondary, fontSize: 12),
             ),
