@@ -58,6 +58,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1020465176946',
     projectId: 'learningbubbles-4ffc2',
     storageBucket: 'learningbubbles-4ffc2.firebasestorage.app',
-    iosBundleId: 'com.ariel.learningbubbles',
+    iosBundleId: 'com.mimoom.onepop',
   );
+
 }

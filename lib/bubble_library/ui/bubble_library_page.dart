@@ -158,7 +158,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                     _drawerTile(tokens, LibraryView.purchased, Icons.inventory_2, 'Purchased'),
                     _drawerTile(tokens, LibraryView.wishlist, Icons.bookmark_border, 'Wishlist'),
                     _drawerTile(tokens, LibraryView.favorites, Icons.star_border, 'Favorites'),
-                    _drawerTile(tokens, LibraryView.history, Icons.history_edu, 'Learning history'),
+                    _drawerTile(tokens, LibraryView.history, Icons.history_edu, 'History'),
                     _drawerTile(tokens, LibraryView.favoriteSentences, Icons.format_quote, 'Saved quotes'),
                   ],
                 ),
@@ -393,7 +393,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
             await UserLearningStore().markLearnedTodayAndGlobal(lp.productId);
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('Logged: 1 learning session today.')));
+                .showSnackBar(const SnackBar(content: Text('Logged: 1 session today.')));
           },
           onMakeUpToday: () {
             ScaffoldMessenger.of(context)
@@ -976,13 +976,13 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
               size: 64, color: tokens.textSecondary.withValues(alpha: 0.5)),
           const SizedBox(height: 16),
           Text(
-            'No learning history yet.',
+            'No history yet.',
             style: TextStyle(
                 color: tokens.textPrimary, fontSize: 16),
           ),
           const SizedBox(height: 8),
           Text(
-            'Your progress will show here once you start learning.',
+            'Your progress will show here once you start.',
             style: TextStyle(
                 color: tokens.textSecondary, fontSize: 14),
           ),
@@ -1052,8 +1052,8 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                     _selectedProductIds.isNotEmpty
                         ? 'No content matches your filters'
                         : showToLearn
-                            ? 'No items to learn yet'
-                            : 'No learned items yet',
+                            ? 'No pending items yet'
+                            : 'No completed items yet',
                     style: TextStyle(
                       color: tokens.textPrimary,
                       fontSize: 16,
@@ -1152,7 +1152,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                     children: [
                       _buildTabChip(
                         context,
-                        label: 'To learn',
+                        label: 'Pending',
                         icon: Icons.schedule,
                         color: tokens.primary,
                         isSelected: _selectedHistoryTab == 0,
@@ -1161,7 +1161,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                       const SizedBox(width: 8),
                       _buildTabChip(
                         context,
-                        label: 'Learned',
+                        label: 'Done',
                         icon: Icons.check_circle,
                         color: tokens.primary,
                         isSelected: _selectedHistoryTab == 1,
@@ -1244,8 +1244,8 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     
     final displayCount = showToLearn ? filteredToLearn.length : filteredLearned.length;
     final subtitle = showToLearn
-        ? 'To learn: $displayCount'
-        : 'Learned: $displayCount';
+        ? 'Pending: $displayCount'
+        : 'Done: $displayCount';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1446,7 +1446,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                             : tokens.primary,
                       ),
                       label: Text(
-                        isLearned ? 'Mark to learn' : 'Mark learned',
+                        isLearned ? 'Mark pending' : 'Mark done',
                         style: TextStyle(
                           fontSize: 12,
                           color: isLearned
@@ -1496,8 +1496,8 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
               right: 8,
               child: Tooltip(
                 message: isLearned
-                    ? 'Learned: Lower priority for notifications. Only chosen when no to-learn items.'
-                    : 'To learn: Higher priority for notification scheduling.',
+                    ? 'Done: Lower priority for notifications. Only chosen when no pending items.'
+                    : 'Pending: Higher priority for notification scheduling.',
                 waitDuration: const Duration(milliseconds: 500),
                 child: Container(
                   padding:
@@ -1522,7 +1522,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        isLearned ? 'Learned' : 'To learn',
+                        isLearned ? 'Done' : 'Pending',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,

@@ -162,7 +162,7 @@ class _MeAchievementsSectionState extends ConsumerState<MeAchievementsSection> {
                       ),
                       _Ach(
                         title: 'Progress',
-                        desc: 'Total learning days (local)',
+                        desc: 'Total active days (local)',
                         current: learnedDays,
                         targets: const [1, 7, 30, 60, 100],
                         icon: Icons.auto_graph_outlined,

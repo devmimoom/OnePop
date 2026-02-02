@@ -10,13 +10,20 @@ import 'push_product_config_page.dart';
 import 'widgets/bubble_card.dart';
 import '../../../pages/push_timeline_page.dart';
 import '../../../notifications/push_timeline_provider.dart';
+import '../../../providers/analytics_provider.dart';
 import '../../theme/app_tokens.dart';
 
 class PushCenterPage extends ConsumerWidget {
   const PushCenterPage({super.key});
 
+  static bool _didLogScreen = false;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (!_didLogScreen) {
+      _didLogScreen = true;
+      ref.read(analyticsProvider).logScreenView(screenName: 'push_center');
+    }
     final globalAsync = ref.watch(globalPushSettingsProvider);
     final libAsync = ref.watch(libraryProductsProvider);
     final productsAsync = ref.watch(productsMapProvider);
@@ -362,8 +369,7 @@ class PushCenterPage extends ConsumerWidget {
           // ✅ 勿擾 / 靜音時段（全域）
           ListTile(
             title: const Text('Quiet hours (global)'),
-            subtitle: Text(
-                '${_fmtTod(g.quietHours.start)} – ${_fmtTod(g.quietHours.end)}'),
+            subtitle: Text(formatTimeRange(g.quietHours)),
             trailing: const Icon(Icons.bedtime_outlined),
             onTap: () async {
               final start = await _pickTime(context, g.quietHours.start);
@@ -389,7 +395,7 @@ class PushCenterPage extends ConsumerWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                     content: Text(
-                        'Quiet hours set: ${_fmtTod(start)} – ${_fmtTod(end)}')),
+                        'Quiet hours set: ${formatTimeRange(TimeRange(start, end))}')),
               );
             },
           ),
@@ -417,7 +423,7 @@ class PushCenterPage extends ConsumerWidget {
 
                 // ignore: use_build_context_synchronously
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Quiet hours turned off (00:00 – 00:00).')),
+                  const SnackBar(content: Text('Quiet hours turned off (00:00 - 00:00).')),
                 );
               },
             ),
@@ -429,12 +435,6 @@ class PushCenterPage extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  String _fmtTod(TimeOfDay t) {
-    final hh = t.hour.toString().padLeft(2, '0');
-    final mm = t.minute.toString().padLeft(2, '0');
-    return '$hh:$mm';
   }
 
   Future<TimeOfDay?> _pickTime(BuildContext context, TimeOfDay initial) {

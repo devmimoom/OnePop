@@ -57,13 +57,13 @@ class CategoryPage extends ConsumerWidget {
                               onTap: () => ref
                                   .read(selectedSegmentProvider.notifier)
                                   .state = s,
-                              borderRadius: BorderRadius.circular(999),
+                              borderRadius: BorderRadius.circular(12),
                               child: Container(
                                 constraints: const BoxConstraints(minWidth: 88),
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 14, vertical: 10),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(999),
+                                  borderRadius: BorderRadius.circular(12),
                                   color: isSel
                                       ? tokens.primary.withValues(alpha: 0.2)
                                       : tokens.chipBg,

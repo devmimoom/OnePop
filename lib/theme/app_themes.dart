@@ -166,9 +166,9 @@ class AppThemes {
     const bg = Color(0xFFFFFFFF);
     const primary = Color(0xFF25C9B8);
 
-    final tokens = AppTokens(
+    const tokens = AppTokens(
       bg: bg,
-      bgGradient: const LinearGradient(
+      bgGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
@@ -220,7 +220,7 @@ class AppThemes {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          primary,
+          Color(0xFF25C9B8),
           Color(0xFF1FB8A8),
         ],
       ),

@@ -41,6 +41,27 @@
    - 選擇 `GoogleService-Info.plist`
    - **重要**：確保勾選「Copy items if needed」和「Runner」target
 
+### 2.3 Google Sign-In（iOS 必填，否則會崩潰）
+
+若 App 使用「以 Google 登入」，必須在 `ios/Runner/Info.plist` 設定 **GIDClientID** 與 **URL Scheme**：
+
+1. **取得 iOS OAuth 2.0 Client ID**
+   - 開啟 [Google Cloud Console](https://console.cloud.google.com/) → 選與 Firebase 同專案
+   - 左側「API 和服務」→「憑證」
+   - 若已有「iOS 版 OAuth 2.0 用戶端 ID」：複製其「用戶端 ID」（格式：`xxxxx.apps.googleusercontent.com`）
+   - 若沒有：點「建立憑證」→「OAuth 用戶端 ID」→應用程式類型選「iOS」→輸入 Bundle ID（與 Firebase iOS 應用相同）→建立後複製「用戶端 ID」
+
+2. **填寫 Info.plist**
+   - 開啟 `ios/Runner/Info.plist`
+   - 將 `GIDClientID` 的 `<string>REPLACE_WITH_YOUR_IOS_OAUTH_CLIENT_ID.apps.googleusercontent.com</string>` 換成你的 **用戶端 ID**（整串，例如 `123456789-xxx.apps.googleusercontent.com`）
+   - 將 `CFBundleURLSchemes` 裡的 `<string>com.googleusercontent.apps.REPLACE_WITH_YOUR_REVERSED_CLIENT_ID</string>` 換成 **反轉的用戶端 ID**：
+     - 用戶端 ID 若為 `123456789-abcdefg.apps.googleusercontent.com`
+     - 反轉後為 `com.googleusercontent.apps.123456789-abcdefg`（即把 `xxxxx.apps.googleusercontent.com` 改成 `com.googleusercontent.apps.xxxxx`）
+
+3. **若從 Firebase 下載的 GoogleService-Info.plist 內含 CLIENT_ID**
+   - 可直接把該檔的 `CLIENT_ID` 值貼到 Info.plist 的 `GIDClientID`
+   - `REVERSED_CLIENT_ID` 通常也會在 GoogleService-Info.plist 裡，可一併複製到 URL Scheme
+
 ## 步驟 3：設定 Android 應用
 
 ### 3.1 在 Firebase Console 註冊 Android 應用

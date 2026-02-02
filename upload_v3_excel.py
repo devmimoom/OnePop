@@ -15,6 +15,18 @@ def to_bool(v):
     if pd.isna(v): return False
     return str(v).strip().lower() in ("true", "1", "yes", "y")
 
+def _is_header_or_empty(row, id_key, id_value=None):
+    """若該列為標題列或 ID 為空，則視為需跳過（不依賴固定跳過第一行）。"""
+    v = row.get(id_key)
+    if pd.isna(v) or str(v).strip() == "":
+        return True
+    s = str(v).strip().lower()
+    if s == id_key.lower():  # 例如 segmentId 列寫 "segmentId"
+        return True
+    if id_value is not None and s == str(id_value).strip().lower():
+        return True
+    return False
+
 def _parse_difficulty(v):
     """解析難度值：支援數字（1-5）或文字（easy=1, medium=2, hard=3）"""
     if pd.isna(v):
@@ -60,11 +72,8 @@ def main():
         seg_df = pd.read_excel(xlsx, sheet_name="UI_SEGMENTS")
         segments = []
         for idx, r in seg_df.iterrows():
-            # 跳過第一行數據（中文說明行）
-            if idx == 0:
-                continue
-            # 跳過空行或無效行
-            if pd.isna(r.get("segmentId")) or pd.isna(r.get("title")):
+            # 跳過標題列或無效列（不固定跳過第一行，避免只有一筆資料時被略過）
+            if _is_header_or_empty(r, "segmentId") or pd.isna(r.get("title")):
                 continue
             try:
                 segments.append({
@@ -97,10 +106,8 @@ def main():
         def flatten_cells(df, col_key):
             out = []
             for idx, r in df.iterrows():
-                if idx == 0:
-                    continue
                 v = r.get(col_key)
-                if pd.isna(v):
+                if pd.isna(v) or str(v).strip().lower() == col_key.lower():
                     continue
                 s = str(v).strip()
                 if not s:
@@ -136,11 +143,7 @@ def main():
         topics_df = pd.read_excel(xlsx, sheet_name="TOPICS")
         topic_writes = []
         for idx, r in topics_df.iterrows():
-            # 跳過第一行數據（中文說明行）
-            if idx == 0:
-                continue
-            # 跳過空行或無效行
-            if pd.isna(r.get("topicId")) or pd.isna(r.get("title")):
+            if _is_header_or_empty(r, "topicId") or pd.isna(r.get("title")):
                 continue
             try:
                 tid = str(r["topicId"]).strip()
@@ -170,11 +173,7 @@ def main():
         prod_df = pd.read_excel(xlsx, sheet_name="PRODUCTS")
         prod_writes = []
         for idx, r in prod_df.iterrows():
-            # 跳過第一行數據（中文說明行）
-            if idx == 0:
-                continue
-            # 跳過空行或無效行
-            if pd.isna(r.get("productId")) or pd.isna(r.get("topicId")):
+            if _is_header_or_empty(r, "productId") or pd.isna(r.get("topicId")):
                 continue
             try:
                 pid = str(r["productId"]).strip()
@@ -220,6 +219,7 @@ def main():
                     "releaseAtMs": int(r.get("releaseAtMs")) if not pd.isna(r.get("releaseAtMs")) else None,
                     "createdAtMs": int(r.get("createdAtMs")) if not pd.isna(r.get("createdAtMs")) else None,
                     "contentArchitecture": none_if_nan(r.get("contentarchitecture")),
+                    "creditsRequired": min(999, max(0, int(r.get("creditsRequired")))) if not pd.isna(r.get("creditsRequired")) else 1,
                 }
                 prod_writes.append(lambda b, pid=pid, data=data: b.set(db.collection("products").document(pid), data, merge=True))
             except (ValueError, KeyError) as e:
@@ -236,11 +236,7 @@ def main():
         fl_df = pd.read_excel(xlsx, sheet_name="FEATURED_LISTS")
         fl_writes = []
         for idx, r in fl_df.iterrows():
-            # 跳過第一行數據（中文說明行）
-            if idx == 0:
-                continue
-            # 跳過空行或無效行
-            if pd.isna(r.get("listId")) or pd.isna(r.get("title")):
+            if _is_header_or_empty(r, "listId") or pd.isna(r.get("title")):
                 continue
             try:
                 lid = str(r["listId"]).strip()
@@ -275,11 +271,7 @@ def main():
         ci_df = pd.read_excel(xlsx, sheet_name="CONTENT_ITEMS")
         ci_writes = []
         for idx, r in ci_df.iterrows():
-            # 跳過第二列（中文說明行）
-            if idx == 0:
-                continue
-            # 跳過空行或無效行
-            if pd.isna(r.get("itemId")) or pd.isna(r.get("productId")):
+            if _is_header_or_empty(r, "itemId") or pd.isna(r.get("productId")):
                 continue
             try:
                 iid = str(r["itemId"]).strip()

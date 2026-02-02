@@ -33,6 +33,16 @@ class TimeRange {
   }
 }
 
+/// 單一時間顯示：XX:XX（時、分皆兩位數）
+String formatTimeOfDay(TimeOfDay t) {
+  return '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+}
+
+/// 時間區間顯示：XX:XX - XX:XX（空格 + 連字號 + 空格）
+String formatTimeRange(TimeRange r) {
+  return '${formatTimeOfDay(r.start)} - ${formatTimeOfDay(r.end)}';
+}
+
 class PushConfig {
   final int freqPerDay; // 1..5
   final PushTimeMode timeMode;

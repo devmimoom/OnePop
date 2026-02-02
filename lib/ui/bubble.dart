@@ -41,39 +41,67 @@ class _BubbleCircleState extends State<BubbleCircle>
     super.dispose();
   }
 
-  Widget _buildCircleContent(AppTokens tokens) {
+  static const double _cardWidth = 90;
+  static const double _cardHeight = 90;
+  static const double _imageHeight = 90;
+  static const double _cornerRadius = 16;
+
+  Widget _buildCardContent(AppTokens tokens) {
     final url = widget.imageUrl;
     if (url == null || url.isEmpty) {
-      return Center(
-        child: Icon(
-          Icons.auto_awesome,
-          size: 22,
-          color: tokens.primary,
+      return Container(
+        height: _imageHeight,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(_cornerRadius)),
+          gradient: tokens.chipGradient ??
+              LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  tokens.chipBg,
+                  tokens.chipBg.withValues(alpha: 0.7),
+                ],
+              ),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.auto_awesome,
+            size: 28,
+            color: tokens.primary,
+          ),
         ),
       );
     }
-    return ClipOval(
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(_cornerRadius)),
       child: Image.network(
         url,
-        width: 82,
-        height: 82,
+        width: double.infinity,
+        height: _imageHeight,
         fit: BoxFit.cover,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
-          return Center(
-            child: Icon(
-              Icons.auto_awesome,
-              size: 22,
-              color: tokens.primary,
+          return SizedBox(
+            height: _imageHeight,
+            child: Center(
+              child: Icon(
+                Icons.auto_awesome,
+                size: 28,
+                color: tokens.primary,
+              ),
             ),
           );
         },
         errorBuilder: (context, error, stackTrace) {
-          return Center(
-            child: Icon(
-              Icons.auto_awesome,
-              size: 22,
-              color: tokens.primary,
+          return SizedBox(
+            height: _imageHeight,
+            child: Center(
+              child: Icon(
+                Icons.auto_awesome,
+                size: 28,
+                color: tokens.primary,
+              ),
             ),
           );
         },
@@ -97,15 +125,15 @@ class _BubbleCircleState extends State<BubbleCircle>
       onTapCancel: () => _controller.reverse(),
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: SizedBox(
-          width: 96,
-          child: Column(
-            children: [
-              Container(
-                width: 82,
-                height: 82,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: _cardWidth,
+              height: _cardHeight,
+              child: Container(
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(_cornerRadius),
                   color: _hasImageUrl ? tokens.chipBg : null,
                   gradient: _hasImageUrl
                       ? null
@@ -131,22 +159,25 @@ class _BubbleCircleState extends State<BubbleCircle>
                   ],
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: _buildCircleContent(tokens),
+                child: _buildCardContent(tokens),
               ),
-              const SizedBox(height: 8),
-              Text(
+            ),
+            const SizedBox(height: 6),
+            SizedBox(
+              width: _cardWidth,
+              child: Text(
                 widget.title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: tokens.textPrimary,
-                  fontSize: 13,
+                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

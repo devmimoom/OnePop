@@ -171,7 +171,7 @@ Widget tlTimelineRow({
                       runSpacing: 6,
                       children: [
                         if ((saved?.learned ?? false))
-                          tlTag(context, 'Learned', Icons.check_circle),
+                          tlTag(context, 'Done', Icons.check_circle),
                         if ((saved?.favorite ?? false)) tlTag(context, 'Saved', Icons.star),
                       ],
                     ),

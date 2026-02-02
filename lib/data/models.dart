@@ -108,6 +108,8 @@ class Product {
   final int? releaseAtMs;
   final int? createdAtMs;
   final String? contentArchitecture;
+  /// 解鎖所需額度：0=免費，1=1 額度，2+=多額度
+  final int creditsRequired;
 
   Product({
     required this.id,
@@ -126,6 +128,7 @@ class Product {
     this.releaseAtMs,
     this.createdAtMs,
     this.contentArchitecture,
+    this.creditsRequired = 1,
   });
 
   factory Product.fromDoc(String id, Map<String, dynamic> m) => Product(
@@ -149,6 +152,9 @@ class Product {
             ? (m['createdAtMs'] as num).toInt()
             : null,
         contentArchitecture: m['contentArchitecture'] as String?,
+        creditsRequired: (m['creditsRequired'] is num)
+            ? (m['creditsRequired'] as num).toInt().clamp(0, 999)
+            : 1,
       );
 
   DateTime? get releaseAt =>

@@ -30,6 +30,9 @@ flutter_ios_podfile_setup
 target 'Runner' do
   use_frameworks!
 
+  # 解決 firebase_auth 與 google_sign_in_ios 對 GTMSessionFetcher 版本衝突
+  pod 'GTMSessionFetcher/Core', '~> 3.4'
+
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
     inherit! :search_paths

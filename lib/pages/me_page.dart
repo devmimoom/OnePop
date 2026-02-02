@@ -5,12 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_scaffold.dart';
 import '../theme/app_tokens.dart';
+import '../widgets/app_card.dart';
 import '../widgets/rich_sections/sections/me_dashboard_section.dart';
 import '../widgets/rich_sections/sections/me_interest_tags_section.dart';
 import '../widgets/rich_sections/sections/me_achievements_section.dart';
 import '../services/reset_service.dart';
 import '../bubble_library/providers/providers.dart';
 import '../bubble_library/ui/push_center_page.dart';
+import 'wallet_page.dart';
+import 'auth/login_page.dart';
 
 class MePage extends ConsumerWidget {
   const MePage({super.key});
@@ -31,6 +34,10 @@ class MePage extends ConsumerWidget {
                 ),
           ),
           const SizedBox(height: 16),
+
+          // Account & My Wallet 整合卡片（置頂）
+          _AccountAndWalletCard(tokens: tokens),
+          const SizedBox(height: 14),
 
           // 學習儀表板
           const MeDashboardSection(),
@@ -57,10 +64,6 @@ class MePage extends ConsumerWidget {
               MaterialPageRoute(builder: (_) => const PushCenterPage()),
             ),
           ),
-          const Divider(),
-
-          // Account
-          _AccountSection(tokens: tokens),
           const Divider(),
 
           ListTile(
@@ -93,7 +96,7 @@ class MePage extends ConsumerWidget {
             leading: Icon(Icons.info_outline, color: tokens.primary),
             title: Text('About', style: TextStyle(color: tokens.textPrimary)),
             subtitle: Text(
-              'Learning Bubbles 1.0.0',
+              'OnePop 1.0.0',
               style: TextStyle(color: tokens.textSecondary),
             ),
             onTap: () => _showAboutDialog(context),
@@ -102,13 +105,13 @@ class MePage extends ConsumerWidget {
             leading: Icon(Icons.privacy_tip_outlined, color: tokens.primary),
             title: Text('Privacy policy', style: TextStyle(color: tokens.textPrimary)),
             trailing: Icon(Icons.open_in_new, size: 18, color: tokens.textSecondary),
-            onTap: () => _launchUrl(context, 'https://example.com/privacy'),
+            onTap: () => _launchUrl(context, 'https://immediate-beast-f57.notion.site/OnePop-Privacy-Policy-2fb560db78bf80f0a4ccdd9ad7e34e7e?source=copy_link'),
           ),
           ListTile(
             leading: Icon(Icons.description_outlined, color: tokens.primary),
             title: Text('Terms of use', style: TextStyle(color: tokens.textPrimary)),
             trailing: Icon(Icons.open_in_new, size: 18, color: tokens.textSecondary),
-            onTap: () => _launchUrl(context, 'https://example.com/terms'),
+            onTap: () => _launchUrl(context, 'https://immediate-beast-f57.notion.site/OnePop-Terms-of-Use-2fb560db78bf80ff9f7cd030e0b646d8?source=copy_link'),
           ),
           const Divider(),
           ListTile(
@@ -118,7 +121,7 @@ class MePage extends ConsumerWidget {
               style: TextStyle(color: Colors.red),
             ),
             subtitle: Text(
-              'Clear all learning progress, settings, and local data. This cannot be undone.',
+              'Clear all progress, settings, and local data. This cannot be undone.',
               style: TextStyle(color: tokens.textSecondary, fontSize: 12),
             ),
             onTap: () => _showResetDialog(context, ref),
@@ -251,7 +254,7 @@ class MePage extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: const Text('About'),
         content: const Text(
-          'Learning Bubbles\nVersion 1.0.0',
+          'OnePop\nVersion 1.0.0',
           style: TextStyle(fontSize: 16),
         ),
         actions: [
@@ -283,41 +286,139 @@ class MePage extends ConsumerWidget {
   }
 }
 
-/// Account section: signed-in status and Sign out (re-sign anonymous to keep app working).
-class _AccountSection extends ConsumerWidget {
-  const _AccountSection({required this.tokens});
+/// Account & My Wallet 整合卡片：置頂，內含 My Wallet 與 Account 兩列。
+class _AccountAndWalletCard extends ConsumerWidget {
+  const _AccountAndWalletCard({required this.tokens});
 
   final AppTokens tokens;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = FirebaseAuth.instance.currentUser;
-    final isAnonymous = user?.isAnonymous ?? true;
-
-    return ListTile(
-      leading: Icon(Icons.person_outline, color: tokens.primary),
-      title: Text('Account', style: TextStyle(color: tokens.textPrimary)),
-      subtitle: Text(
-        user == null ? 'Not signed in' : (isAnonymous ? 'Signed in anonymously' : 'Signed in'),
-        style: TextStyle(color: tokens.textSecondary, fontSize: 12),
+    final balance = ref.watch(creditsBalanceProvider).valueOrNull ?? 0;
+    return AppCard(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.account_balance_wallet_outlined, color: tokens.primary),
+            title: Text('My Wallet', style: TextStyle(color: tokens.textPrimary)),
+            subtitle: Text(
+              '$balance credits · Balance & history',
+              style: TextStyle(color: tokens.textSecondary, fontSize: 12),
+            ),
+            trailing: Icon(Icons.chevron_right, color: tokens.textSecondary),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const WalletPage()),
+            ),
+          ),
+          Divider(height: 1, color: tokens.textSecondary.withValues(alpha: 0.3)),
+          _AccountSection(tokens: tokens, contentPadding: EdgeInsets.zero),
+        ],
       ),
-      trailing: user != null
-          ? TextButton(
-              onPressed: () => _signOutAndResign(context, ref),
-              child: Text('Sign out', style: TextStyle(color: tokens.primary)),
-            )
-          : null,
     );
+  }
+}
+
+/// Account section: 匿名時顯示「升級帳號」導向登入頁；已登入時顯示「登出」。
+class _AccountSection extends ConsumerStatefulWidget {
+  const _AccountSection({required this.tokens, this.contentPadding});
+
+  final AppTokens tokens;
+  final EdgeInsets? contentPadding;
+
+  @override
+  ConsumerState<_AccountSection> createState() => _AccountSectionState();
+}
+
+class _AccountSectionState extends ConsumerState<_AccountSection> {
+  bool _isSigningOut = false;
+
+  Future<void> _handleSignOut() async {
+    if (_isSigningOut) return;
+    setState(() => _isSigningOut = true);
+    try {
+      await _signOutAndResign(context, ref);
+    } finally {
+      if (mounted) setState(() => _isSigningOut = false);
+    }
   }
 
   Future<void> _signOutAndResign(BuildContext context, WidgetRef ref) async {
     await FirebaseAuth.instance.signOut();
-    await FirebaseAuth.instance.signInAnonymously();
-    ref.invalidate(uidProvider);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Signed out. You are now signed in as a new guest.')),
-      );
+    const maxAttempts = 2;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await FirebaseAuth.instance.signInAnonymously();
+        ref.invalidate(uidProvider);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Signed out. You are now signed in as a new guest.')),
+          );
+        }
+        return;
+      } catch (_) {
+        if (attempt == maxAttempts && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Signed out, but could not continue as guest. Please try again.'),
+            ),
+          );
+        }
+      }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = widget.tokens;
+    final user = ref.watch(authStateProvider).valueOrNull;
+    final isAnonymous = user?.isAnonymous ?? true;
+
+    return ListTile(
+      contentPadding: widget.contentPadding ?? const EdgeInsets.symmetric(horizontal: 16),
+      leading: Icon(Icons.person_outline, color: tokens.primary),
+      title: Text('Account', style: TextStyle(color: tokens.textPrimary)),
+      subtitle: Text(
+        user == null
+            ? 'Not signed in'
+            : (isAnonymous
+                ? 'Guest'
+                : (user.email != null && user.email!.isNotEmpty
+                    ? user.email!
+                    : 'Signed in')),
+        style: TextStyle(color: tokens.textSecondary, fontSize: 12),
+      ),
+      trailing: isAnonymous
+          ? TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const LoginPage(),
+                ),
+              ),
+              child: Text('Upgrade account', style: TextStyle(color: tokens.primary)),
+            )
+          : TextButton(
+              onPressed: _isSigningOut ? null : _handleSignOut,
+              child: _isSigningOut
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: tokens.primary,
+                      ),
+                    )
+                  : Text('Sign out', style: TextStyle(color: tokens.primary)),
+            ),
+      onTap: isAnonymous
+          ? () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const LoginPage(),
+                ),
+              )
+          : null,
+    );
   }
 }

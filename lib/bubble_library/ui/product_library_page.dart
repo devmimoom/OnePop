@@ -183,7 +183,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
                                         CrossAxisAlignment.baseline,
                                     textBaseline: TextBaseline.alphabetic,
                                     children: [
-                                      Text('Your learning progress',
+                                      Text('Your progress',
                                           style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w700,
@@ -400,7 +400,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
                   ? Icons.check_circle
                   : Icons.check_circle_outline),
               onPressed: null,
-              tooltip: (saved?.learned ?? false) ? 'Learned' : 'To learn',
+              tooltip: (saved?.learned ?? false) ? 'Done' : 'Pending',
             ),
             IconButton(
               icon: Icon(

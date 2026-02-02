@@ -5,19 +5,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/providers.dart';
 import '../models/push_config.dart';
 import '../notifications/push_orchestrator.dart';
+import '../notifications/push_scheduler.dart';
 import '../notifications/notification_service.dart';
 import '../notifications/notification_scheduler.dart';
 import '../../notifications/push_exclusion_store.dart';
 import '../../widgets/rich_sections/user_learning_store.dart';
 import 'widgets/bubble_card.dart';
+import '../../providers/analytics_provider.dart';
 import '../../theme/app_tokens.dart';
 
 class PushProductConfigPage extends ConsumerWidget {
   final String productId;
   const PushProductConfigPage({super.key, required this.productId});
 
+  static final _loggedConfigIds = <String>{};
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (!_loggedConfigIds.contains(productId)) {
+      _loggedConfigIds.add(productId);
+      ref.read(analyticsProvider).logScreenView(screenName: 'push_config');
+    }
     // 檢查是否登入
     String? uid;
     try {
@@ -315,7 +323,7 @@ class PushProductConfigPage extends ConsumerWidget {
             final selected = cfg.presetSlots.contains(s);
             return FilterChip(
               selected: selected,
-              label: Text('$s:00'),
+              label: Text(formatTimeRange(PushScheduler.presetSlotRanges[s]!)),
               onSelected: (v) async {
                 final newSlots = List<String>.from(cfg.presetSlots);
                 if (v) {
@@ -429,7 +437,7 @@ class PushProductConfigPage extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Start over?'),
-        content: Text('This will clear all learning progress for "$productTitle" and re-enable notifications.\n\nContinue?'),
+        content: Text('This will clear all progress for "$productTitle" and re-enable notifications.\n\nContinue?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -501,7 +509,7 @@ class PushProductConfigPage extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Started over. Notifications rescheduled and learning history cleared.')),
+          const SnackBar(content: Text('Started over. Notifications rescheduled and history cleared.')),
         );
       }
     } catch (e) {

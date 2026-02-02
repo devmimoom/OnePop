@@ -8,12 +8,15 @@ import '../providers/providers.dart';
 import '../models/user_library.dart';
 import 'widgets/bubble_card.dart';
 import '../../../theme/app_tokens.dart';
+import '../../../providers/analytics_provider.dart';
 import '../../notifications/favorite_sentences_store.dart';
 import '../../services/learning_progress_service.dart';
 
 class DetailPage extends ConsumerWidget {
   final String contentItemId;
   const DetailPage({super.key, required this.contentItemId});
+
+  static final _loggedDetailIds = <String>{};
 
   List<Uri> _parseUrls(String s) {
     final parts = s.split(';').map((e) => e.trim()).where((e) => e.isNotEmpty);
@@ -31,6 +34,17 @@ class DetailPage extends ConsumerWidget {
     final productsAsync = ref.watch(productsMapProvider);
     final savedAsync = ref.watch(savedItemsProvider);
     final tokens = context.tokens;
+
+    if (itemAsync.hasValue && itemAsync.value != null && !_loggedDetailIds.contains(contentItemId)) {
+      _loggedDetailIds.add(contentItemId);
+      final item = itemAsync.value!;
+      ref.read(analyticsProvider).logScreenView(screenName: 'detail');
+      ref.read(analyticsProvider).logEvent('select_content', {
+        'content_type': 'content',
+        'item_id': contentItemId,
+        'content_group': item.productId,
+      });
+    }
 
     return Scaffold(
       backgroundColor: tokens.bg,
@@ -233,6 +247,10 @@ class DetailPage extends ConsumerWidget {
                             pushOrder: item.pushOrder,
                             source: 'detail_page',
                           );
+                          ref.read(analyticsProvider).logEvent('mark_learned', {
+                            'content_id': item.id,
+                            'topic_id': product.topicId,
+                          });
                           // ✅ 刷新 UI（savedItemsProvider 是 StreamProvider，會自動更新）
                           // 但為確保即時性，手動 invalidate
                           ref.invalidate(savedItemsProvider);

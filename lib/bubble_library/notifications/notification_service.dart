@@ -59,6 +59,28 @@ class NotificationService {
     if (onReschedule != null) _onReschedule = onReschedule;
   }
 
+  /// Requests notification permission only (no full init).
+  /// Use from onboarding "Turn On & Start"; full init runs when main app loads.
+  Future<void> requestPermissionOnly() async {
+    await plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+
+    final iosImpl = plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    if (iosImpl != null) {
+      final granted = await iosImpl.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      if (kDebugMode) {
+        debugPrint('🔔 iOS 通知權限: ${granted == true ? "已授予" : "未授予"}');
+      }
+    }
+  }
+
   Future<void> init({
     required String uid,
     void Function(Map<String, dynamic> data)? onTap,
@@ -523,9 +545,9 @@ class NotificationService {
     }
 
     final androidDetails = AndroidNotificationDetails(
-      'bubble_channel',
-      'Learning Bubble',
-      channelDescription: 'Daily learning bubbles',
+      'onepop_channel',
+      'OnePop',
+      channelDescription: 'OnePop daily',
       importance: Importance.high,
       priority: Priority.high,
       styleInformation: BigTextStyleInformation(body),
@@ -779,9 +801,9 @@ title: 'All done! 🎉',
 
     // Android 可先簡單帶過
     const androidDetails = AndroidNotificationDetails(
-      'bubble_test_channel',
-      'Bubble Test',
-      channelDescription: 'Test bubble notifications',
+      'onepop_test_channel',
+      'OnePop Test',
+      channelDescription: 'Test OnePop notifications',
       importance: Importance.max,
       priority: Priority.high,
       actions: [
@@ -807,8 +829,8 @@ title: 'All done! 🎉',
     try {
       await plugin.show(
         999001, // 固定 id（測試時覆蓋同一則）
-        'Learning bubble 30 sec',
-        'Tap "Done" to mark as learned.',
+        'OnePop 30 sec',
+        'Tap "Done" to mark as done.',
         details,
         payload: jsonEncode(payload),
       );

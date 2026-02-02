@@ -10,6 +10,7 @@ import 'widgets/app_background.dart';
 import 'theme/theme_controller.dart';
 import 'theme/app_tokens.dart';
 import 'providers/nav_providers.dart';
+import 'providers/analytics_provider.dart';
 import 'notifications/notification_bootstrapper.dart';
 
 final themeControllerProvider = Provider<ThemeController>((ref) {
@@ -57,8 +58,13 @@ class MainScaffold4Tabs extends ConsumerWidget {
             ),
             child: NavigationBar(
               selectedIndex: index,
-              onDestinationSelected: (i) =>
-                  ref.read(bottomTabIndexProvider.notifier).state = i,
+              onDestinationSelected: (i) {
+                ref.read(bottomTabIndexProvider.notifier).state = i;
+                final names = ['home', 'category', 'search', 'library', 'me'];
+                if (i >= 0 && i < names.length) {
+                  ref.read(analyticsProvider).logScreenView(screenName: names[i]);
+                }
+              },
               backgroundColor: Colors.transparent,
               elevation: 0,
               labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,

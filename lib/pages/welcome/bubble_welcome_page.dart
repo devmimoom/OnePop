@@ -108,7 +108,7 @@ class _BubbleWelcomePageState extends State<BubbleWelcomePage>
                               opacity: _popped ? (1.0 - popT) : 1.0,
                               duration: const Duration(milliseconds: 120),
                               child: const Text(
-                                'Learning Bubbles',
+                                'OnePop',
                                 style: TextStyle(
                                   fontSize: 44,
                                   fontWeight: FontWeight.w700,

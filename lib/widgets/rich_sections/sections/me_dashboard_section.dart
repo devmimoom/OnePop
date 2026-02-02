@@ -28,7 +28,7 @@ class MeDashboardSection extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Learning dashboard',
+            Text('Dashboard',
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
@@ -51,7 +51,7 @@ class MeDashboardSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Learning dashboard',
+          Text('Dashboard',
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,

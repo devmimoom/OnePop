@@ -313,7 +313,7 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
                                     ),
                                   ));
                                 },
-                          child: const Text('Learn 1 now'),
+                          child: const Text('Do 1 now'),
                         ),
                       ),
                     ],

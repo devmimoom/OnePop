@@ -271,31 +271,35 @@ class _ForYouCard extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(product.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                            color: tokens.textPrimary)),
-                    const SizedBox(height: 4),
-                    Text('${product.topicId} · ${product.level}',
-                        style: TextStyle(
-                            color: tokens.textSecondary, fontSize: 11)),
-                    const Spacer(),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Text('View ›',
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(product.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                              color: tokens.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800)),
-                    ),
-                  ],
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              color: tokens.textPrimary)),
+                      const SizedBox(height: 4),
+                      Text('${product.topicId} · ${product.level}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: tokens.textSecondary, fontSize: 11)),
+                      const SizedBox(height: 6),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Text('View ›',
+                            style: TextStyle(
+                                color: tokens.primary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

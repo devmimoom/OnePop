@@ -219,7 +219,7 @@ class ProductRail extends StatelessWidget {
                                 ),
                               ],
                               if (ctaText != null) ...[
-                                const Spacer(),
+                                const SizedBox(height: 6),
                                 Align(
                                   alignment: Alignment.bottomRight,
                                   child: Text(

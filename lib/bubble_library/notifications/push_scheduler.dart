@@ -44,7 +44,7 @@ class PushScheduler {
     // ✅ 修復：start == end 時視為「無勿擾時段」（例如 0:0 - 0:0）
     if (start == end) {
       if (kDebugMode) {
-        debugPrint('  ℹ️ _inQuiet: 無勿擾時段（start == end），時間 ${t.hour}:${t.minute} 不在勿擾時段');
+        debugPrint('  ℹ️ _inQuiet: 無勿擾時段（start == end），時間 ${formatTimeOfDay(t)} 不在勿擾時段');
       }
       return false;
     }
@@ -57,7 +57,7 @@ class PushScheduler {
     }
     
     if (kDebugMode && result) {
-      debugPrint('  ⚠️ _inQuiet: 時間 ${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')} 在勿擾時段內（${q.start.hour}:${q.start.minute} - ${q.end.hour}:${q.end.minute}）');
+      debugPrint('  ⚠️ _inQuiet: 時間 ${formatTimeOfDay(t)} 在勿擾時段內（${formatTimeRange(q)}）');
     }
     
     return result;

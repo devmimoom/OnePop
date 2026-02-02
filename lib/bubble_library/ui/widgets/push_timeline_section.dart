@@ -61,8 +61,6 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
     );
   }
 
-  int _toMinutes(TimeOfDay tod) => tod.hour * 60 + tod.minute;
-
   String _dateHeader(DateTime dt) {
     final y = dt.year.toString();
     final m = dt.month.toString().padLeft(2, '0');
@@ -74,12 +72,6 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
     final hh = dt.hour.toString().padLeft(2, '0');
     final mm = dt.minute.toString().padLeft(2, '0');
     return '$hh:$mm';
-  }
-
-  String _fmtMin(int minutes) {
-    final h = (minutes ~/ 60).toString().padLeft(2, '0');
-    final m = (minutes % 60).toString().padLeft(2, '0');
-    return '$h:$m';
   }
 
   Future<void> _pickTime({required bool isStart}) async {
@@ -225,15 +217,13 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
         // ✅ 從 Firestore 讀取勿擾時段
         ref.watch(globalPushSettingsProvider).when(
           data: (g) {
-            final startMin = _toMinutes(g.quietHours.start);
-            final endMin = _toMinutes(g.quietHours.end);
             return BubbleCard(
               child: Row(
                 children: [
                   const Icon(Icons.bedtime),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text('${_fmtMin(startMin)} - ${_fmtMin(endMin)}',
+                    child: Text(formatTimeRange(g.quietHours),
                         style: const TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w800),
                         overflow: TextOverflow.ellipsis),

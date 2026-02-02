@@ -53,6 +53,16 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
       
+      // 額度包餘額：users/{userId}/wallet/balance
+      match /wallet/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // 額度交易紀錄：users/{userId}/credit_transactions
+      match /credit_transactions/{transactionId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
       // ✅ 進度管理（SSOT）- ProgressService 使用
       // 路徑：users/{userId}/progress/{contentId}
       match /progress/{contentId} {

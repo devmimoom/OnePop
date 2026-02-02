@@ -131,7 +131,7 @@ class PushOrchestrator {
       debugPrint('  - days: $days');
       debugPrint('  - global.enabled: ${global.enabled}');
       debugPrint('  - global.dailyTotalCap: ${global.dailyTotalCap}');
-      debugPrint('  - global.quietHours: ${global.quietHours.start.hour}:${global.quietHours.start.minute} - ${global.quietHours.end.hour}:${global.quietHours.end.minute}');
+      debugPrint('  - global.quietHours: ${formatTimeRange(global.quietHours)}');
       debugPrint('  - libMap 產品數量: ${libMap.length}');
       
       final pushingForLog = libMap.values.where((p) => p.pushEnabled && !p.isHidden).toList();

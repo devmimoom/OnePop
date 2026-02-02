@@ -1,5 +1,21 @@
 # iOS 安裝到真機排錯
 
+## App 沒有留在手機（安裝後消失）
+
+若用 `flutter run` 安裝後 app 沒有留在手機上，請改用 **Xcode 建置並安裝**，通常就能常駐：
+
+1. **用 Xcode 開啟專案**
+   ```bash
+   open ios/Runner.xcworkspace
+   ```
+2. 上方 **Run destination** 選你的 iPhone（例如：xxx 的 iPhone）。
+3. 選單 **Product** → **Run**（或按 ⌘R），等建置完成。
+4. 安裝完成後，app 會留在手機主畫面。若出現「未受信任的開發者」，請到手機 **設定** → **一般** → **VPN 與裝置管理** → 信任你的開發者帳號。
+
+**補充**：用免費 Apple ID 簽署的 app 約 7 天後會過期，需重新用 Xcode 跑一次安裝。
+
+---
+
 ## 若出現「無法驗證其完整性」或 Could not run ... on device
 
 錯誤可能類似：

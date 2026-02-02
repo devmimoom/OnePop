@@ -198,7 +198,7 @@ class PushScheduleConflictChecker {
         type: ConflictType.allTimesInQuietHours,
         productId: product.productId,
         message:
-            '該產品的所有推播時間都在勿擾時段內（${global.quietHours.start.hour}:${global.quietHours.start.minute.toString().padLeft(2, '0')}-${global.quietHours.end.hour}:${global.quietHours.end.minute.toString().padLeft(2, '0')}），當天不會推播',
+            '該產品的所有推播時間都在勿擾時段內（${formatTimeRange(global.quietHours)}），當天不會推播',
         severity: Severity.warning,
       ));
     }
@@ -280,7 +280,7 @@ class PushScheduleConflictChecker {
         type: ConflictType.skipBlocksAllContent,
         productId: product.productId,
         message:
-            '跳過清單包含所有未學習的內容（${skipItems.length} 則），該產品在下次排程時可能無法推播',
+            '跳過清單包含所有未完成的內容（${skipItems.length} 則），該產品在下次排程時可能無法推播',
         severity: Severity.warning,
       ));
     }
