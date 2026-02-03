@@ -93,6 +93,7 @@ def main():
 
         topic_id = safe_str(r.get("topicId"))
         level = safe_str(r.get("level"))
+        title = none_if_nan(r.get("title")) or f"{topic_id} {level}".strip()
 
         data = {
             "type": none_if_nan(r.get("type")),
@@ -121,10 +122,8 @@ def main():
             "spec4Icon": none_if_nan(r.get("spec4Icon")),
             "trialMode": none_if_nan(r.get("trialMode")),
             "trialLimit": int(r.get("trialLimit")) if not pd.isna(r.get("trialLimit")) else 3,
-            # Search MVP（前綴搜尋用）
-            "titleLower": safe_str(r.get("titleLower")).lower() or None,
-            # title: use Excel if provided, else fallback
-            "title": none_if_nan(r.get("title")) or f"{topic_id} {level}".strip(),
+            "title": title,
+            "titleLower": (title or "").lower(),
         }
         prod_writes.append(lambda b, pid=pid, data=data: b.set(db.collection("products").document(pid), data, merge=True))
     commit_in_batches(prod_writes)

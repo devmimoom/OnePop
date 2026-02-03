@@ -179,10 +179,8 @@ def main():
                 pid = str(r["productId"]).strip()
                 # 生成 title（優先使用 Excel 中的 title，否則使用 topicId + level）
                 title = none_if_nan(r.get("title")) or f'{str(r["topicId"]).strip()} {str(r["level"]).strip()}'
-                # 生成 titleLower（優先使用 Excel 中的 titleLower，否則從 title 自動生成小寫版本）
-                title_lower = none_if_nan(r.get("titleLower"))
-                if not title_lower:
-                    title_lower = title.lower().strip()
+                # 生成 titleLower：一律由 title 產生，確保與 title 一致、搜尋可用
+                title_lower = (title or "").lower().strip()
                 # 處理 order 欄位（如果 Excel 中有就使用，沒有就設為 0）
                 order_value = int(r.get("order")) if not pd.isna(r.get("order")) else 0
 

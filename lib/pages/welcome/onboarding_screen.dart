@@ -120,13 +120,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 圓角與分層：外層漸層為「下方」、Padding 留白、內層圓角+陰影+裁切
+    // 正確的分層結構：外層漸層 → SafeArea → Padding → Material(圓角+陰影) → ClipRRect → PageView
     const double inset = 16;
     const double radius = 28;
     const Color layerBg = Color(0xFF0A0E27);
     return Scaffold(
       backgroundColor: layerBg,
       body: Container(
+        // 外層：漸層背景（整個螢幕）
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -134,22 +135,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             colors: [Color(0xFF0A0E27), Color(0xFF1A1F3A)],
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(inset),
-          child: Container(
-            decoration: BoxDecoration(
+        child: SafeArea(
+          // SafeArea 在這裡，確保內容不會被瀏海遮住
+          child: Padding(
+            padding: const EdgeInsets.all(inset),
+            child: Material(
+              // Material 同時處理圓角和陰影
               borderRadius: BorderRadius.circular(radius),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 20,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(radius),
-              child: SafeArea(
+              elevation: 8,
+              shadowColor: Colors.black.withValues(alpha: 0.3),
+              color: Colors.transparent,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(radius),
                 child: PageView(
                   controller: _pageController,
                   onPageChanged: _onPageChanged,
@@ -469,77 +466,12 @@ class _LogoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 120,
+      width: 160,
       height: 120,
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-              ),
-            ),
-            child: const Center(
-              child: Text(
-                'OP',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  letterSpacing: -1,
-                ),
-              ),
-            ),
-          ),
-          const Positioned(
-              top: 8, left: 8, child: _CornerAccent(position: 0)),
-          const Positioned(
-              top: 8, right: 8, child: _CornerAccent(position: 1)),
-          const Positioned(
-              bottom: 8, left: 8, child: _CornerAccent(position: 2)),
-          const Positioned(
-              bottom: 8, right: 8, child: _CornerAccent(position: 3)),
-        ],
-      ),
-    );
-  }
-}
-
-class _CornerAccent extends StatelessWidget {
-  final int position;
-
-  const _CornerAccent({required this.position});
-
-  @override
-  Widget build(BuildContext context) {
-    const side = BorderSide(color: Color(0x99FFFFFF), width: 3);
-    Border border;
-    switch (position) {
-      case 0:
-        border = const Border(top: side, left: side);
-        break;
-      case 1:
-        border = const Border(top: side, right: side);
-        break;
-      case 2:
-        border = const Border(bottom: side, left: side);
-        break;
-      case 3:
-        border = const Border(bottom: side, right: side);
-        break;
-      default:
-        border = Border.all(color: Colors.transparent);
-    }
-
-    return Container(
-      width: 20,
-      height: 20,
-      decoration: BoxDecoration(
-        border: border,
-        borderRadius: BorderRadius.circular(4),
+      child: Image.asset(
+        'assets/images/OnePop.png',
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
       ),
     );
   }

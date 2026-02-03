@@ -116,7 +116,7 @@ final searchResultsProvider = FutureProvider<List<Product>>((ref) async {
 enum SearchOwnedFilter { all, purchased, notPurchased }
 enum SearchPushFilter { all, pushingOnly }
 enum SearchWishFilter { all, wishedOnly }
-enum SearchLevelFilter { all, l1, l2, l3, l4, l5, l6 }
+enum SearchLevelFilter { all, foundation, practical, deepDive, specialized }
 
 final searchOwnedFilterProvider =
     StateProvider<SearchOwnedFilter>((ref) => SearchOwnedFilter.all);

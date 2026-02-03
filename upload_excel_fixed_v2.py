@@ -132,7 +132,7 @@ def main():
                 continue
 
             title = as_str(r.get("title")) or f"{as_str(r.get('topicId'), '')} {as_str(r.get('level'), '')}".strip()
-            title_lower = as_str(r.get("titleLower")) or title.lower()
+            title_lower = (title or "").lower().strip()
 
             data = {
                 "type": as_str(r.get("type")),

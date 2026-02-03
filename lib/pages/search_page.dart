@@ -93,8 +93,10 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Future<void> _submitSearch(String q) async {
     if (q.trim().isEmpty) return;
+    FocusManager.instance.primaryFocus?.unfocus();
     await _store.addRecentSearch(q);
     ref.read(searchQueryProvider.notifier).state = q;
+    ref.read(_searchFilterProvider.notifier).state = const _SearchFilterState();
     _searchController.text = q;
     _historyKey.currentState?.reload();
     await _loadRecentCache();
@@ -234,17 +236,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }) {
     Iterable<dynamic> list = products;
 
-    // filters
+    // filters（比對時 trim，與 sheet 萃取一致）
     if (filter.topicIds.isNotEmpty) {
       list = list.where((p) {
-        final tid = (p as dynamic).topicId?.toString();
-        return tid != null && filter.topicIds.contains(tid);
+        final tid = ((p as dynamic).topicId?.toString() ?? '').trim();
+        return tid.isNotEmpty && filter.topicIds.contains(tid);
       });
     }
     if (filter.levels.isNotEmpty) {
       list = list.where((p) {
-        final lv = (p as dynamic).level?.toString();
-        return lv != null && filter.levels.contains(lv);
+        final lv = ((p as dynamic).level?.toString() ?? '').trim();
+        return lv.isNotEmpty && filter.levels.contains(lv);
       });
     }
     if (filter.onlyPurchased) {
@@ -278,20 +280,24 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     required BuildContext context,
     required List<dynamic> products,
   }) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final tokens = context.tokens;
     final cur = ref.read(_searchFilterProvider);
 
-    // 從「目前結果」萃取可選項
+    // 從「目前結果」萃取可選項（trim 以利後續精確比對）
     final topicIds = <String>{};
     final levels = <String>{};
     for (final p in products) {
-      final tid = (p as dynamic).topicId?.toString();
-      final lv = (p as dynamic).level?.toString();
-      if (tid != null && tid.isNotEmpty) topicIds.add(tid);
-      if (lv != null && lv.isNotEmpty) levels.add(lv);
+      final tid = ((p as dynamic).topicId?.toString() ?? '').trim();
+      final lv = ((p as dynamic).level?.toString() ?? '').trim();
+      if (tid.isNotEmpty) topicIds.add(tid);
+      if (lv.isNotEmpty) levels.add(lv);
     }
     final topicList = topicIds.toList()..sort();
     final levelList = levels.toList()..sort();
+
+    // draft 必須跨 rebuild 保留，否則點 chip 後 setState 會把 draft 重置為 cur
+    final draftNotifier = ValueNotifier<_SearchFilterState>(cur);
 
     await showModalBottomSheet(
       context: context,
@@ -301,17 +307,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         return Container(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           decoration: BoxDecoration(
-            // ✅ 修復深色主題背景重疊問題：使用不透明背景
             color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF14182E) // 深色主題使用不透明背景
+                ? const Color(0xFF14182E)
                 : tokens.cardBg,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             border: Border.all(color: tokens.cardBorder),
           ),
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              var draft = cur;
-
+          child: ValueListenableBuilder<_SearchFilterState>(
+            valueListenable: draftNotifier,
+            builder: (context, draft, _) {
               Widget chips({
                 required List<String> items,
                 required Set<String> selected,
@@ -329,7 +333,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     return FilterChip(
                       selected: sel,
                       label: Text(v),
-                      onSelected: (_) => setState(() => onToggle(v)),
+                      onSelected: (_) => onToggle(v),
                       selectedColor: tokens.primary.withValues(alpha: 0.15),
                       checkmarkColor: tokens.primary,
                       labelStyle: TextStyle(
@@ -358,15 +362,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                 color: tokens.textPrimary)),
                         const Spacer(),
                         TextButton(
-                          onPressed: () => setState(
-                              () => draft = const _SearchFilterState()),
+                          onPressed: () =>
+                              draftNotifier.value = const _SearchFilterState(),
                           child: const Text('Clear'),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
                           onPressed: () {
                             ref.read(_searchFilterProvider.notifier).state =
-                                draft;
+                                draftNotifier.value;
                             Navigator.of(context).pop();
                           },
                           child: const Text('Apply'),
@@ -377,9 +381,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     SwitchListTile.adaptive(
                       contentPadding: EdgeInsets.zero,
                       value: draft.onlyPurchased,
-                      onChanged: (v) => setState(() {
-                        draft = draft.copyWith(onlyPurchased: v);
-                      }),
+                      onChanged: (v) =>
+                          draftNotifier.value = draft.copyWith(onlyPurchased: v),
                       title: Text('Purchased only',
                           style: TextStyle(color: tokens.textPrimary)),
                       subtitle: Text('Sign in to filter by purchase',
@@ -388,9 +391,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     SwitchListTile.adaptive(
                       contentPadding: EdgeInsets.zero,
                       value: draft.onlyPushing,
-                      onChanged: (v) => setState(() {
-                        draft = draft.copyWith(onlyPushing: v);
-                      }),
+                      onChanged: (v) =>
+                          draftNotifier.value = draft.copyWith(onlyPushing: v),
                       title: Text('Notifications on only',
                           style: TextStyle(color: tokens.textPrimary)),
                       subtitle: Text('Purchased and notifications enabled',
@@ -408,7 +410,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       onToggle: (v) {
                         final next = {...draft.topicIds};
                         next.contains(v) ? next.remove(v) : next.add(v);
-                        draft = draft.copyWith(topicIds: next);
+                        draftNotifier.value = draft.copyWith(topicIds: next);
                       },
                     ),
                     const SizedBox(height: 14),
@@ -423,7 +425,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       onToggle: (v) {
                         final next = {...draft.levels};
                         next.contains(v) ? next.remove(v) : next.add(v);
-                        draft = draft.copyWith(levels: next);
+                        draftNotifier.value = draft.copyWith(levels: next);
                       },
                     ),
                     const SizedBox(height: 8),
@@ -604,18 +606,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   switch (levelFilter) {
                     case SearchLevelFilter.all:
                       return true;
-                    case SearchLevelFilter.l1:
-                      return lv.contains('l1') || lv == '1';
-                    case SearchLevelFilter.l2:
-                      return lv.contains('l2') || lv == '2';
-                    case SearchLevelFilter.l3:
-                      return lv.contains('l3') || lv == '3';
-                    case SearchLevelFilter.l4:
-                      return lv.contains('l4') || lv == '4';
-                    case SearchLevelFilter.l5:
-                      return lv.contains('l5') || lv == '5';
-                    case SearchLevelFilter.l6:
-                      return lv.contains('l6') || lv == '6';
+                    case SearchLevelFilter.foundation:
+                      return lv.contains('foundation');
+                    case SearchLevelFilter.practical:
+                      return lv.contains('practical');
+                    case SearchLevelFilter.deepDive:
+                      return lv.contains('deep');
+                    case SearchLevelFilter.specialized:
+                      return lv.contains('specialized');
                   }
                 }
 
@@ -642,13 +640,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           label: const Text('Purchased'),
                           onSelected: (v) => ref.read(searchOwnedFilterProvider.notifier).state =
                               v ? SearchOwnedFilter.purchased : SearchOwnedFilter.all,
-                        ),
-                        const SizedBox(width: 8),
-                        FilterChip(
-                          selected: ownedFilter == SearchOwnedFilter.notPurchased,
-                          label: const Text('Not purchased'),
-                          onSelected: (v) => ref.read(searchOwnedFilterProvider.notifier).state =
-                              v ? SearchOwnedFilter.notPurchased : SearchOwnedFilter.all,
                         ),
                         const SizedBox(width: 8),
                         FilterChip(
@@ -758,6 +749,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   return Column(
                     children: [
                       filterBar(),
+                      const SizedBox(height: 4),
+                      filtersBar(),
+                      const SizedBox(height: 10),
                       Expanded(
                         child: Center(
                           child: Text('Filters applied, but no matching results',
@@ -974,36 +968,28 @@ class _LevelChip extends StatelessWidget {
       case SearchLevelFilter.all:
         label = 'Level';
         break;
-      case SearchLevelFilter.l1:
-        label = 'L1';
+      case SearchLevelFilter.foundation:
+        label = 'Foundation';
         break;
-      case SearchLevelFilter.l2:
-        label = 'L2';
+      case SearchLevelFilter.practical:
+        label = 'Practical';
         break;
-      case SearchLevelFilter.l3:
-        label = 'L3';
+      case SearchLevelFilter.deepDive:
+        label = 'Deep Dive';
         break;
-      case SearchLevelFilter.l4:
-        label = 'L4';
-        break;
-      case SearchLevelFilter.l5:
-        label = 'L5';
-        break;
-      case SearchLevelFilter.l6:
-        label = 'L6';
+      case SearchLevelFilter.specialized:
+        label = 'Specialized';
         break;
     }
 
     return PopupMenuButton<SearchLevelFilter>(
       onSelected: onChange,
       itemBuilder: (_) => const [
-        PopupMenuItem(value: SearchLevelFilter.all, child: Text('All')),
-        PopupMenuItem(value: SearchLevelFilter.l1, child: Text('L1')),
-        PopupMenuItem(value: SearchLevelFilter.l2, child: Text('L2')),
-        PopupMenuItem(value: SearchLevelFilter.l3, child: Text('L3')),
-        PopupMenuItem(value: SearchLevelFilter.l4, child: Text('L4')),
-        PopupMenuItem(value: SearchLevelFilter.l5, child: Text('L5')),
-        PopupMenuItem(value: SearchLevelFilter.l6, child: Text('L6')),
+        PopupMenuItem(value: SearchLevelFilter.all, child: Text('All Levels')),
+        PopupMenuItem(value: SearchLevelFilter.foundation, child: Text('Foundation')),
+        PopupMenuItem(value: SearchLevelFilter.practical, child: Text('Practical')),
+        PopupMenuItem(value: SearchLevelFilter.deepDive, child: Text('Deep Dive')),
+        PopupMenuItem(value: SearchLevelFilter.specialized, child: Text('Specialized')),
       ],
       child: Chip(
         label: Text(label),
