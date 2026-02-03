@@ -248,7 +248,12 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     }
 
     String latestTitleText(ScheduledPushEntry e) {
-      final day = extractDayFromBody(e.body);
+      // Day from payload first (body no longer contains Day N/365)
+      final pushOrder = e.payload['pushOrder'];
+      final day = pushOrder is int
+          ? pushOrder.toString()
+          : (pushOrder is num ? pushOrder.toInt().toString() : null) ??
+              extractDayFromBody(e.body);
       return day == null ? 'Next: ${e.title}' : 'Next: ${e.title} (#$day)';
     }
 
@@ -1423,7 +1428,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          'Day ${contentItem.seq} · ${contentItem.anchorGroup}',
+                          '#${contentItem.seq} · ${contentItem.anchorGroup}',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,

@@ -155,15 +155,11 @@ class _ContinueCard extends StatelessWidget {
   String _fmtTime(DateTime dt) =>
       '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 
-  String _extractDay(String body) {
-    final firstLine = body.split('\n').first;
-    final m = RegExp(r'Day\s+(\d+)/365').firstMatch(firstLine);
-    // 如果找不到舊格式，嘗試找新格式（只有數字）
-    if (m == null) {
-      final m2 = RegExp(r'(\d+)/365').firstMatch(firstLine);
-      return m2 == null ? '' : '（${m2.group(1)}）';
-    }
-    return '（${m.group(1)}）';
+  String _dayFromPayload(ScheduledPushEntry e) {
+    final pushOrder = e.payload['pushOrder'];
+    if (pushOrder is int) return '（$pushOrder）';
+    if (pushOrder is num) return '（${pushOrder.toInt()}）';
+    return '';
   }
 
   @override
@@ -174,7 +170,7 @@ class _ContinueCard extends StatelessWidget {
         ? 'Notifications off'
         : (nextEntry == null
             ? 'No schedule for next 3 days'
-            : 'Next: ${_fmtTime(nextEntry!.when)} · ${nextEntry!.title}${_extractDay(nextEntry!.body)}');
+            : 'Next: ${_fmtTime(nextEntry!.when)} · ${nextEntry!.title}${_dayFromPayload(nextEntry!)}');
 
     return InkWell(
       onTap: onTap,

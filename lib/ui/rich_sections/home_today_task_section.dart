@@ -79,13 +79,10 @@ final _todayPushStatsProvider = FutureProvider<TodayPushStats>((ref) async {
       final productsMap = await ref.read(productsMapProvider.future);
       final product = productsMap[task.productId];
       final productTitle = product?.title ?? task.productId;
-      
-      final title = task.item.anchorGroup.isNotEmpty
-          ? task.item.anchorGroup
-          : productTitle;
-      final subtitle =
-          'L1｜${task.item.intent}｜◆${task.item.difficulty}｜${task.item.pushOrder}/365';
-      final body = '$subtitle\n${task.item.content}';
+
+      // Same as push_orchestrator: title = productTitle only (no anchor), body = content
+      final title = productTitle.trim().isNotEmpty ? productTitle.trim() : task.productId;
+      final body = task.item.content;
       
       final payload = {
         'type': 'bubble',

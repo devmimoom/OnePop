@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +13,7 @@ import '../widgets/rich_sections/sections/me_achievements_section.dart';
 import '../services/reset_service.dart';
 import '../bubble_library/providers/providers.dart';
 import '../bubble_library/ui/push_center_page.dart';
+import 'ios_notification_guide_page.dart';
 import 'wallet_page.dart';
 import 'auth/login_page.dart';
 
@@ -64,6 +66,21 @@ class MePage extends ConsumerWidget {
               MaterialPageRoute(builder: (_) => const PushCenterPage()),
             ),
           ),
+          if (Theme.of(context).platform == TargetPlatform.iOS)
+            ListTile(
+              leading: Icon(CupertinoIcons.settings, color: tokens.primary),
+              title: Text('Notification setup tips', style: TextStyle(color: tokens.textPrimary)),
+              subtitle: Text(
+                'Banner & preview settings',
+                style: TextStyle(color: tokens.textSecondary, fontSize: 12),
+              ),
+              trailing: Icon(Icons.chevron_right, color: tokens.textSecondary),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const IosNotificationGuidePage(),
+                ),
+              ),
+            ),
           const Divider(),
 
           ListTile(
@@ -240,7 +257,7 @@ class MePage extends ConsumerWidget {
       }
 
       if (kDebugMode) {
-        debugPrint('重置失败: $e');
+        debugPrint('Reset failed: $e');
       }
     } finally {
       // 释放资源

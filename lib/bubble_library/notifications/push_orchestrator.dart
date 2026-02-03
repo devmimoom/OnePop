@@ -279,11 +279,9 @@ class PushOrchestrator {
       final productTitle = product?.title ?? t.productId;
       final topicId = product?.topicId ?? '';
 
-      final title =
-          t.item.anchorGroup.isNotEmpty ? t.item.anchorGroup : productTitle;
-      final subtitle =
-          'L1｜${t.item.intent}｜◆${t.item.difficulty}｜Day ${t.item.pushOrder}/365';
-      final body = '$subtitle\n${t.item.content}';
+      // Title: productTitle only (no anchor); Body: content only
+      final title = productTitle.trim().isNotEmpty ? productTitle.trim() : t.productId;
+      final body = t.item.content;
 
       final payload = {
         'type': 'bubble',

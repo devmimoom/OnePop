@@ -151,16 +151,16 @@ class PushTimelineSectionState extends ConsumerState<PushTimelineSection> {
                         final contentItemId =
                             e.payload['contentItemId']?.toString() ?? '';
 
-                        // title 通常是 anchorGroup 或 productTitle
+                        // title: productTitle only (or productId fallback)
                         final title = e.title.isNotEmpty ? e.title : productId;
 
-                        // body 第一行通常有 Day xx/365
-                        final firstLine = e.body.split('\n').first;
-                        final dayMatch =
-                            RegExp(r'Day\s+(\d+)/365').firstMatch(firstLine);
-                        final dayText = dayMatch == null
-                            ? ''
-                            : ' · Day ${dayMatch.group(1)}';
+                        // Day from payload (body no longer contains Day N/365)
+                        final pushOrder = e.payload['pushOrder'];
+                        final dayNum = pushOrder is int
+                            ? pushOrder
+                            : (pushOrder is num ? pushOrder.toInt() : null);
+                        final dayText =
+                            dayNum == null ? '' : ' · Day $dayNum';
 
                         return ListTile(
                           contentPadding: EdgeInsets.zero,

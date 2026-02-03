@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'dart:io';
+
 import '../../bubble_library/notifications/notification_service.dart';
+import '../ios_notification_guide_page.dart';
 import 'onboarding_store.dart';
 
 // Onboarding State Provider
@@ -98,15 +101,31 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   Future<void> _enableNotifications() async {
     await NotificationService().requestPermissionOnly();
-    await setOnboardingComplete();
-    if (mounted) widget.onComplete();
+    if (!mounted) return;
+    if (Platform.isIOS) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => IosNotificationGuidePage(
+            onComplete: () {
+              setOnboardingComplete().then((_) => widget.onComplete());
+            },
+          ),
+        ),
+      );
+    } else {
+      await setOnboardingComplete();
+      if (mounted) widget.onComplete();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    const double inset = 14;
-    const double radius = 24;
+    // 圓角與分層：外層漸層為「下方」、Padding 留白、內層圓角+陰影+裁切
+    const double inset = 16;
+    const double radius = 28;
+    const Color layerBg = Color(0xFF0A0E27);
     return Scaffold(
+      backgroundColor: layerBg,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
