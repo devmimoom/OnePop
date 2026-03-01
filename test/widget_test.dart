@@ -20,7 +20,10 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(
       ProviderScope(
-        child: MyApp(themeController: themeController),
+        child: MyApp(
+          themeController: themeController,
+          initialHasSeenOnboarding: true,
+        ),
       ),
     );
 

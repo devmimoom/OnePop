@@ -51,7 +51,7 @@ class LibraryRichCard extends StatelessWidget {
           if (coverImageUrl != null && coverImageUrl!.isNotEmpty)
             LayoutBuilder(
               builder: (context, constraints) {
-                final h = (constraints.maxWidth / kBannerAspectRatio)
+                final h = (constraints.maxWidth / kCoverAspectRatio)
                     .clamp(120.0, 260.0);
                 return ClipRRect(
                   borderRadius:

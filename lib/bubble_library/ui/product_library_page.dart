@@ -1,14 +1,15 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/providers.dart';
+import '../models/product.dart';
 import '../models/content_item.dart';
 import '../models/user_library.dart';
+import '../../localization/app_language.dart';
+import '../../localization/app_language_provider.dart';
 import 'detail_page.dart';
 import 'widgets/bubble_card.dart';
 import '../../../theme/app_tokens.dart';
-import '../../widgets/rich_sections/user_learning_store.dart';
 import '../notifications/scheduled_push_cache.dart';
 
 class ProductLibraryPage extends ConsumerStatefulWidget {
@@ -64,8 +65,6 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
     super.initState();
     // 監聽頁面生命週期，當頁面重新可見時刷新數據
     WidgetsBinding.instance.addObserver(this);
-    // 保底記錄：進入內容頁就記一次學習
-    unawaited(UserLearningStore().markLearnedTodayAndGlobal(widget.productId));
   }
 
   @override
@@ -85,6 +84,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(appLanguageProvider);
     final productsAsync = ref.watch(productsMapProvider);
     final contentsAsync = ref.watch(contentByProductProvider(widget.productId));
     final savedAsync = ref.watch(savedItemsProvider);
@@ -140,7 +140,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(product.title,
+                                      Text(product.displayTitle(lang),
                                           style: const TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w900)),
@@ -251,7 +251,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
                               // 確保卡片顯示最新的狀態（learned/reviewLater/favorite）
                               ref.invalidate(savedItemsProvider);
                             },
-                            child: _contentCard(context, ref, it, saved),
+                            child: _contentCard(context, ref, it, saved, lang),
                           ),
                         );
 
@@ -350,7 +350,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
     );
   }
 
-  Widget _contentCard(BuildContext context, WidgetRef ref, ContentItem it, SavedContent? saved) {
+  Widget _contentCard(BuildContext context, WidgetRef ref, ContentItem it, SavedContent? saved, AppLanguage lang) {
     try {
       ref.read(uidProvider);
     } catch (_) {
@@ -368,7 +368,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
           children: [
             Expanded(
               child: Text(
-                it.anchor.isNotEmpty ? it.anchor : it.anchorGroup,
+                it.displayAnchor(lang).isNotEmpty ? it.displayAnchor(lang) : it.displayAnchorGroup(lang),
                 style:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
               ),
@@ -390,7 +390,7 @@ class _ProductLibraryPageState extends ConsumerState<ProductLibraryPage> with Wi
         const SizedBox(height: 8),
         // 內容預覽（增加字數限制，最多2行）
         Text(
-          ellipsize(it.content, 100),
+          ellipsize(it.displayContent(lang), 100),
           style: const TextStyle(fontSize: 15, height: 1.4),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,

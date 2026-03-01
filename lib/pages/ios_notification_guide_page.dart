@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../localization/app_language.dart';
+import '../localization/app_language_provider.dart';
+import '../localization/app_strings.dart';
 
-class IosNotificationGuidePage extends StatelessWidget {
+class IosNotificationGuidePage extends ConsumerWidget {
   const IosNotificationGuidePage({
     super.key,
     this.onComplete,
@@ -11,14 +15,15 @@ class IosNotificationGuidePage extends StatelessWidget {
   final VoidCallback? onComplete;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(appLanguageProvider);
     final body = ListView(
       padding: const EdgeInsets.all(20),
       children: [
         // Header
-        const Text(
-          'Set up notifications',
-          style: TextStyle(
+        Text(
+          uiString(lang, 'ios_guide_title'),
+          style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
             color: Color(0xFF1E1E1E),
@@ -26,7 +31,7 @@ class IosNotificationGuidePage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Turn on these three settings so you never miss an update.',
+          uiString(lang, 'ios_guide_subtitle'),
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey.shade600,
@@ -38,16 +43,17 @@ class IosNotificationGuidePage extends StatelessWidget {
         // Setting 1: Deliver Immediately
         _buildSettingCard(
           context,
+          lang: lang,
           icon: CupertinoIcons.bell_fill,
           iconColor: const Color(0xFFFF9800),
-          title: 'Delivery → Choose "Immediately"',
-          description: 'OnePop delivers at the right time. Keep delivery set to "Immediately" so notifications show up right away instead of being batched.',
-          steps: [
-            '1. Open the Settings app.',
-            '2. Tap Notifications, then OnePop.',
-            '3. Make sure "Immediately" is selected (not "Scheduled Summary").',
+          titleKey: 'ios_guide_delivery_title',
+          descriptionKey: 'ios_guide_delivery_desc',
+          stepKeys: [
+            'ios_guide_step_open_settings',
+            'ios_guide_step_tap_notifications',
+            'ios_guide_step_immediately',
           ],
-          badgeText: 'Important',
+          badgeTextKey: 'ios_guide_badge_important',
           isHighlighted: true,
         ),
 
@@ -56,15 +62,16 @@ class IosNotificationGuidePage extends StatelessWidget {
         // Setting 2: Banner style
         _buildSettingCard(
           context,
+          lang: lang,
           icon: CupertinoIcons.rectangle_stack,
           iconColor: const Color(0xFF5B8DEF),
-          title: 'Banner Style → Choose "Persistent"',
-          description: 'Banners stay at the top until you tap or dismiss them, so you don\'t miss anything.',
-          steps: [
-            '1. In Notifications → OnePop, tap Banner Style.',
-            '2. Select "Persistent" (not "Temporary").',
+          titleKey: 'ios_guide_banner_title',
+          descriptionKey: 'ios_guide_banner_desc',
+          stepKeys: [
+            'ios_guide_banner_step1',
+            'ios_guide_banner_step2',
           ],
-          badgeText: 'Recommended',
+          badgeTextKey: 'ios_guide_badge_recommended',
         ),
 
         const SizedBox(height: 20),
@@ -72,15 +79,16 @@ class IosNotificationGuidePage extends StatelessWidget {
         // Setting 3: Show Previews
         _buildSettingCard(
           context,
+          lang: lang,
           icon: CupertinoIcons.eye,
           iconColor: const Color(0xFF66BB6A),
-          title: 'Show Previews → Choose "Always"',
-          description: 'You\'ll see the full message on the lock screen so you can read it at a glance.',
-          steps: [
-            '1. In Notifications → OnePop, find Show Previews.',
-            '2. Select "Always".',
+          titleKey: 'ios_guide_previews_title',
+          descriptionKey: 'ios_guide_previews_desc',
+          stepKeys: [
+            'ios_guide_previews_step1',
+            'ios_guide_previews_step2',
           ],
-          badgeText: 'Handy',
+          badgeTextKey: 'ios_guide_badge_handy',
         ),
 
         const SizedBox(height: 32),
@@ -113,9 +121,9 @@ class IosNotificationGuidePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Why "Immediately"?',
-                    style: TextStyle(
+                  Text(
+                    uiString(lang, 'ios_guide_why_immediately_title'),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1E1E1E),
@@ -125,7 +133,7 @@ class IosNotificationGuidePage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'OnePop is built around specific send times (e.g. 7:00, 12:30, 21:00) so content arrives when it\'s most useful.',
+                uiString(lang, 'ios_guide_why_immediately_body1'),
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey.shade800,
@@ -134,7 +142,7 @@ class IosNotificationGuidePage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'If you use "Scheduled Summary", iOS will hold notifications until your chosen summary time (e.g. 8:00 AM), which defeats the point of OnePop\'s timing.',
+                uiString(lang, 'ios_guide_why_immediately_body2'),
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey.shade800,
@@ -167,16 +175,16 @@ class IosNotificationGuidePage extends StatelessWidget {
                 color: Color(0xFF5B8DEF),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Open Settings',
-                style: TextStyle(
+              Text(
+                uiString(lang, 'ios_guide_open_settings_title'),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Tap below to jump straight to iOS Settings.',
+                uiString(lang, 'ios_guide_open_settings_subtitle'),
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey.shade600,
@@ -186,7 +194,7 @@ class IosNotificationGuidePage extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () => _openAppSettings(context),
                 icon: const Icon(CupertinoIcons.arrow_right_circle),
-                label: const Text('Open Settings'),
+                label: Text(uiString(lang, 'ios_guide_open_settings_btn')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF5B8DEF),
                   foregroundColor: Colors.white,
@@ -222,7 +230,7 @@ class IosNotificationGuidePage extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'You can change these anytime in Settings → Notifications → OnePop.',
+                  uiString(lang, 'ios_guide_footer_note'),
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.grey.shade600,
@@ -248,7 +256,7 @@ class IosNotificationGuidePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Get Started'),
+              child: Text(uiString(lang, 'ios_guide_get_started')),
             ),
           ),
         ],
@@ -265,7 +273,7 @@ class IosNotificationGuidePage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: const Text('Notification Settings'),
+          title: Text(uiString(lang, 'notification_settings_title')),
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           elevation: 0,
@@ -277,14 +285,19 @@ class IosNotificationGuidePage extends StatelessWidget {
 
   Widget _buildSettingCard(
     BuildContext context, {
+    required AppLanguage lang,
     required IconData icon,
     required Color iconColor,
-    required String title,
-    required String description,
-    required List<String> steps,
-    required String badgeText,
+    required String titleKey,
+    required String descriptionKey,
+    required List<String> stepKeys,
+    required String badgeTextKey,
     bool isHighlighted = false,
   }) {
+    final title = uiString(lang, titleKey);
+    final description = uiString(lang, descriptionKey);
+    final badgeText = uiString(lang, badgeTextKey);
+    final steps = stepKeys.map((k) => uiString(lang, k)).toList();
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(

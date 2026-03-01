@@ -11,7 +11,7 @@ class BubbleCard extends StatefulWidget {
     super.key,
     required this.child,
     this.onTap,
-    this.padding = const EdgeInsets.all(14),
+    this.padding = const EdgeInsets.all(16),
   });
 
   @override

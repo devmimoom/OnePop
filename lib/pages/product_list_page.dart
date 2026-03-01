@@ -5,6 +5,8 @@ import '../providers/v2_providers.dart';
 import '../widgets/app_card.dart';
 import '../theme/app_tokens.dart';
 import '../theme/layout_constants.dart';
+import '../localization/app_language_provider.dart';
+import '../localization/bilingual_text.dart';
 import 'product_page.dart';
 
 class ProductListPage extends ConsumerWidget {
@@ -15,6 +17,7 @@ class ProductListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final products = ref.watch(productsByTopicProvider(topicId));
     final tokens = context.tokens;
+    final lang = ref.watch(appLanguageProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text('Products · $topicId')),
@@ -77,7 +80,7 @@ class ProductListPage extends ConsumerWidget {
                       (screenWidth - gridPadding - (crossAxisCount - 1) * spacing) /
                           crossAxisCount;
                   final imageHeight = cellWidth / kCoverAspectRatio;
-                  const textAreaHeight = 110.0;
+                  const textAreaHeight = 80.0;
                   final childAspectRatio =
                       cellWidth / (imageHeight + textAreaHeight);
 
@@ -128,26 +131,23 @@ class ProductListPage extends ConsumerWidget {
                               ),
                             Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(10),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(p.title,
+                                    Text(productTitle(p, lang),
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                             fontWeight: FontWeight.w800,
+                                            fontSize: 13,
                                             color: tokens.textPrimary)),
-                                    const SizedBox(height: 6),
+                                    const SizedBox(height: 4),
                                     Text('${p.topicId} · ${p.level}',
                                         style: TextStyle(
+                                            fontSize: 11,
                                             color: tokens.textSecondary)),
-                                    const Spacer(),
-                                    Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: Text('View ›',
-                                            style: TextStyle(
-                                                color: tokens.primary))),
                                   ],
                                 ),
                               ),

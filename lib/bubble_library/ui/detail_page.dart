@@ -6,11 +6,16 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/providers.dart';
 import '../models/user_library.dart';
+import '../models/product.dart';
+import '../models/content_item.dart';
 import 'widgets/bubble_card.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../providers/analytics_provider.dart';
+import '../../../localization/app_language_provider.dart';
+import '../../../localization/app_strings.dart';
 import '../../notifications/favorite_sentences_store.dart';
 import '../../services/learning_progress_service.dart';
+import '../../../widgets/rich_sections/user_learning_store.dart';
 
 class DetailPage extends ConsumerWidget {
   final String contentItemId;
@@ -30,6 +35,7 @@ class DetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(appLanguageProvider);
     final itemAsync = ref.watch(contentItemProvider(contentItemId));
     final productsAsync = ref.watch(productsMapProvider);
     final savedAsync = ref.watch(savedItemsProvider);
@@ -51,11 +57,13 @@ class DetailPage extends ConsumerWidget {
       appBar: AppBar(
         title: itemAsync.when(
           data: (item) => Text(
-            item.anchor.isNotEmpty ? item.anchor : 'Detail',
+            item.displayAnchor(lang).isNotEmpty
+                ? item.displayAnchor(lang)
+                : uiString(lang, 'detail_title'),
             overflow: TextOverflow.ellipsis,
           ),
-          loading: () => const Text('Detail'),
-          error: (_, __) => const Text('Detail'),
+          loading: () => Text(uiString(lang, 'detail_title')),
+          error: (_, __) => Text(uiString(lang, 'detail_title')),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -65,8 +73,8 @@ class DetailPage extends ConsumerWidget {
           final urls = _parseUrls(item.sourceUrl);
           final productsMap = productsAsync.valueOrNull;
           final product = productsMap?[item.productId];
-          final headerTitle = product?.title ?? item.anchorGroup;
-          final headerSubtitle = [item.anchor, item.anchorGroup]
+          final headerTitle = product?.displayTitle(lang) ?? item.displayAnchorGroup(lang);
+          final headerSubtitle = [item.displayAnchor(lang), item.displayAnchorGroup(lang)]
               .where((s) => s.isNotEmpty)
               .join(' · ');
 
@@ -79,7 +87,9 @@ class DetailPage extends ConsumerWidget {
               try {
                 uid = ref.read(uidProvider);
               } catch (_) {
-                return const Center(child: Text('Sign in to use this feature.'));
+                return Center(
+                  child: Text(uiString(lang, 'sign_in_to_use_feature')),
+                );
               }
 
               final repo = ref.read(libraryRepoProvider);
@@ -117,11 +127,15 @@ class DetailPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Quick Bite',
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w900)),
+                        Text(
+                          uiString(lang, 'quick_read'),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                         const SizedBox(height: 8),
-                        Text(item.content,
+                        Text(item.displayContent(lang),
                             style: const TextStyle(
                                 fontSize: 18,
                                 height: 1.35,
@@ -132,13 +146,16 @@ class DetailPage extends ConsumerWidget {
                             TextButton.icon(
                               onPressed: () async {
                                 await Clipboard.setData(
-                                    ClipboardData(text: item.content));
+                                    ClipboardData(text: item.displayContent(lang)));
                                 // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Copied.')));
+                                  SnackBar(
+                                    content: Text(uiString(lang, 'copied')),
+                                  ),
+                                );
                               },
                               icon: const Icon(Icons.copy, size: 18),
-                              label: const Text('Copy'),
+                              label: Text(uiString(lang, 'copy')),
                             ),
                             Builder(
                               builder: (ctx) {
@@ -148,7 +165,7 @@ class DetailPage extends ConsumerWidget {
                                       headerTitle,
                                       headerSubtitle,
                                       '',
-                                      item.content,
+                                      item.displayContent(lang),
                                     ].join('\n');
                                     try {
                                       final box = ctx.findRenderObject() as RenderBox?;
@@ -162,18 +179,27 @@ class DetailPage extends ConsumerWidget {
                                       );
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Shared.')));
+                                          SnackBar(
+                                            content:
+                                                Text(uiString(lang, 'shared')),
+                                          ),
+                                        );
                                       }
                                     } catch (e, st) {
                                       debugPrint('Share: $e\n$st');
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Share not available: ${e.toString()}')));
+                                          SnackBar(
+                                            content: Text(
+                                              '${uiString(lang, 'share_not_available')}${e.toString()}',
+                                            ),
+                                          ),
+                                        );
                                       }
                                     }
                                   },
                                   icon: const Icon(Icons.share, size: 18),
-                                  label: const Text('Share'),
+                                  label: Text(uiString(lang, 'share')),
                                 );
                               },
                             ),
@@ -194,7 +220,8 @@ class DetailPage extends ConsumerWidget {
                                   // 收藏：獲取產品名稱並保存到本地
                                   final productsMap = await ref.read(productsMapProvider.future);
                                   final product = productsMap[item.productId];
-                                  final productName = product?.title ?? 'Unknown product';
+                                  final productName =
+                                      product?.title ?? uiString(lang, 'unknown_product');
                                   
                                   await FavoriteSentencesStore.add(
                                     uid,
@@ -233,12 +260,24 @@ class DetailPage extends ConsumerWidget {
                         if (product == null) {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Could not load product info.')),
+                              SnackBar(
+                                content: Text(
+                                  uiString(lang, 'could_not_load_product_info'),
+                                ),
+                              ),
                             );
                           }
                           return;
                         }
                         
+                        // ✅ 先保底寫 saved_items（與 bootstrapper 一致）
+                        // 避免 markLearnedAndAdvance 的 early return 跳過 saved_items 寫入
+                        try {
+                          await repo.setSavedItem(uid!, item.id, {'learned': true});
+                        } catch (e) {
+                          debugPrint('⚠️ setSavedItem fallback error: $e');
+                        }
+
                         final progress = LearningProgressService();
                         try {
                           await progress.markLearnedAndAdvance(
@@ -247,29 +286,29 @@ class DetailPage extends ConsumerWidget {
                             pushOrder: item.pushOrder,
                             source: 'detail_page',
                           );
-                          ref.read(analyticsProvider).logEvent('mark_learned', {
-                            'content_id': item.id,
-                            'topic_id': product.topicId,
-                          });
-                          // ✅ 刷新 UI（savedItemsProvider 是 StreamProvider，會自動更新）
-                          // 但為確保即時性，手動 invalidate
-                          ref.invalidate(savedItemsProvider);
-                          ref.invalidate(libraryProductsProvider);
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Marked as complete.')),
-                            );
-                          }
                         } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Action failed: $e')),
-                            );
-                          }
+                          // 已有 setSavedItem 保底，忽略即可
+                          debugPrint('⚠️ markLearnedAndAdvance failed (fallback used): $e');
+                        }
+                        ref.read(analyticsProvider).logEvent('mark_learned', {
+                          'content_id': item.id,
+                          'topic_id': product.topicId,
+                        });
+                        // 以「標記學會」為準：更新 streak（當天有學習）
+                        await UserLearningStore().markLearnedTodayAndGlobal(item.productId);
+                        ref.invalidate(savedItemsProvider);
+                        ref.invalidate(libraryProductsProvider);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text(uiString(lang, 'marked_as_complete')),
+                            ),
+                          );
                         }
                       },
                       icon: const Icon(Icons.check),
-                      label: const Text('Done'),
+                      label: Text(uiString(lang, 'done')),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -279,15 +318,21 @@ class DetailPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Deep dive',
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w900)),
+                        Text(
+                          uiString(lang, 'deep_dive'),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                         const SizedBox(height: 10),
-                        if (item.deepAnalysis.isEmpty)
-                          Text('No content',
-                              style: TextStyle(color: tokens.textSecondary))
+                        if (item.displayDeepAnalysis(lang).isEmpty)
+                          Text(
+                            uiString(lang, 'no_content'),
+                            style: TextStyle(color: tokens.textSecondary),
+                          )
                         else
-                          Text(item.deepAnalysis,
+                          Text(item.displayDeepAnalysis(lang),
                               style: const TextStyle(
                                   height: 1.35,
                                   fontSize: 15)),
@@ -301,13 +346,19 @@ class DetailPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Further reading',
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w900)),
+                        Text(
+                          uiString(lang, 'further_reading'),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                         const SizedBox(height: 10),
                         if (urls.isEmpty)
-                          Text('No links',
-                              style: TextStyle(color: tokens.textSecondary))
+                          Text(
+                            uiString(lang, 'no_links'),
+                            style: TextStyle(color: tokens.textSecondary),
+                          )
                         else
                           ...urls.map((u) => Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
@@ -320,8 +371,12 @@ class DetailPage extends ConsumerWidget {
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
-                                          const SnackBar(
-                                              content: Text('Could not open link')),
+                                          SnackBar(
+                                            content: Text(
+                                              uiString(
+                                                  lang, 'could_not_open_link'),
+                                            ),
+                                          ),
                                         );
                                       }
                                     }
@@ -339,11 +394,15 @@ class DetailPage extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('saved error: $e')),
+            error: (e, _) => Center(
+              child: Text('${uiString(lang, 'saved_error')}$e'),
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('detail error: $e')),
+        error: (e, _) => Center(
+          child: Text('${uiString(lang, 'detail_error')}$e'),
+        ),
       ),
     );
   }

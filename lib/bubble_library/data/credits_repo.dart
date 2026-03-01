@@ -100,18 +100,20 @@ class CreditsRepo {
         'balance': balanceAfter,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-      if (!libSnap.exists) {
-        tx.set(libraryRef, {
-          'productId': productId,
-          'purchasedAt': FieldValue.serverTimestamp(),
-          'isFavorite': false,
-          'isHidden': false,
-          'pushEnabled': false,
-          'progress': {'nextSeq': 1, 'learnedCount': 0},
-          'pushConfig': null,
-          'lastOpenedAt': null,
-        });
-      }
+      // 不論是否已存在，都確保 isHidden=false（含曾被刪除後重購的情況）
+      final libData = libSnap.data();
+      tx.set(libraryRef, {
+        'productId': productId,
+        'purchasedAt': libSnap.exists && libData?['purchasedAt'] != null
+            ? libData!['purchasedAt']
+            : FieldValue.serverTimestamp(),
+        'isFavorite': libData?['isFavorite'] ?? false,
+        'isHidden': false,
+        'pushEnabled': libData?['pushEnabled'] ?? false,
+        'progress': libData?['progress'] ?? {'nextSeq': 1, 'learnedCount': 0},
+        'pushConfig': libData?['pushConfig'],
+        'lastOpenedAt': libData?['lastOpenedAt'],
+      }, SetOptions(merge: true));
       tx.set(txCol.doc(), {
         'type': 'redeem',
         'amount': amount,

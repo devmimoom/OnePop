@@ -355,7 +355,8 @@ class PushTimelineList extends ConsumerWidget {
                                       ?.toInt() ??
                                   0;
 
-                              final productTitle = productsMap[productId]?.title ?? productId;
+                              final productTitle =
+                                  productsMap[productId]?.title ?? productId;
                               // 第一行、第二行都用 product title
                               final displayTitle = productTitle;
 

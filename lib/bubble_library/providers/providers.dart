@@ -37,6 +37,12 @@ final uidProvider = Provider<String>((ref) {
   return u.uid;
 });
 
+/// 當前使用者 uid，未登入或匿名時為 'local'（供 Me 頁興趣標籤等使用）
+final uidOrLocalProvider = Provider<String>((ref) {
+  final user = ref.watch(authStateProvider).valueOrNull;
+  return user?.uid ?? 'local';
+});
+
 /// 審查／全開帳號：登入此 email 時所有產品視為免費（不扣額度）。
 const _fullAccessEmails = ['dev.mimoom@gmail.com'];
 

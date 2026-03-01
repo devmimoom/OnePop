@@ -6,6 +6,9 @@ import '../../app_card.dart';
 
 import '../../../bubble_library/providers/providers.dart';
 import '../../../collections/wishlist_provider.dart';
+import '../../../localization/app_language.dart';
+import '../../../localization/app_language_provider.dart';
+import '../../../localization/app_strings.dart';
 import '../../../pages/product_page.dart';
 
 class MeDashboardSection extends ConsumerWidget {
@@ -14,6 +17,7 @@ class MeDashboardSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = context.tokens;
+    final lang = ref.watch(appLanguageProvider);
 
     // 未登入：顯示簡易提示（不要炸）
     String? uid;
@@ -28,13 +32,13 @@ class MeDashboardSection extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Dashboard',
+            Text(uiString(lang, 'dashboard'),
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
                     color: tokens.textPrimary)),
             const SizedBox(height: 8),
-            Text('Sign in to see: purchased, favorites, notifications, recent opens, and preferences',
+            Text(uiString(lang, 'dashboard_sign_in_hint'),
                 style: TextStyle(color: tokens.textSecondary)),
           ],
         ),
@@ -47,11 +51,10 @@ class MeDashboardSection extends ConsumerWidget {
     final globalPushAsync = ref.watch(globalPushSettingsProvider);
 
     return AppCard(
-      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Dashboard',
+          Text(uiString(lang, 'dashboard'),
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
@@ -169,15 +172,16 @@ class MeDashboardSection extends ConsumerWidget {
                         children: [
                           _kpiRow(
                             context,
+                            lang: lang,
                             items: [
-                              _Kpi('Owned', purchased.length),
-                              _Kpi('Bookmarked', wishlist.length),
-                              _Kpi('Favorites', favIds.length),
-                              _Kpi('Push', pushingCount),
+                              _Kpi('owned', purchased.length),
+                              _Kpi('bookmarked', wishlist.length),
+                              _Kpi('favorites', favIds.length),
+                              _Kpi('push', pushingCount),
                             ],
                           ),
                           const SizedBox(height: 14),
-                          Text('Goals',
+                          Text(uiString(lang, 'goals'),
                               style: TextStyle(
                                   color: tokens.textSecondary,
                                   fontWeight: FontWeight.w700)),
@@ -192,12 +196,12 @@ class MeDashboardSection extends ConsumerWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                              'Saved/unlocked $totalOwnedOrSaved / $goal',
+                              '${uiString(lang, 'saved_unlocked')} $totalOwnedOrSaved / $goal',
                               style: TextStyle(
                                   color: tokens.textSecondary, fontSize: 12)),
                           const SizedBox(height: 16),
                           if (recentTop.isNotEmpty) ...[
-                            Text('Recently opened',
+                            Text(uiString(lang, 'recently_opened'),
                                 style: TextStyle(
                                     color: tokens.textSecondary,
                                     fontWeight: FontWeight.w700)),
@@ -205,7 +209,7 @@ class MeDashboardSection extends ConsumerWidget {
                             ...recentTop.map((lp) {
                               final pid = (lp as dynamic).productId.toString();
                               final title = productsMap[pid]?.title ?? pid;
-                              final sub = _recentSubtitle(lp, globalPushEnabled: globalPush.enabled);
+                              final sub = _recentSubtitle(lang, lp, globalPushEnabled: globalPush.enabled);
                               return _recentTile(
                                 context,
                                 title: title,
@@ -220,7 +224,7 @@ class MeDashboardSection extends ConsumerWidget {
                             const SizedBox(height: 14),
                           ],
                           if (top3.isNotEmpty) ...[
-                            Text('Your top categories',
+                            Text(uiString(lang, 'your_top_categories'),
                                 style: TextStyle(
                                     color: tokens.textSecondary,
                                     fontWeight: FontWeight.w700)),
@@ -238,26 +242,27 @@ class MeDashboardSection extends ConsumerWidget {
                         },
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => Text('wishlist error: $e',
+                        error: (e, _) => Text('${uiString(lang, 'wishlist_error')}$e',
                             style: TextStyle(color: tokens.textSecondary)),
                       );
                     },
                     loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Text('library error: $e',
+                    error: (e, _) => Text('${uiString(lang, 'library_error')}$e',
                         style: TextStyle(color: tokens.textSecondary)),
                   );
                 },
                 loading: () =>
                     const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Text(
-                  'We couldn’t load your notification settings. Please try again later.',
+                  uiString(lang, 'notification_settings_error'),
                   style: TextStyle(color: tokens.textSecondary),
                 ),
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () =>
+                const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text(
-              'We couldn’t load your content summary right now. Please try again later.',
+              uiString(lang, 'content_summary_error'),
               style: TextStyle(color: tokens.textSecondary),
             ),
           ),
@@ -266,8 +271,7 @@ class MeDashboardSection extends ConsumerWidget {
     );
   }
 
-  String _recentSubtitle(dynamic lp, {required bool globalPushEnabled}) {
-    // 不靠 Excel：用 pushEnabled / purchasedAt / lastOpenedAt 組一個資訊密度
+  String _recentSubtitle(AppLanguage lang, dynamic lp, {required bool globalPushEnabled}) {
     String whenText(DateTime? dt) {
       if (dt == null) return '';
       String two(int v) => v.toString().padLeft(2, '0');
@@ -288,27 +292,27 @@ class MeDashboardSection extends ConsumerWidget {
       itemPushEnabled = (lp.pushEnabled == true);
     } catch (_) {}
 
-    // 推播狀態：需要全域推播開關和個別商品推播開關都啟用才算推播中
     final pushing = globalPushEnabled && itemPushEnabled;
 
     final parts = <String>[];
-    if (opened != null) parts.add('Last: ${whenText(opened)}');
-    if (purchased != null) parts.add('Purchased: ${whenText(purchased)}');
-    parts.add(pushing ? 'Pushing' : 'Push off');
+    if (opened != null) parts.add('${uiString(lang, 'last')}: ${whenText(opened)}');
+    if (purchased != null) parts.add('${uiString(lang, 'purchased_label')}: ${whenText(purchased)}');
+    parts.add(pushing ? uiString(lang, 'pushing') : uiString(lang, 'push_off'));
     return parts.join(' · ');
   }
 
-  Widget _kpiRow(BuildContext context, {required List<_Kpi> items}) {
+  String _dashboardLabelKey(String key) => 'dashboard_$key';
+
+  Widget _kpiRow(BuildContext context, {required AppLanguage lang, required List<_Kpi> items}) {
     final tokens = context.tokens;
     return Row(
       children: items.map((e) {
-        // 根據 label 長度決定 flex 值，讓各項目有適當的空間
         final flex = switch (e.label) {
-          'Owned' => 7,
-          'Bookmarked' => 12,
-          'Favorites' => 9,
-          'Push' => 6,
-          _ => 6, // 預設值
+          'owned' => 7,
+          'bookmarked' => 12,
+          'favorites' => 9,
+          'push' => 6,
+          _ => 6,
         };
         return Flexible(
           flex: flex,
@@ -329,7 +333,7 @@ class MeDashboardSection extends ConsumerWidget {
                         fontWeight: FontWeight.w900,
                         color: tokens.textPrimary)),
                 const SizedBox(height: 6),
-                Text(e.label,
+                Text(uiString(lang, _dashboardLabelKey(e.label)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style:

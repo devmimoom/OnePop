@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 import '../data/models.dart';
 import '../theme/app_tokens.dart';
 import '../theme/layout_constants.dart';
 import 'app_card.dart';
 import '../pages/product_page.dart';
-import '../widgets/rich_sections/user_learning_store.dart';
-import 'dart:async';
+import '../localization/app_language.dart';
+import '../localization/bilingual_text.dart';
 
 enum ProductRailSize { large, medium, small }
 
@@ -18,6 +19,7 @@ class ProductRail extends StatelessWidget {
   final bool dim; // tone: dim
   final bool showReleaseDate;
   final VoidCallback? onTapViewAll;
+  final AppLanguage? lang;
 
   const ProductRail({
     super.key,
@@ -28,11 +30,13 @@ class ProductRail extends StatelessWidget {
     this.dim = false,
     this.showReleaseDate = false,
     this.onTapViewAll,
+    this.lang,
   });
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
+    final effectiveLang = lang ?? AppLanguage.zhTw;
     
     // 根據螢幕寬度動態計算，iPad 上 clamp 住不會過大
     final screenWidth = MediaQuery.of(context).size.width;
@@ -108,7 +112,6 @@ class ProductRail extends StatelessWidget {
           return AppCard(
             padding: EdgeInsets.zero,
             onTap: () {
-              unawaited(UserLearningStore().markGlobalLearnedToday());
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => ProductPage(productId: p.id)),
               );
@@ -121,29 +124,35 @@ class ProductRail extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 封面圖片
+                      // 封面圖片：上半部圖片 + ColorFiltered tint（保留 neon accent 氛圍）
                       if (p.coverImageUrl != null &&
                           p.coverImageUrl!.isNotEmpty)
                         ClipRRect(
                           borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(20)),
-                          child: CachedNetworkImage(
-                            imageUrl: p.coverImageUrl!,
-                            width: double.infinity,
-                            height: imageHeight,
-                            fit: BoxFit.cover,
-                            alignment: Alignment.center,
-                            placeholder: (context, url) => Container(
-                              height: imageHeight,
-                              color: tokens.chipBg,
-                              child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                          child: ColorFiltered(
+                            colorFilter: ColorFilter.mode(
+                              tokens.primary.withValues(alpha: 0.22),
+                              BlendMode.softLight,
                             ),
-                            errorWidget: (context, url, error) =>
-                                Container(
+                            child: CachedNetworkImage(
+                              imageUrl: p.coverImageUrl!,
+                              width: double.infinity,
                               height: imageHeight,
-                              color: tokens.chipBg,
-                              child: Icon(Icons.image_not_supported,
-                                  color: tokens.textSecondary),
+                              fit: BoxFit.cover,
+                              alignment: Alignment.center,
+                              placeholder: (context, url) => Container(
+                                height: imageHeight,
+                                color: tokens.chipBg,
+                                child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  Container(
+                                height: imageHeight,
+                                color: tokens.chipBg,
+                                child: Icon(Icons.image_not_supported,
+                                    color: tokens.textSecondary),
+                              ),
                             ),
                           ),
                         )
@@ -166,7 +175,7 @@ class ProductRail extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      p.title,
+                                      productTitle(p, effectiveLang),
                                       maxLines: size == ProductRailSize.small ? 2 : 2,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
@@ -184,8 +193,7 @@ class ProductRail extends StatelessWidget {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: tokens.primary
-                                            .withValues(alpha: 0.18),
+                                        color: tokens.primaryBright,
                                         borderRadius: BorderRadius.circular(999),
                                         border: Border.all(
                                             color: tokens.primary
@@ -194,9 +202,9 @@ class ProductRail extends StatelessWidget {
                                       child: Text(
                                         badge,
                                         style: TextStyle(
-                                          color: tokens.primary,
+                                          color: tokens.textOnPrimary,
                                           fontSize: 11,
-                                          fontWeight: FontWeight.w700,
+                                          fontWeight: FontWeight.w800,
                                         ),
                                       ),
                                     ),
@@ -256,16 +264,16 @@ class ProductRail extends StatelessWidget {
                             horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(999),
-                          color: Colors.black.withValues(alpha: 0.35),
+                          color: tokens.primaryBright,
                           border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.18)),
+                              color: tokens.primary.withValues(alpha: 0.3)),
                         ),
                         child: Text(
                           badge,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            color: tokens.textOnPrimary,
                           ),
                         ),
                       ),

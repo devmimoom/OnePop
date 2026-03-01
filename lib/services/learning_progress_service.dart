@@ -59,11 +59,19 @@ class LearningProgressService {
       final contentSnap = await tx.get(contentRef);
       final progSnap = await tx.get(progressRef);
 
-      // 已經 learned → 直接 return (避免 double increment)
+      // 已經 learned → 補寫 saved_items 後 return（避免 double increment）
       if (contentSnap.exists) {
         final data = contentSnap.data()!;
         final status = (data['status'] as String?) ?? '';
-        if (status == 'learned') return;
+        if (status == 'learned') {
+          // ✅ 即使已 learned，仍確保 saved_items 有 learned: true
+          // 防止 contentState 與 saved_items 不同步
+          tx.set(savedRef, {
+            'learned': true,
+            'learnedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
+          return;
+        }
       }
 
       // 讀取 progress，讓 nextPushOrder 至少到 pushOrder+1（不倒退）

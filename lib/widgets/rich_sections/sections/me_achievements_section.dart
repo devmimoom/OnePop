@@ -62,7 +62,6 @@ class _MeAchievementsSectionState extends ConsumerState<MeAchievementsSection> {
     final wishAsync = _safeWish();
 
     return AppCard(
-      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -7,7 +7,6 @@ import '../bubble_library/providers/providers.dart';
 import '../ui/glass.dart';
 import '../theme/app_tokens.dart';
 import '../theme/layout_constants.dart';
-import '../widgets/rich_sections/user_learning_store.dart';
 import '../notifications/coming_soon_remind_store.dart';
 import '../bubble_library/notifications/notification_service.dart';
 import '../bubble_library/ui/product_library_page.dart';
@@ -15,6 +14,8 @@ import '../collections/wishlist_provider.dart';
 import '../iap/credits_pack_store_sheet.dart';
 import '../providers/analytics_provider.dart';
 import '../widgets/app_card.dart';
+import '../localization/app_language_provider.dart';
+import '../localization/bilingual_text.dart';
 
 class ProductPage extends ConsumerStatefulWidget {
   final String productId;
@@ -30,8 +31,6 @@ class _ProductPageState extends ConsumerState<ProductPage> {
   @override
   void initState() {
     super.initState();
-    // 保底記錄：進入產品頁就記一次學習
-    unawaited(UserLearningStore().markGlobalLearnedToday());
   }
 
   @override
@@ -49,6 +48,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
     final previews = ref.watch(previewItemsProvider(widget.productId));
     final comingSoonSet = ref.watch(comingSoonIdsProvider);
     final tokens = context.tokens;
+    final lang = ref.watch(appLanguageProvider);
 
     final localWishAsync = ref.watch(localWishlistProvider);
 
@@ -63,7 +63,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
             data: (wish) {
               final isWish = wish.any((e) => e.productId == widget.productId);
               return IconButton(
-                tooltip: isWish ? 'Remove from favorites' : 'Add to favorites',
+                tooltip: isWish ? 'Remove bookmark' : 'Add to bookmark',
                 icon: Icon(isWish ? Icons.bookmark : Icons.bookmark_outline),
                 onPressed: () async {
                   await ref.read(localWishlistNotifierProvider).toggleCollect(widget.productId);
@@ -71,7 +71,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(isWish ? 'Removed from favorites.' : 'Added to favorites.'),
+                        content: Text(isWish ? 'Removed from bookmark.' : 'Added to bookmark.'),
                         duration: const Duration(seconds: 1),
                       ),
                     );
@@ -106,29 +106,35 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 封面圖片（1200x800 = 3:2）
+                    // 封面圖片（3:2，與全站封面一致，加框與對稱留白）
                     if (p.coverImageUrl != null && p.coverImageUrl!.isNotEmpty)
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(tokens.cardRadius),
-                          topRight: Radius.circular(tokens.cardRadius),
-                        ),
-                        child: AspectRatio(
-                          aspectRatio: kCoverAspectRatio,
-                          child: CachedNetworkImage(
-                            imageUrl: p.coverImageUrl!,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            alignment: Alignment.center,
-                            placeholder: (context, url) => Container(
-                              color: tokens.chipBg,
-                              child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Container(
-                              color: tokens.chipBg,
-                              child: Icon(Icons.image_not_supported,
-                                  size: 48, color: tokens.textSecondary),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(6, 6, 6, 4),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(26),
+                            border: Border.all(color: tokens.cardBorder),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(26),
+                            child: AspectRatio(
+                              aspectRatio: kCoverAspectRatio,
+                              child: CachedNetworkImage(
+                                imageUrl: p.coverImageUrl!,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                alignment: Alignment.center,
+                                placeholder: (context, url) => Container(
+                                  color: tokens.chipBg,
+                                  child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    Container(
+                                  color: tokens.chipBg,
+                                  child: Icon(Icons.image_not_supported,
+                                      size: 48, color: tokens.textSecondary),
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -139,7 +145,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(p.title,
+                          Text(productTitle(p, lang),
                               style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w900,
@@ -176,11 +182,11 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                           ],
                           const SizedBox(height: 12),
                           if ((p.levelGoal ?? '').isNotEmpty)
-                            Text(p.levelGoal!,
+                            Text(productLevelGoal(p, lang),
                                 style: TextStyle(color: tokens.textPrimary)),
                           const SizedBox(height: 6),
                           if ((p.levelBenefit ?? '').isNotEmpty)
-                            Text(p.levelBenefit!,
+                            Text(productLevelBenefit(p, lang),
                                 style: TextStyle(color: tokens.textSecondary)),
                         ],
                       ),
@@ -228,7 +234,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(it.anchor,
+                                  Text(contentItemAnchor(it, lang),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
@@ -236,7 +242,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                                           color: tokens.textPrimary)),
                                   const SizedBox(height: 6),
                                   Expanded(
-                                    child: Text(it.content,
+                                  child: Text(contentItemText(it, lang),
                                         maxLines: 5,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -278,7 +284,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      p.contentArchitecture!,
+                      productContentArchitecture(p, lang),
                       style: TextStyle(
                         fontSize: 14,
                         height: 1.5,
@@ -324,8 +330,8 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
-                            icon: Icon(isWish ? Icons.favorite : Icons.favorite_border),
-                            label: Text(isWish ? 'In wishlist' : 'Add to wishlist'),
+                            icon: Icon(isWish ? Icons.bookmark : Icons.bookmark_outline),
+                            label: Text(isWish ? 'Bookmarked' : 'Add to bookmark'),
                             onPressed: (uid == null)
                                 ? null
                                 : () async {
@@ -333,14 +339,14 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                                       await ref.read(localWishlistNotifierProvider).remove(widget.productId);
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Removed from wishlist.')),
+                                          const SnackBar(content: Text('Removed from bookmark.')),
                                         );
                                       }
                                     } else {
                                       await ref.read(localWishlistNotifierProvider).toggleCollect(widget.productId);
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Added to wishlist.')),
+                                          const SnackBar(content: Text('Added to bookmark.')),
                                         );
                                       }
                                     }
@@ -354,7 +360,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                     height: 44,
                     child: Center(child: CircularProgressIndicator()),
                   ),
-                  error: (e, _) => Text('wishlist error: $e'),
+                  error: (e, _) => Text('Bookmark error: $e'),
                 ),
                 const SizedBox(height: 10),
 
@@ -607,7 +613,7 @@ class _ComingSoonBar extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'This product is not yet available. Add to wishlist or set a reminder below.',
+              'This product is not yet available. Bookmark it or set a reminder below.',
               style: TextStyle(
                 fontSize: 13,
                 height: 1.25,

@@ -83,7 +83,7 @@ class CategoryNetflixRails extends ConsumerWidget {
             final sw = MediaQuery.of(context).size.width;
             final cw = (sw * 0.7).clamp(200.0, kMaxCardWidth);
             return SizedBox(
-              height: cw / kCoverAspectRatio + 80,
+              height: cw / kCoverAspectRatio + 102,
               child: const Center(child: CircularProgressIndicator()),
             );
           },
@@ -106,7 +106,7 @@ class CategoryNetflixRails extends ConsumerWidget {
             final sw = MediaQuery.of(context).size.width;
             final cw = (sw * 0.7).clamp(200.0, kMaxCardWidth);
             return SizedBox(
-              height: cw / kCoverAspectRatio + 80,
+              height: cw / kCoverAspectRatio + 102,
               child: const Center(child: CircularProgressIndicator()),
             );
           },
@@ -128,7 +128,7 @@ class CategoryNetflixRails extends ConsumerWidget {
             final sw = MediaQuery.of(context).size.width;
             final cw = (sw * 0.7).clamp(200.0, kMaxCardWidth);
             return SizedBox(
-              height: cw / kCoverAspectRatio + 80,
+              height: cw / kCoverAspectRatio + 102,
               child: const Center(child: CircularProgressIndicator()),
             );
           },
@@ -161,7 +161,7 @@ class CategoryNetflixRails extends ConsumerWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = (screenWidth * 0.7).clamp(200.0, kMaxCardWidth);
     final imageHeight = cardWidth / kCoverAspectRatio;
-    const textArea = 80.0; // 原 190-110
+    const textArea = 102.0; // 多一行餘裕（原 80）
     final railHeight = imageHeight + textArea;
 
     return SizedBox(
@@ -208,6 +208,7 @@ class CategoryNetflixRails extends ConsumerWidget {
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(products[i].title,
                             maxLines: 2,
@@ -216,11 +217,9 @@ class CategoryNetflixRails extends ConsumerWidget {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w900,
                                 color: tokens.textPrimary)),
-                        const SizedBox(height: 6),
                         Text('${products[i].topicId} · ${products[i].level}',
                             style: TextStyle(
                                 color: tokens.textSecondary, fontSize: 12)),
-                        const Spacer(),
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Text('View ›',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'user_state_store.dart';
+import '../../theme/app_tokens.dart';
 
 class SearchHistorySection extends StatefulWidget {
   final void Function(String) onTapQuery;
@@ -42,15 +43,18 @@ class SearchHistorySectionState extends State<SearchHistorySection> {
   @override
   Widget build(BuildContext context) {
     if (_loading) return const LinearProgressIndicator();
+    final tokens = context.tokens;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            const Expanded(
+            Expanded(
                 child: Text('History',
-                    style: TextStyle(fontWeight: FontWeight.w800))),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: tokens.textPrimary))),
             if (_recent.isNotEmpty)
               IconButton(
                 onPressed: _clear,
@@ -61,7 +65,8 @@ class SearchHistorySectionState extends State<SearchHistorySection> {
         ),
         const SizedBox(height: 8),
         if (_recent.isEmpty)
-          Text('No search history yet', style: Theme.of(context).textTheme.bodySmall)
+          Text('No search history yet',
+              style: TextStyle(color: tokens.textSecondary))
         else
           Wrap(
             spacing: 8,

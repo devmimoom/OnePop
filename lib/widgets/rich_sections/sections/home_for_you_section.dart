@@ -299,35 +299,36 @@ class _ForYouCard extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(product.title,
-                          maxLines: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    // 唯一 flex：吃「剩餘」高度，避免總內容超過 textArea(78)-padding(20)=58px 而溢出
+                    Expanded(
+                      child: Text(product.title,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w900,
                               color: tokens.textPrimary)),
-                      const SizedBox(height: 4),
-                      Text('${product.topicId} · ${product.level}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text('${product.topicId} · ${product.level}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: tokens.textSecondary, fontSize: 11)),
+                    const SizedBox(height: 6),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Text('View ›',
                           style: TextStyle(
-                              color: tokens.textSecondary, fontSize: 11)),
-                      const SizedBox(height: 6),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Text('View ›',
-                            style: TextStyle(
-                                color: tokens.primary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800)),
-                      ),
-                    ],
-                  ),
+                              color: tokens.primary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800)),
+                    ),
+                  ],
                 ),
               ),
             ),

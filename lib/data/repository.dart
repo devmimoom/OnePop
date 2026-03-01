@@ -516,12 +516,20 @@ class V2Repository {
           .where(F.isPreview, isEqualTo: true)
           .get();
 
-      // 在客戶端過濾包含搜索關鍵詞的內容項
+      // 在客戶端過濾包含搜索關鍵詞的內容項（支援 content / content_zh / contentZh / content_en / contentEn）
       for (final contentDoc in contentSnapshot.docs) {
         final contentData = contentDoc.data();
         final content = (contentData['content'] ?? '').toString().toLowerCase();
-        
-        if (content.contains(queryLower)) {
+        final contentZh = (contentData['contentZh'] ?? contentData['content_zh'] ?? '')
+            .toString()
+            .toLowerCase();
+        final contentEn = (contentData['contentEn'] ?? contentData['content_en'] ?? '')
+            .toString()
+            .toLowerCase();
+
+        if (content.contains(queryLower) ||
+            contentZh.contains(queryLower) ||
+            contentEn.contains(queryLower)) {
           final productId = (contentData[F.productId] ?? '').toString();
           if (productId.isNotEmpty) {
             matchedProductIds.add(productId);

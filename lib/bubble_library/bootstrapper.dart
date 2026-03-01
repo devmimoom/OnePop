@@ -119,6 +119,8 @@ class _BubbleBootstrapperState extends ConsumerState<BubbleBootstrapper> {
             }
           }
         }
+        // 以「標記學會」為準：更新 streak（onLearned payload 無 productId，用全域）
+        await UserLearningStore().markGlobalLearnedToday();
       },
       // ✅ 重新學習回調：重置產品進度並重新排程
       onRestart: (payload) async {
@@ -368,6 +370,13 @@ class _BubbleBootstrapperState extends ConsumerState<BubbleBootstrapper> {
         // 如果 payload 缺少必要資訊，使用舊方法
         await repo.setSavedItem(uid, cid, {'learned': true});
         ref.invalidate(savedItemsProvider);
+      }
+      
+      // 以「標記學會」為準：更新 streak
+      if (pid != null && pid.isNotEmpty) {
+        await UserLearningStore().markLearnedTodayAndGlobal(pid);
+      } else {
+        await UserLearningStore().markGlobalLearnedToday();
       }
       
       // ✅ 4) 取消該內容的推播

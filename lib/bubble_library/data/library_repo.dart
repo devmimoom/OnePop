@@ -46,7 +46,13 @@ class LibraryRepo {
     final ref =
         _db.collection(FirestorePaths.userLibraryProducts(uid)).doc(productId);
     final doc = await ref.get();
-    if (doc.exists) return;
+    if (doc.exists) {
+      // 如果產品被隱藏（之前刪除過），重新顯示
+      if (doc.data()?['isHidden'] == true) {
+        await ref.set({'isHidden': false}, SetOptions(merge: true));
+      }
+      return;
+    }
 
     await ref.set({
       'productId': productId,

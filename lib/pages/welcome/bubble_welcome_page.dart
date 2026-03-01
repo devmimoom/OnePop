@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../localization/app_language.dart';
+import '../../localization/app_language_provider.dart';
+import '../../localization/app_strings.dart';
 
 class BubbleWelcomePage extends StatefulWidget {
   const BubbleWelcomePage({super.key, required this.onFinished});
@@ -30,20 +34,25 @@ class _BubbleWelcomePageState extends State<BubbleWelcomePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: widget.onFinished,
-        child: FadeTransition(
-          opacity: _fadeController,
-          child: const Stack(
-            children: [
-              Positioned.fill(child: _PremiumBackground()),
-              _CenterContent(),
-            ],
+    return Consumer(
+      builder: (context, ref, _) {
+        final lang = ref.watch(appLanguageProvider);
+        return Scaffold(
+          body: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: widget.onFinished,
+            child: FadeTransition(
+              opacity: _fadeController,
+              child: Stack(
+                children: [
+                  const Positioned.fill(child: _PremiumBackground()),
+                  _CenterContent(lang: lang),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -73,7 +82,8 @@ class _PremiumBackground extends StatelessWidget {
 
 // Center content
 class _CenterContent extends StatelessWidget {
-  const _CenterContent();
+  const _CenterContent({required this.lang});
+  final AppLanguage lang;
 
   @override
   Widget build(BuildContext context) {
@@ -85,15 +95,15 @@ class _CenterContent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'OnePop',
-                style: GoogleFonts.quicksand(
-                  fontSize: 54,
+                style: TextStyle(
+                  fontSize: 36,
                   fontWeight: FontWeight.w300,
                   color: Colors.white,
                   letterSpacing: 6,
                   height: 1.1,
-                  shadows: const [
+                  shadows: [
                     Shadow(
                       color: Colors.black26,
                       offset: Offset(0, 2),
@@ -104,13 +114,12 @@ class _CenterContent extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Tagline - subtle
               Text(
-                'Your mental snack',
+                uiString(lang, 'your_mental_snack'),
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w400,
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   letterSpacing: 2,
                   shadows: const [
                     Shadow(
@@ -123,21 +132,19 @@ class _CenterContent extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Secondary tagline - very subtle
               Text(
-                'One pop · One moment',
+                uiString(lang, 'one_pop_one_moment'),
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w300,
-                  color: Colors.white.withOpacity(0.45),
+                  color: Colors.white.withValues(alpha: 0.45),
                   letterSpacing: 1.5,
                 ),
               ),
 
               const SizedBox(height: 80),
 
-              // Tap hint with subtle animation
-              const _TapHint(),
+              _TapHint(lang: lang),
             ],
           ),
         ),
@@ -148,7 +155,8 @@ class _CenterContent extends StatelessWidget {
 
 // Tap hint with fade animation
 class _TapHint extends StatefulWidget {
-  const _TapHint();
+  const _TapHint({required this.lang});
+  final AppLanguage lang;
 
   @override
   State<_TapHint> createState() => _TapHintState();
@@ -180,9 +188,9 @@ class _TapHintState extends State<_TapHint>
       builder: (context, child) {
         return Opacity(
           opacity: 0.4 + (_controller.value * 0.25),
-          child: const Text(
-            'Tap to enter',
-            style: TextStyle(
+          child: Text(
+            uiString(widget.lang, 'tap_to_enter'),
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
               color: Colors.white,

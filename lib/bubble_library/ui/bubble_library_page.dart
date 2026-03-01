@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../providers/providers.dart';
 import '../models/product.dart';
 import '../models/user_library.dart';
@@ -9,6 +8,9 @@ import '../models/content_item.dart';
 import '../notifications/scheduled_push_cache.dart';
 import '../notifications/push_orchestrator.dart';
 import '../../notifications/push_timeline_provider.dart';
+import '../../localization/app_language.dart';
+import '../../localization/app_language_provider.dart';
+import '../../localization/app_strings.dart';
 import 'product_library_page.dart';
 import 'push_center_page.dart';
 import 'push_product_config_page.dart';
@@ -33,9 +35,10 @@ class BubbleLibraryPage extends ConsumerStatefulWidget {
 }
 
 class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   LibraryView currentView = LibraryView.purchased;
   DateTime? _lastRescheduleTime;
-  
+
   final Set<String> _selectedProductIds = {};
   int _selectedHistoryTab = 0; // 0 = 待學習, 1 = 已學習
 
@@ -47,6 +50,8 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    final lang = ref.watch(appLanguageProvider);
     final productsAsync = ref.watch(productsMapProvider);
 
     // 檢查是否登入，未登入時顯示提示
@@ -54,8 +59,16 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
       ref.read(uidProvider);
     } catch (_) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Library')),
-        body: const Center(child: Text('Sign in to use the library.')),
+        backgroundColor: tokens.bg,
+        appBar: AppBar(
+          title: Text(uiString(lang, 'my_library')),
+          backgroundColor: tokens.bg,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+        ),
+        body: Center(
+          child: Text(uiString(lang, 'library_sign_in_hint')),
+        ),
       );
     }
 
@@ -64,13 +77,24 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     final scheduledAsync = ref.watch(scheduledCacheProvider);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      key: _scaffoldKey,
+      backgroundColor: tokens.bg,
       appBar: AppBar(
-        title: const Text('Library'),
-        backgroundColor: Colors.transparent,
+        title: Text(uiString(lang, 'my_library')),
+        backgroundColor: tokens.bg,
         elevation: 0,
         scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_active_outlined),
             onPressed: () => Navigator.of(context).push(
@@ -78,7 +102,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
           ),
         ],
       ),
-      drawer: _buildDrawer(),
+      drawer: _buildDrawer(lang),
       body: productsAsync.when(
         data: (productsMap) {
           return libAsync.when(
@@ -101,28 +125,30 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                     wishItems,
                     productsMap,
                     scheduled,
+                    lang,
                   );
                 },
                 loading: () =>
                     const Center(child: CircularProgressIndicator()),
-                error: (e, _) =>
-                    Center(child: Text('wishlist error: $e')),
+                error: (e, _) => Center(
+                  child: Text('${uiString(lang, 'wishlist_error')}$e'),
+                ),
               );
             },
             loading: () =>
                 const Center(child: CircularProgressIndicator()),
-            error: (e, _) => const Center(
+            error: (e, _) => Center(
               child: Text(
-                'We couldn’t load your library right now. Please try again later.',
+                uiString(lang, 'library_load_error'),
                 textAlign: TextAlign.center,
               ),
             ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => const Center(
+        error: (e, _) => Center(
           child: Text(
-            'We couldn’t load your content right now. Please try again later.',
+            uiString(lang, 'content_load_error'),
             textAlign: TextAlign.center,
           ),
         ),
@@ -130,7 +156,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     );
   }
 
-  Widget _buildDrawer() {
+  Widget _buildDrawer(AppLanguage lang) {
     final tokens = context.tokens;
     return Drawer(
       child: ClipRRect(
@@ -154,7 +180,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                   ),
                 ),
                 child: Text(
-                  'Library',
+                  uiString(lang, 'my_library'),
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -166,11 +192,28 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Column(
                   children: [
-                    _drawerTile(tokens, LibraryView.purchased, Icons.inventory_2, 'Purchased'),
-                    _drawerTile(tokens, LibraryView.wishlist, Icons.bookmark_border, 'Bookmarked'),
-                    _drawerTile(tokens, LibraryView.favorites, Icons.star_border, 'Favorites'),
-                    _drawerTile(tokens, LibraryView.history, Icons.history_edu, 'Recent'),
-                    _drawerTile(tokens, LibraryView.favoriteSentences, Icons.format_quote, 'Saved Bites'),
+                    _drawerTile(tokens, LibraryView.purchased,
+                        Icons.inventory_2, uiString(lang, 'purchased_label')),
+                    _drawerTile(
+                        tokens,
+                        LibraryView.wishlist,
+                        Icons.bookmark_border,
+                        uiString(lang, 'dashboard_bookmarked')),
+                    _drawerTile(
+                        tokens,
+                        LibraryView.favorites,
+                        Icons.star_border,
+                        uiString(lang, 'dashboard_favorites')),
+                    _drawerTile(
+                        tokens,
+                        LibraryView.history,
+                        Icons.history_edu,
+                        uiString(lang, 'recently_opened')),
+                    _drawerTile(
+                        tokens,
+                        LibraryView.favoriteSentences,
+                        Icons.format_quote,
+                        uiString(lang, 'saved_bites')),
                   ],
                 ),
               ),
@@ -214,17 +257,18 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     List<WishlistItem> wishItems,
     Map<String, Product> productsMap,
     List<ScheduledPushEntry> scheduled,
+    AppLanguage lang,
   ) {
     switch (currentView) {
       case LibraryView.purchased:
         return _buildPurchasedTab(
-            context, visibleLib, productsMap, scheduled);
+            context, visibleLib, productsMap, scheduled, lang);
       case LibraryView.wishlist:
-        return _buildWishlistTab(context, wishItems, productsMap, visibleLib);
+        return _buildWishlistTab(context, wishItems, productsMap, visibleLib, lang);
       case LibraryView.favorites:
-        return _buildFavoritesTab(context, visibleLib, wishItems, productsMap);
+        return _buildFavoritesTab(context, visibleLib, wishItems, productsMap, lang);
       case LibraryView.history:
-        return _buildHistoryView(context);
+        return _buildHistoryView(context, lang);
       case LibraryView.favoriteSentences:
         return _buildFavoriteSentencesTab(context);
     }
@@ -235,6 +279,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     List<dynamic> visibleLib,
     Map<String, Product> productsMap,
     List<ScheduledPushEntry> scheduled,
+    AppLanguage lang,
   ) {
     // Helper: 根據 productId 找最早的排程項目
     ScheduledPushEntry? nextEntryFor(String productId) {
@@ -302,8 +347,11 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
       if (_purchasedPushFilter == PurchasedPushFilter.off &&
           lp.pushEnabled) { return false; }
       final q = _purchasedSearchQuery.trim();
-      if (q.isNotEmpty &&
-          !product.title.toLowerCase().contains(q.toLowerCase())) { return false; }
+      if (q.isNotEmpty) {
+        final t = product.title.toLowerCase();
+        final tzh = product.titleZh?.toLowerCase() ?? '';
+        if (!t.contains(q.toLowerCase()) && !tzh.contains(q.toLowerCase())) return false;
+      }
       return true;
     }).toList();
 
@@ -356,7 +404,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
         );
 
         return LibraryRichCard(
-          title: product.title,
+          title: product.displayTitle(lang),
           coverImageUrl: null,
           totalItems: totalItems,
           level: product.level.isEmpty ? null : product.level,
@@ -406,7 +454,6 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
             ],
           ),
           onLearnNow: () async {
-            await UserLearningStore().markLearnedTodayAndGlobal(lp.productId);
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context)
                 .showSnackBar(const SnackBar(content: Text('Logged: 1 session today.')));
@@ -423,7 +470,6 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
             ));
           },
           onTap: () async {
-            await UserLearningStore().markLearnedTodayAndGlobal(lp.productId);
             await ref
                 .read(libraryRepoProvider)
                 .touchLastOpened(ref.read(uidProvider), lp.productId);
@@ -650,6 +696,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     List<WishlistItem> wishItems,
     Map<String, Product> productsMap,
     List<UserLibraryProduct> visibleLib,
+    AppLanguage lang,
   ) {
     final tokens = context.tokens;
     
@@ -697,7 +744,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
       itemBuilder: (_, i) {
         final w = visibleWish[i];
         final p = productsMap[w.productId]!;
-        final title = p.title;
+        final title = p.displayTitle(lang);
 
         Widget chip(String label) {
           return Container(
@@ -807,6 +854,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     List<UserLibraryProduct> visibleLib,
     List<WishlistItem> visibleWish,
     Map<String, Product> productsMap,
+    AppLanguage lang,
   ) {
     final tokens = context.tokens;
     final favPids = <String>{};
@@ -849,7 +897,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (ctx, i) {
         final pid = favList[i];
-        final title = productsMap[pid]!.title;
+        final title = productsMap[pid]!.displayTitle(lang);
         final lp = visibleLib.where((e) => e.productId == pid).firstOrNull;
         final isPurchased = lp != null;
 
@@ -877,7 +925,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     );
   }
 
-  Widget _buildHistoryView(BuildContext context) {
+  Widget _buildHistoryView(BuildContext context, AppLanguage lang) {
     final savedAsync = ref.watch(savedItemsProvider);
     final productsAsync = ref.watch(productsMapProvider);
 
@@ -929,11 +977,11 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                   }
                 }
 
-                // 排序：依產品名稱
+                // 排序：依產品名稱（依當前語言顯示標題排序）
                 final sortedProducts = groupedByProduct.keys.toList()
                   ..sort((a, b) {
-                    final titleA = productsMap[a]?.title ?? '';
-                    final titleB = productsMap[b]?.title ?? '';
+                    final titleA = productsMap[a]?.displayTitle(lang) ?? '';
+                    final titleB = productsMap[b]?.displayTitle(lang) ?? '';
                     return titleA.compareTo(titleB);
                   });
 
@@ -949,6 +997,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                   contentItemsMap,
                   productsMap,
                   _selectedHistoryTab == 0, // showToLearn: true = 待學習, false = 已學習
+                  lang,
                 );
               },
             );
@@ -1015,6 +1064,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     Map<String, ContentItem> contentItemsMap,
     Map<String, Product> productsMap,
     bool showToLearn,
+    AppLanguage lang,
   ) {
     final tokens = context.tokens;
     // 建立扁平化列表：用於 ListView.builder
@@ -1092,6 +1142,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
               contentItemsMap,
               productsMap,
               showToLearn,
+              lang,
             );
           case _HistoryItemType.content:
           case _HistoryItemType.sectionHeader:
@@ -1150,6 +1201,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
 
   // ✅ 階段 4：搜尋/篩選工具列
   Widget _buildSearchAndFilterBar() {
+    final lang = ref.watch(appLanguageProvider);
     final savedAsync = ref.watch(savedItemsProvider);
     final productsAsync = ref.watch(productsMapProvider);
 
@@ -1196,7 +1248,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                         ..._selectedProductIds.map((productId) {
                           final product = productsMap[productId];
                           return Chip(
-                            label: Text(product?.title ?? productId),
+                            label: Text(product?.displayTitle(lang) ?? productId),
                             onDeleted: () {
                               setState(() {
                                 _selectedProductIds.remove(productId);
@@ -1237,10 +1289,11 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     Map<String, ContentItem> contentItemsMap,
     Map<String, Product> productsMap,
     bool showToLearn,
+    AppLanguage lang,
   ) {
     final tokens = context.tokens;
-    final product = productsMap[productId];
-    final productTitle = product?.title ?? 'Unknown product';
+      final product = productsMap[productId];
+      final productTitle = product?.displayTitle(lang) ?? 'Unknown product';
     
     // 根據 showToLearn 過濾內容
     final filteredToLearn = showToLearn ? group['toLearn']! : <String>[];
@@ -1295,6 +1348,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                     false,
                     productsMap,
                     contentItem,
+                    lang,
                   ),
                 );
               })
@@ -1310,6 +1364,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                     true,
                     productsMap,
                     contentItem,
+                    lang,
                   ),
                 );
               }),
@@ -1325,6 +1380,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     bool isLearned,
     Map<String, Product> productsMap,
     ContentItem? contentItem, // 可選，如果已載入則直接使用
+    AppLanguage lang,
   ) {
     // 如果已提供 contentItem，直接使用；否則從 provider 載入
     if (contentItem != null) {
@@ -1334,6 +1390,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
         isLearned,
         productsMap,
         contentItem,
+        lang,
       );
     }
 
@@ -1346,6 +1403,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
         isLearned,
         productsMap,
         item,
+        lang,
       ),
       loading: () => const Padding(
         padding: EdgeInsets.only(bottom: 10),
@@ -1372,9 +1430,10 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     bool isLearned,
     Map<String, Product> productsMap,
     ContentItem contentItem,
+    AppLanguage lang,
   ) {
     final product = productsMap[contentItem.productId];
-    final productTitle = product?.title ?? 'Unknown product';
+    final productTitle = product?.displayTitle(lang) ?? 'Unknown product';
     final tokens = context.tokens;
 
     return Padding(
@@ -1439,7 +1498,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          '#${contentItem.seq} · ${contentItem.anchorGroup}',
+                          '#${contentItem.seq} · ${contentItem.displayAnchorGroup(lang)}',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -1478,6 +1537,10 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                           contentItemId,
                           {'learned': !isLearned},
                         );
+                        // 以「標記學會」為準：從待學改為已學時更新 streak
+                        if (!isLearned) {
+                          await UserLearningStore().markLearnedTodayAndGlobal(contentItem.productId);
+                        }
                         ref.invalidate(savedItemsProvider);
                         _triggerReschedule();
                       },
@@ -1489,19 +1552,22 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                           : null,
                     ),
                   ),
-                  if (contentItem.content.isNotEmpty) ...[
+                  if (contentItem.displayContent(lang).isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    Text(
-                      contentItem.content.length > 100
-                          ? '${contentItem.content.substring(0, 100)}...'
-                          : contentItem.content,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: tokens.textSecondary,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    Builder(builder: (_) {
+                      final contentText = contentItem.displayContent(lang);
+                      return Text(
+                        contentText.length > 100
+                            ? '${contentText.substring(0, 100)}...'
+                            : contentText,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: tokens.textSecondary,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    }),
                   ],
                 ],
               ),

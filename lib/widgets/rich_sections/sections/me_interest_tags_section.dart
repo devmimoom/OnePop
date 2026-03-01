@@ -5,7 +5,11 @@ import '../../../theme/app_tokens.dart';
 import '../../app_card.dart';
 import '../../../bubble_library/providers/providers.dart';
 import '../../../collections/wishlist_provider.dart';
+import '../../../localization/app_language.dart';
+import '../../../localization/app_language_provider.dart';
+import '../../../localization/app_strings.dart';
 import '../user/me_prefs_store.dart';
+import '../learning_metrics_providers.dart';
 
 class MeInterestTagsSection extends ConsumerStatefulWidget {
   const MeInterestTagsSection({super.key});
@@ -50,12 +54,14 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
   Future<void> _save(List<String> nextTags) async {
     final key = _uidOrLocal();
     await MePrefsStore.setInterestTags(key, nextTags);
+    ref.invalidate(meInterestTagsProvider(key));
     await _reload();
   }
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
+    final lang = ref.watch(appLanguageProvider);
 
     // 建議標籤：從你已擁有/收藏的產品 topicId 推出（不改後端）
     final productsMapAsync = ref.watch(productsMapProvider);
@@ -63,13 +69,13 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
     final wishAsync = _safeWish();
 
     return AppCard(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text('Interest tags',
+              Text(uiString(lang, 'interest_tags'),
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
@@ -79,11 +85,12 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                 onPressed: _loading
                     ? null
                     : () async {
-                        final next = await _openEditSheet(context);
+                        final next = await _openEditSheet(context, lang);
                         if (next != null) await _save(next);
                       },
-                icon: const Icon(Icons.edit, size: 18),
-                label: const Text('Edit'),
+                icon: Icon(Icons.edit, size: 18, color: tokens.primary),
+                label: Text(uiString(lang, 'edit'),
+                    style: TextStyle(color: tokens.primary)),
               ),
             ],
           ),
@@ -91,8 +98,9 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
           if (_loading)
             const Center(child: CircularProgressIndicator())
           else if (_tags.isEmpty)
-            Text('Pick a few tags for better recommendations.',
-                style: TextStyle(color: tokens.textSecondary))
+            Text(uiString(lang, 'interest_tags_pick_hint'),
+                style: TextStyle(
+                    color: tokens.textSecondary, fontSize: _chipFontSize))
           else
             Wrap(
               spacing: 10,
@@ -100,7 +108,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
               children: _tags.map((t) => _chip(context, t)).toList(),
             ),
           const SizedBox(height: 14),
-          Text('Suggested for you',
+          Text(uiString(lang, 'interest_tags_suggested'),
               style: TextStyle(
                   color: tokens.textSecondary, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
@@ -116,18 +124,19 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                           .toList();
 
                       if (suggested.isEmpty) {
-                        return Text('Few items saved. Try popular tags below.',
-                            style: TextStyle(color: tokens.textSecondary));
+                        return Text(
+                            uiString(lang, 'interest_tags_few_items'),
+                            style: TextStyle(
+                                color: tokens.textSecondary,
+                                fontSize: _chipFontSize));
                       }
 
                       return Wrap(
                         spacing: 10,
                         runSpacing: 10,
                         children: suggested.map((t) {
-                          return ActionChip(
-                            label: Text(t),
-                            onPressed: () => _save([..._tags, t]),
-                          );
+                          return _chipTappable(
+                              context, t, () => _save([..._tags, t]));
                         }).toList(),
                       );
                     },
@@ -135,20 +144,26 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                         height: 36,
                         child: Center(child: CircularProgressIndicator())),
                     error: (e, _) => Text('$e',
-                        style: TextStyle(color: tokens.textSecondary)),
+                        style: TextStyle(
+                            color: tokens.textSecondary,
+                            fontSize: _chipFontSize)),
                   );
                 },
                 loading: () => const SizedBox(
                     height: 36,
                     child: Center(child: CircularProgressIndicator())),
-                error: (e, _) =>
-                    Text('$e', style: TextStyle(color: tokens.textSecondary)),
+                error: (e, _) => Text('$e',
+                    style: TextStyle(
+                        color: tokens.textSecondary,
+                        fontSize: _chipFontSize)),
               );
             },
             loading: () => const SizedBox(
                 height: 36, child: Center(child: CircularProgressIndicator())),
-            error: (e, _) =>
-                Text('$e', style: TextStyle(color: tokens.textSecondary)),
+            error: (e, _) => Text('$e',
+                style: TextStyle(
+                    color: tokens.textSecondary,
+                    fontSize: _chipFontSize)),
           ),
         ],
       ),
@@ -205,21 +220,54 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
     return list.map((e) => e.key).toList();
   }
 
+  static const _chipPadding = EdgeInsets.symmetric(horizontal: 14, vertical: 8);
+  static const _chipFontSize = 13.0;
+
   Widget _chip(BuildContext context, String text) {
     final tokens = context.tokens;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: _chipPadding,
       decoration: BoxDecoration(
-        color: tokens.chipBg,
+        gradient: tokens.chipGradient,
+        color: tokens.chipGradient == null ? tokens.chipBg : null,
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: tokens.cardBorder),
       ),
-      child:
-          Text(text, style: TextStyle(color: tokens.textPrimary, fontSize: 12)),
+      child: Text(text,
+          style: TextStyle(
+              color: tokens.textPrimary,
+              fontSize: _chipFontSize,
+              fontWeight: FontWeight.w500)),
     );
   }
 
-  Future<List<String>?> _openEditSheet(BuildContext context) async {
+  Widget _chipTappable(BuildContext context, String text, VoidCallback onTap) {
+    final tokens = context.tokens;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: _chipPadding,
+          decoration: BoxDecoration(
+            gradient: tokens.chipGradient,
+            color: tokens.chipGradient == null ? tokens.chipBg : null,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: tokens.cardBorder),
+          ),
+          child: Text(text,
+              style: TextStyle(
+                  color: tokens.textPrimary,
+                  fontSize: _chipFontSize,
+                  fontWeight: FontWeight.w500)),
+        ),
+      ),
+    );
+  }
+
+  Future<List<String>?> _openEditSheet(
+      BuildContext context, AppLanguage lang) async {
     final tokens = context.tokens;
     final key = _uidOrLocal();
 
@@ -251,38 +299,33 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
     final selected = {..._tags};
     final controller = TextEditingController();
 
-    return showModalBottomSheet<List<String>>(
+    final sheetFuture = showModalBottomSheet<List<String>>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent, // 使用透明背景，让 Container 控制颜色
+      backgroundColor: Colors.transparent,
       builder: (_) {
         return StatefulBuilder(
           builder: (context, setModal) {
-            Widget chip(String t) {
+            Widget selectableChip(String t) {
               final isSel = selected.contains(t);
-              return FilterChip(
-                label: Text(t),
-                selected: isSel,
-                onSelected: (_) => setModal(() {
+              return _selectableChip(context, tokens, t, isSel, () {
+                setModal(() {
                   if (isSel) {
                     selected.remove(t);
                   } else {
                     selected.add(t);
                   }
-                }),
-              );
+                });
+              });
             }
 
             return Container(
               margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                // ✅ 修復深色主題背景重疊問題：使用不透明背景
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF14182E) // 深色主題使用不透明背景
-                    : context.tokens.cardBg,
+                color: tokens.cardBg,
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: context.tokens.cardBorder),
+                border: Border.all(color: tokens.cardBorder),
               ),
               child: SafeArea(
                 top: false,
@@ -290,7 +333,7 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Edit interest tags',
+                    Text(uiString(lang, 'interest_tags_edit_title'),
                         style: TextStyle(
                             color: tokens.textPrimary,
                             fontWeight: FontWeight.w900,
@@ -299,9 +342,9 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                     Wrap(
                         spacing: 10,
                         runSpacing: 10,
-                        children: all.map(chip).toList()),
+                        children: all.map(selectableChip).toList()),
                     const SizedBox(height: 14),
-                    Text('Add custom tag',
+                    Text(uiString(lang, 'interest_tags_add_custom'),
                         style: TextStyle(
                             color: tokens.textSecondary,
                             fontWeight: FontWeight.w700)),
@@ -313,29 +356,31 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                             controller: controller,
                             style: TextStyle(color: tokens.textPrimary),
                             decoration: InputDecoration(
-                              hintText: 'e.g. bedtime, commute…',
-                              hintStyle: TextStyle(color: tokens.textSecondary),
+                              hintText:
+                                  uiString(lang, 'interest_tags_hint_custom'),
+                              hintStyle:
+                                  TextStyle(color: tokens.textSecondary),
                               filled: true,
-                              // ✅ 修復深色主題輸入框透明背景重疊問題：使用不透明背景
-                              fillColor: Theme.of(context).brightness == Brightness.dark
-                                  ? const Color.fromRGBO(255, 255, 255, 0.10) // 深色主題使用不透明背景
-                                  : tokens.cardBg.withValues(alpha: 0.5),
+                              fillColor: tokens.chipBg,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide(
-                                    color: tokens.cardBorder),
+                                borderSide:
+                                    BorderSide(color: tokens.cardBorder),
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 10),
-                        ElevatedButton(
+                        _appPrimaryButton(
+                          tokens: tokens,
+                          label: uiString(lang, 'interest_tags_add_btn'),
                           onPressed: () async {
                             final t = controller.text.trim();
                             if (t.isEmpty) return;
                             await MePrefsStore.addCustomTag(key, t);
                             controller.clear();
-                            final fresh = await MePrefsStore.getCustomTags(key);
+                            final fresh =
+                                await MePrefsStore.getCustomTags(key);
                             setModal(() {
                               _custom = fresh;
                               all
@@ -344,25 +389,27 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
                                     {...builtin, ...fresh}.toList()..sort());
                             });
                           },
-                          child: const Text('Add'),
-                        )
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => setModal(() => selected.clear()),
-                            child: const Text('Clear'),
+                          child: _appOutlinedButton(
+                            tokens: tokens,
+                            label: uiString(lang, 'interest_tags_clear'),
+                            onPressed: () =>
+                                setModal(() => selected.clear()),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: ElevatedButton(
+                          child: _appPrimaryButton(
+                            tokens: tokens,
+                            label: uiString(lang, 'interest_tags_save'),
                             onPressed: () => Navigator.of(context)
                                 .pop(selected.toList()..sort()),
-                            child: const Text('Save'),
                           ),
                         ),
                       ],
@@ -374,6 +421,92 @@ class _MeInterestTagsSectionState extends ConsumerState<MeInterestTagsSection> {
           },
         );
       },
+    );
+    sheetFuture.whenComplete(() => controller.dispose());
+    return sheetFuture;
+  }
+
+  Widget _selectableChip(BuildContext context, AppTokens tokens,
+      String text, bool selected, VoidCallback onTap) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: _chipPadding,
+          decoration: BoxDecoration(
+            gradient: selected ? null : tokens.chipGradient,
+            color: selected
+                ? tokens.primaryPale
+                : (tokens.chipGradient == null ? tokens.chipBg : null),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: selected ? tokens.primary : tokens.cardBorder,
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Text(text,
+              style: TextStyle(
+                  color: tokens.textPrimary,
+                  fontSize: _chipFontSize,
+                  fontWeight:
+                      selected ? FontWeight.w700 : FontWeight.w500)),
+        ),
+      ),
+    );
+  }
+
+  Widget _appPrimaryButton({
+    required AppTokens tokens,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: tokens.primary,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Center(
+            child: Text(label,
+                style: TextStyle(
+                    color: tokens.textOnPrimary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _appOutlinedButton({
+    required AppTokens tokens,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: tokens.cardBorder),
+          ),
+          child: Center(
+            child: Text(label,
+                style: TextStyle(
+                    color: tokens.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14)),
+          ),
+        ),
+      ),
     );
   }
 }

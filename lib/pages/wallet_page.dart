@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../bubble_library/data/credits_repo.dart';
 import '../bubble_library/providers/providers.dart';
+import '../localization/app_language.dart';
+import '../localization/app_language_provider.dart';
+import '../localization/app_strings.dart';
 import '../theme/app_tokens.dart';
 import '../ui/glass.dart';
 import '../iap/credits_pack_store_sheet.dart';
@@ -13,6 +16,7 @@ class WalletPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = context.tokens;
+    final lang = ref.watch(appLanguageProvider);
     String? uid;
     try {
       uid = ref.watch(uidProvider);
@@ -23,7 +27,7 @@ class WalletPage extends ConsumerWidget {
     if (uid == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('My Wallet'),
+          title: Text(uiString(lang, 'my_wallet')),
           backgroundColor: Colors.transparent,
           foregroundColor: tokens.textPrimary,
         ),
@@ -41,7 +45,7 @@ class WalletPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Sign in to view your wallet',
+                    uiString(lang, 'sign_in_to_view_wallet'),
                     style: TextStyle(
                       fontSize: 18,
                       color: tokens.textPrimary,
@@ -61,7 +65,7 @@ class WalletPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Wallet'),
+        title: Text(uiString(lang, 'my_wallet')),
         backgroundColor: Colors.transparent,
         foregroundColor: tokens.textPrimary,
       ),
@@ -76,7 +80,7 @@ class WalletPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Balance',
+                    uiString(lang, 'balance'),
                     style: TextStyle(
                       fontSize: 14,
                       color: tokens.textSecondary,
@@ -116,7 +120,7 @@ class WalletPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'credits',
+                    uiString(lang, 'credits'),
                     style: TextStyle(
                       fontSize: 14,
                       color: tokens.textSecondary,
@@ -127,7 +131,7 @@ class WalletPage extends ConsumerWidget {
                     onPressed: () =>
                         showCreditsPackStoreSheet(context, ref),
                     icon: const Icon(Icons.add, size: 20),
-                    label: const Text('Buy credits'),
+                    label: Text(uiString(lang, 'buy_credits')),
                   ),
                 ],
               ),
@@ -135,7 +139,7 @@ class WalletPage extends ConsumerWidget {
             const SizedBox(height: 24),
             // Transaction history
             Text(
-              'Transaction history',
+              uiString(lang, 'transaction_history'),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -152,7 +156,7 @@ class WalletPage extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Center(
                         child: Text(
-                          'No transactions yet.',
+                          uiString(lang, 'no_transactions_yet'),
                           style: TextStyle(
                             fontSize: 14,
                             color: tokens.textSecondary,
@@ -167,6 +171,7 @@ class WalletPage extends ConsumerWidget {
                       .map((tx) => _TransactionTile(
                             transaction: tx,
                             tokens: tokens,
+                            lang: lang,
                           ))
                       .toList(),
                 );
@@ -183,7 +188,7 @@ class WalletPage extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Center(
                     child: Text(
-                      'Could not load transactions.',
+                      uiString(lang, 'could_not_load_transactions'),
                       style: TextStyle(
                         fontSize: 14,
                         color: tokens.textSecondary,
@@ -203,10 +208,12 @@ class WalletPage extends ConsumerWidget {
 class _TransactionTile extends StatelessWidget {
   final CreditTransaction transaction;
   final AppTokens tokens;
+  final AppLanguage lang;
 
   const _TransactionTile({
     required this.transaction,
     required this.tokens,
+    required this.lang,
   });
 
   @override
@@ -216,9 +223,10 @@ class _TransactionTile extends StatelessWidget {
             '${transaction.createdAt!.hour.toString().padLeft(2, '0')}:${transaction.createdAt!.minute.toString().padLeft(2, '0')}'
         : '—';
     final typeLabel =
-        transaction.type == 'add' ? 'Added' : 'Redeemed';
+        transaction.type == 'add' ? uiString(lang, 'transaction_added') : uiString(lang, 'transaction_redeemed');
+    final creditLabel = uiString(lang, 'credits');
     final amountLabel =
-        '${transaction.type == 'add' ? '+' : '-'}${transaction.amount} credit${transaction.amount != 1 ? 's' : ''}';
+        '${transaction.type == 'add' ? '+' : '-'}${transaction.amount} $creditLabel';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -276,7 +284,7 @@ class _TransactionTile extends StatelessWidget {
             if (transaction.balanceAfter != null) ...[
               const SizedBox(height: 4),
               Text(
-                'Balance after: ${transaction.balanceAfter}',
+                '${uiString(lang, 'balance_after')}${transaction.balanceAfter}',
                 style: TextStyle(
                   fontSize: 12,
                   color: tokens.textSecondary,

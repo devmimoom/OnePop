@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/providers.dart';
+import '../models/product.dart';
 import '../models/push_config.dart';
+import '../../localization/app_language_provider.dart';
 import '../notifications/push_orchestrator.dart';
 import '../notifications/push_scheduler.dart';
 import '../notifications/notification_service.dart';
@@ -37,6 +39,7 @@ class PushProductConfigPage extends ConsumerWidget {
       );
     }
 
+    final lang = ref.watch(appLanguageProvider);
     final libAsync = ref.watch(libraryProductsProvider);
     final productsAsync = ref.watch(productsMapProvider);
     final globalAsync = ref.watch(globalPushSettingsProvider);
@@ -48,7 +51,7 @@ class PushProductConfigPage extends ConsumerWidget {
           data: (global) => libAsync.when(
             data: (lib) {
               final lp = lib.firstWhere((e) => e.productId == productId);
-              final title = products[productId]?.title ?? productId;
+              final title = products[productId]?.displayTitle(lang) ?? productId;
               final cfg = lp.pushConfig;
               
               // 計算所有啟用推播的商品的總頻率
@@ -193,9 +196,7 @@ class PushProductConfigPage extends ConsumerWidget {
                         const SizedBox(height: 10),
                         DropdownButton<int>(
                           value: cfg.freqPerDay,
-                          dropdownColor: Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0xFF14182E)
-                              : null,
+                          dropdownColor: context.tokens.cardBg,
                           items: const [1, 2, 3, 4, 5]
                               .map((e) => DropdownMenuItem(
                                   value: e, child: Text('$e per day')))
@@ -265,9 +266,7 @@ class PushProductConfigPage extends ConsumerWidget {
                             style: TextStyle(fontWeight: FontWeight.w900)),
                         DropdownButton<int>(
                           value: cfg.minIntervalMinutes,
-                          dropdownColor: Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0xFF14182E)
-                              : null,
+                          dropdownColor: context.tokens.cardBg,
                           items: const [60, 90, 120, 180]
                               .map((e) =>
                                   DropdownMenuItem(value: e, child: Text('$e')))

@@ -181,7 +181,7 @@ class _ContinueCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(tokens.cardRadius),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(tokens.cardRadius),
           border: Border.all(color: tokens.cardBorder.withValues(alpha: 0.5)),

@@ -8,6 +8,9 @@ import '../../../theme/layout_constants.dart';
 import '../../app_card.dart';
 import '../../../data/models.dart';
 import '../../../pages/product_page.dart';
+import '../../../localization/app_language.dart';
+import '../../../localization/app_language_provider.dart';
+import '../../../localization/bilingual_text.dart';
 
 class CategoryDynamicRailsSection extends ConsumerWidget {
   const CategoryDynamicRailsSection({super.key});
@@ -15,6 +18,7 @@ class CategoryDynamicRailsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = context.tokens;
+    final lang = ref.watch(appLanguageProvider);
 
     final segsAsync = ref.watch(segmentsProvider);
     final selected = ref.watch(selectedSegmentProvider);
@@ -50,18 +54,21 @@ class CategoryDynamicRailsSection extends ConsumerWidget {
               title: 'For you',
               async: forYouAsync,
               emptyHint: 'No data (check Firestore featured_lists/$forYouId)',
+              lang: lang,
             ),
             const SizedBox(height: 14),
             _RailBlock(
               title: 'New',
               async: newAsync,
               emptyHint: 'No data (check Firestore featured_lists/$newId)',
+              lang: lang,
             ),
             const SizedBox(height: 14),
             _RailBlock(
               title: 'Popular',
               async: hotAsync,
               emptyHint: 'No data (check Firestore featured_lists/$hotId)',
+              lang: lang,
             ),
           ],
         );
@@ -85,11 +92,13 @@ class _RailBlock extends StatelessWidget {
   final String title;
   final AsyncValue<List<Product>> async;
   final String emptyHint;
+  final AppLanguage lang;
 
   const _RailBlock({
     required this.title,
     required this.async,
     required this.emptyHint,
+    required this.lang,
   });
 
   @override
@@ -107,7 +116,7 @@ class _RailBlock extends StatelessWidget {
         if (ps.isEmpty) {
           return AppCard(
             child: Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(16),
               child: Text(emptyHint,
                   style: TextStyle(color: tokens.textSecondary)),
             ),
@@ -136,6 +145,7 @@ class _RailBlock extends StatelessWidget {
                     product: p,
                     cardWidth: cardWidth,
                     imageHeight: imageHeight,
+                    lang: lang,
                   );
                 },
               ),
@@ -149,7 +159,7 @@ class _RailBlock extends StatelessWidget {
       ),
       error: (e, _) => AppCard(
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           child: Text('$title error: $e',
               style: const TextStyle(color: Colors.red)),
         ),
@@ -162,10 +172,12 @@ class _MiniProductCard extends StatelessWidget {
   final Product product;
   final double cardWidth;
   final double imageHeight;
+  final AppLanguage lang;
   const _MiniProductCard({
     required this.product,
     required this.cardWidth,
     required this.imageHeight,
+    required this.lang,
   });
 
   @override
@@ -218,38 +230,42 @@ class _MiniProductCard extends StatelessWidget {
                 child: Icon(Icons.auto_awesome, color: tokens.textSecondary),
               ),
 
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                      color: tokens.textPrimary,
-                    ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        productTitle(product, lang),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: tokens.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${product.topicId} · ${product.level}',
+                        style: TextStyle(color: tokens.textSecondary, fontSize: 12),
+                      ),
+                      if (productLevelGoal(product, lang).trim().isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          productLevelGoal(product, lang),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              TextStyle(color: tokens.textSecondary, fontSize: 12),
+                        ),
+                      ],
+                    ],
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${product.topicId} · ${product.level}',
-                    style: TextStyle(color: tokens.textSecondary, fontSize: 12),
-                  ),
-                  if (product.levelGoal != null &&
-                      product.levelGoal!.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      product.levelGoal!,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style:
-                          TextStyle(color: tokens.textSecondary, fontSize: 12),
-                    ),
-                  ],
-                ],
+                ),
               ),
             ),
           ],

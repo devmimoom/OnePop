@@ -1,21 +1,15 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'firebase_options.dart';
 
+import 'app_bootstrapper.dart';
 import 'app_scaffold.dart';
 import 'bubble_library/bootstrapper.dart';
-import 'iap/credits_iap_service.dart';
 import 'theme/theme_controller.dart';
 import 'theme/app_themes.dart';
 import 'navigation/app_nav.dart';
 import 'pages/welcome/bubble_welcome_page.dart';
 import 'pages/welcome/onboarding_screen.dart';
-import 'pages/welcome/onboarding_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,70 +17,59 @@ void main() async {
   // 禁止 Google Fonts 在運行時下載字型（避免審核或離線時的問題）
   GoogleFonts.config.allowRuntimeFetching = false;
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  // ✅ 時區初始化已移至 BubbleBootstrapper，避免與插件註冊衝突
-
-  // 自動匿名登入（如果尚未登入）
-  final auth = FirebaseAuth.instance;
-  if (auth.currentUser == null) {
-    try {
-      await auth.signInAnonymously();
-    } catch (e) {
-      // 如果匿名登入失敗，記錄錯誤但不阻止應用程式啟動
-      if (kDebugMode) debugPrint('Anonymous sign-in failed: $e');
-    }
-  }
-
-  if (auth.currentUser != null) {
-    await CreditsIAPService.configure(auth.currentUser!.uid);
-    await FirebaseAnalytics.instance.setUserId(id: auth.currentUser!.uid);
-  }
-
-  // 初始化主題控制器
-  final themeController = ThemeController();
-  await themeController.init();
-
-  runApp(ProviderScope(child: MyApp(themeController: themeController)));
+  runApp(AppBootstrapper(
+    builder: (themeController, initialHasSeenOnboarding) => ProviderScope(
+      overrides: [themeControllerProvider.overrideWithValue(themeController)],
+      child: MyApp(
+        themeController: themeController,
+        initialHasSeenOnboarding: initialHasSeenOnboarding,
+      ),
+    ),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final ThemeController themeController;
-  const MyApp({super.key, required this.themeController});
+  final bool initialHasSeenOnboarding;
+  const MyApp({
+    super.key,
+    required this.themeController,
+    required this.initialHasSeenOnboarding,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return _AppRoot(themeController: themeController);
+    return _AppRoot(
+      themeController: themeController,
+      initialHasSeenOnboarding: initialHasSeenOnboarding,
+    );
   }
 }
 
 /// Root gate: shows onboarding when not seen, then Welcome or Main based on flow B.
 class _AppRoot extends StatefulWidget {
   final ThemeController themeController;
+  final bool initialHasSeenOnboarding;
 
-  const _AppRoot({required this.themeController});
+  const _AppRoot({
+    required this.themeController,
+    required this.initialHasSeenOnboarding,
+  });
 
   @override
   State<_AppRoot> createState() => _AppRootState();
 }
 
 class _AppRootState extends State<_AppRoot> {
-  bool? _hasSeenOnboarding;
-  bool _showWelcomePage = false;
+  late bool _hasSeenOnboarding;
+  late bool _showWelcomePage;
 
   @override
   void initState() {
     super.initState();
-    hasSeenOnboarding().then((value) {
-      if (mounted) {
-        setState(() {
-          _hasSeenOnboarding = value;
-          // 每次啟動都先顯示 Welcome，點擊後才進入 Main
-          if (value) _showWelcomePage = true;
-        });
-      }
-    });
+    _hasSeenOnboarding = widget.initialHasSeenOnboarding;
+    // 每次啟動都先顯示 Welcome，點擊後才進入 Main
+    _showWelcomePage = widget.initialHasSeenOnboarding;
   }
 
   void _onOnboardingComplete() {
@@ -99,25 +82,6 @@ class _AppRootState extends State<_AppRoot> {
   @override
   Widget build(BuildContext context) {
     final themeController = widget.themeController;
-
-    if (_hasSeenOnboarding == null) {
-      return MaterialApp(
-        title: 'OnePop',
-        debugShowCheckedModeBanner: false,
-        theme: AppThemes.byId(themeController.id),
-        home: const Scaffold(
-          body: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF0A0E27), Color(0xFF1A1F3A)],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
 
     if (_hasSeenOnboarding == false) {
       return AnimatedBuilder(

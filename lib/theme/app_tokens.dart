@@ -8,8 +8,17 @@ class AppTokens extends ThemeExtension<AppTokens> {
   final Gradient? bgGradient;
 
   final Color primary;
+  /// Filled buttons/badges in light use this; in dark same as primary or lighter.
+  final Color primaryBright;
+  /// Light theme: pill/tag bg (#FFF3DC). Dark: optional dim.
+  final Color primaryPale;
+  /// Dark: amber. Light: near-black (section headers NOT amber).
+  final Color sectionTitleColor;
   final Color textPrimary;
   final Color textSecondary;
+  final Color textMuted;
+  /// Button/badge text on primary bg.
+  final Color textOnPrimary;
 
   final Color cardBg;
   final Color cardBorder;
@@ -33,8 +42,13 @@ class AppTokens extends ThemeExtension<AppTokens> {
     required this.bg,
     required this.bgGradient,
     required this.primary,
+    required this.primaryBright,
+    required this.primaryPale,
+    required this.sectionTitleColor,
     required this.textPrimary,
     required this.textSecondary,
+    required this.textMuted,
+    required this.textOnPrimary,
     required this.cardBg,
     required this.cardBorder,
     required this.cardRadius,
@@ -54,8 +68,13 @@ class AppTokens extends ThemeExtension<AppTokens> {
     Color? bg,
     Gradient? bgGradient,
     Color? primary,
+    Color? primaryBright,
+    Color? primaryPale,
+    Color? sectionTitleColor,
     Color? textPrimary,
     Color? textSecondary,
+    Color? textMuted,
+    Color? textOnPrimary,
     Color? cardBg,
     Color? cardBorder,
     double? cardRadius,
@@ -73,8 +92,13 @@ class AppTokens extends ThemeExtension<AppTokens> {
       bg: bg ?? this.bg,
       bgGradient: bgGradient ?? this.bgGradient,
       primary: primary ?? this.primary,
+      primaryBright: primaryBright ?? this.primaryBright,
+      primaryPale: primaryPale ?? this.primaryPale,
+      sectionTitleColor: sectionTitleColor ?? this.sectionTitleColor,
       textPrimary: textPrimary ?? this.textPrimary,
       textSecondary: textSecondary ?? this.textSecondary,
+      textMuted: textMuted ?? this.textMuted,
+      textOnPrimary: textOnPrimary ?? this.textOnPrimary,
       cardBg: cardBg ?? this.cardBg,
       cardBorder: cardBorder ?? this.cardBorder,
       cardRadius: cardRadius ?? this.cardRadius,
@@ -97,8 +121,13 @@ class AppTokens extends ThemeExtension<AppTokens> {
       bg: Color.lerp(bg, other.bg, t)!,
       bgGradient: t < 0.5 ? bgGradient : other.bgGradient,
       primary: Color.lerp(primary, other.primary, t)!,
+      primaryBright: Color.lerp(primaryBright, other.primaryBright, t)!,
+      primaryPale: Color.lerp(primaryPale, other.primaryPale, t)!,
+      sectionTitleColor: Color.lerp(sectionTitleColor, other.sectionTitleColor, t)!,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
+      textMuted: Color.lerp(textMuted, other.textMuted, t)!,
+      textOnPrimary: Color.lerp(textOnPrimary, other.textOnPrimary, t)!,
       cardBg: Color.lerp(cardBg, other.cardBg, t)!,
       cardBorder: Color.lerp(cardBorder, other.cardBorder, t)!,
       cardRadius: lerpDouble(cardRadius, other.cardRadius, t)!,

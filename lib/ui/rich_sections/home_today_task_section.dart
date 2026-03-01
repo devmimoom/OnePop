@@ -9,7 +9,6 @@ import '../../bubble_library/notifications/scheduled_push_cache.dart';
 import '../../bubble_library/providers/providers.dart';
 import '../../notifications/push_timeline_provider.dart';
 
-import '../../widgets/rich_sections/user_learning_store.dart';
 import '../../bubble_library/ui/product_library_page.dart';
 import '../../notifications/push_exclusion_store.dart';
 
@@ -284,10 +283,6 @@ class _HomeTodayTaskSectionState extends ConsumerState<HomeTodayTaskSection> {
                                           ?.toString() ??
                                       '';
                                   if (pid.isEmpty) return;
-
-                                  // 記錄今日完成（全域）
-                                  await UserLearningStore()
-                                      .markGlobalLearnedToday();
 
                                   // 標記推播為已開啟
                                   if (pid.isNotEmpty && cid.isNotEmpty) {

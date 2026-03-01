@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/global_push_settings.dart';
+import '../models/product.dart';
 import '../models/push_config.dart';
 import '../notifications/push_orchestrator.dart';
 import '../notifications/notification_service.dart';
 import '../providers/providers.dart';
+import '../../localization/app_language_provider.dart';
 import 'push_product_config_page.dart';
 import 'widgets/bubble_card.dart';
 import '../../../pages/push_timeline_page.dart';
@@ -24,6 +26,7 @@ class PushCenterPage extends ConsumerWidget {
       _didLogScreen = true;
       ref.read(analyticsProvider).logScreenView(screenName: 'push_center');
     }
+    final lang = ref.watch(appLanguageProvider);
     final globalAsync = ref.watch(globalPushSettingsProvider);
     final libAsync = ref.watch(libraryProductsProvider);
     final productsAsync = ref.watch(productsMapProvider);
@@ -124,9 +127,9 @@ class PushCenterPage extends ConsumerWidget {
                     children: [
                       // 推播中的商品
                       ...pushing.map((lp) {
-                      final title =
-                          products[lp.productId]?.title ?? lp.productId;
-                      return Padding(
+                        final title =
+                            products[lp.productId]?.displayTitle(lang) ?? lp.productId;
+                        return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: BubbleCard(
                           onTap: () => Navigator.of(context).push(
@@ -186,7 +189,8 @@ class PushCenterPage extends ConsumerWidget {
                               ),
                               const SizedBox(height: 12),
                               ...completed.map((lp) {
-                                final title = products[lp.productId]?.title ?? lp.productId;
+                                final title =
+                                    products[lp.productId]?.displayTitle(lang) ?? lp.productId;
                                 final completedDate = lp.completedAt != null
                                     ? '${lp.completedAt!.month}/${lp.completedAt!.day}'
                                     : '';
@@ -310,9 +314,7 @@ class PushCenterPage extends ConsumerWidget {
             trailing: DropdownButton<int>(
               value: g.dailyTotalCap,
               // ✅ 修復深色主題下拉選單透明背景重疊問題
-              dropdownColor: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF14182E)
-                  : null,
+              dropdownColor: context.tokens.cardBg,
               items: (() {
                 const presets = <int>[6, 8, 12, 20];
                 final values = {...presets, g.dailyTotalCap}.toList()..sort();

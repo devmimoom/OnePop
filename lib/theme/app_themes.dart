@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'app_theme_id.dart';
 import 'app_tokens.dart';
 
+// Apply this color migration across the entire project.
+// OnePop Color Migration — Dual Theme Spec: Amber Night (dark) + Warm Amber (light).
+
 class AppThemes {
   static ThemeData byId(AppThemeId id) {
     switch (id) {
@@ -12,54 +15,67 @@ class AppThemes {
     }
   }
 
+  /// Amber Night (dark): amber IS headline/accent. Section titles = amber.
   static ThemeData _darkNeon() {
-    const bg = Color(0xFF0B0E1A);
-    const primary = Color(0xFF2EF2E1);
+    const bg = Color(0xFF0C0F1A);
+    const primary = Color(0xFFE8A838);
+    const primaryLight = Color(0xFFF5C04A);
+    const textOnPrimary = Color(0xFF0C0F1A);
 
-    final tokens = AppTokens(
+    const tokens = AppTokens(
       bg: bg,
-      bgGradient: const LinearGradient(
+      bgGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Color(0xFF0B0E1A),
-          Color(0xFF121A35),
-          Color(0xFF0B0E1A),
+          Color(0xFF0C0F1A),
+          Color(0xFF1A1F35),
+          Color(0xFF0C0F1A),
         ],
       ),
       primary: primary,
-      textPrimary: Colors.white,
-      textSecondary: const Color.fromRGBO(255, 255, 255, 0.72),
-      cardBg: const Color.fromRGBO(255, 255, 255, 0.08),
-      cardBorder: const Color.fromRGBO(255, 255, 255, 0.14),
+      primaryBright: primary,
+      primaryPale: Color.fromRGBO(232, 168, 56, 0.15),
+      sectionTitleColor: primary,
+      textPrimary: Color(0xFFEDE8DD),
+      textSecondary: Color(0xFF9A9484),
+      textMuted: Color(0xFF6B6558),
+      textOnPrimary: textOnPrimary,
+      cardBg: Color(0xFF151929),
+      cardBorder: Color.fromRGBO(232, 168, 56, 0.12),
       cardRadius: 24,
-      cardShadow: const [
+      cardShadow: [
+        BoxShadow(
+          color: Color.fromRGBO(232, 168, 56, 0.06),
+          blurRadius: 80,
+          offset: Offset(0, 12),
+        ),
         BoxShadow(
           color: Color.fromRGBO(0, 0, 0, 0.35),
           blurRadius: 28,
           offset: Offset(0, 12),
         ),
       ],
-      cardGradient: const LinearGradient(
+      cardGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
           Color.fromRGBO(255, 255, 255, 0.12),
-          Color.fromRGBO(46, 242, 225, 0.08),
+          Color.fromRGBO(232, 168, 56, 0.08),
           Color.fromRGBO(255, 255, 255, 0.08),
         ],
       ),
-      chipBg: const Color.fromRGBO(255, 255, 255, 0.08),
-      chipGradient: const LinearGradient(
+      chipBg: Color(0xFF1C2139),
+      chipGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Color.fromRGBO(46, 242, 225, 0.15),
+          Color.fromRGBO(232, 168, 56, 0.15),
           Color.fromRGBO(255, 255, 255, 0.08),
         ],
       ),
-      navBg: const Color.fromRGBO(20, 24, 44, 0.72),
-      navGradient: const LinearGradient(
+      navBg: Color.fromRGBO(20, 24, 44, 0.72),
+      navGradient: LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
@@ -70,12 +86,9 @@ class AppThemes {
       buttonGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          primary,
-          primary.withValues(alpha: 0.8),
-        ],
+        colors: [primary, primaryLight],
       ),
-      searchBarGradient: const LinearGradient(
+      searchBarGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
@@ -162,9 +175,12 @@ class AppThemes {
     return base.copyWith(extensions: [tokens]);
   }
 
+  /// Warm Amber (light): section titles = near-black. Amber only for buttons/links/accent bar.
   static ThemeData _whiteMint() {
-    const bg = Color(0xFFFFFFFF);
-    const primary = Color(0xFF25C9B8);
+    const bg = Color(0xFFFAF8F4);
+    const primary = Color(0xFFC8850A);
+    const primaryBright = Color(0xFFE8A838);
+    const primaryPale = Color(0xFFFFF3DC);
 
     const tokens = AppTokens(
       bg: bg,
@@ -172,22 +188,27 @@ class AppThemes {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Color(0xFFFFFFFF),
-          Color(0xFFF8FCFC),
-          Color(0xFFF2F9F8),
+          Color(0xFFFAF8F4),
+          Color(0xFFF5F2EC),
+          Color(0xFFFAF8F4),
         ],
       ),
       primary: primary,
-      textPrimary: Color(0xFF111827),
-      textSecondary: Color(0xFF6B7280),
+      primaryBright: primaryBright,
+      primaryPale: primaryPale,
+      sectionTitleColor: Color(0xFF1A1710),
+      textPrimary: Color(0xFF1A1710),
+      textSecondary: Color(0xFF6B6152),
+      textMuted: Color(0xFF9A9080),
+      textOnPrimary: Color(0xFFFFFFFF),
       cardBg: Color(0xFFFFFFFF),
-      cardBorder: Color(0xFFEEF1F6),
+      cardBorder: Color.fromRGBO(26, 23, 16, 0.08),
       cardRadius: 22,
       cardShadow: [
         BoxShadow(
-          color: Color.fromRGBO(0, 0, 0, 0.08),
-          blurRadius: 24,
-          offset: Offset(0, 10),
+          color: Color.fromRGBO(26, 23, 16, 0.06),
+          blurRadius: 12,
+          offset: Offset(0, 2),
         ),
       ],
       cardGradient: LinearGradient(
@@ -195,41 +216,38 @@ class AppThemes {
         end: Alignment.bottomRight,
         colors: [
           Color(0xFFFFFFFF),
-          Color(0xFFF8FCFC),
+          Color(0xFFFAF8F4),
         ],
       ),
-      chipBg: Color(0xFFF5F7FB),
+      chipBg: Color(0xFFF0EDE6),
       chipGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Color(0xFFF5F7FB),
-          Color(0xFFE8F5F3),
+          Color(0xFFF0EDE6),
+          Color(0xFFFFF8EC),
         ],
       ),
-      navBg: Color.fromRGBO(255, 255, 255, 0.92),
+      navBg: Color(0xFFFFFFFF),
       navGradient: LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          Color.fromRGBO(255, 255, 255, 0.98),
-          Color.fromRGBO(255, 255, 255, 0.95),
+          Color(0xFFFFFFFF),
+          Color(0xFFFFFFFF),
         ],
       ),
       buttonGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          Color(0xFF25C9B8),
-          Color(0xFF1FB8A8),
-        ],
+        colors: [primaryBright, primaryBright],
       ),
       searchBarGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Color(0xFFF8F9FA),
-          Color(0xFFF0F2F5),
+          Color(0xFFF5F2EC),
+          Color(0xFFF0EDE6),
         ],
       ),
       glassBlurSigma: 10,

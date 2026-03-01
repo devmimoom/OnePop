@@ -4,10 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/v2_providers.dart';
 import '../widgets/app_card.dart';
 import '../theme/app_tokens.dart';
+import '../theme/layout_constants.dart';
+import '../data/models.dart';
 import '../ui/rich_sections/user_state_store.dart';
 import '../ui/rich_sections/search_history_section.dart';
 import '../ui/rich_sections/search_suggestions_section.dart';
 import 'product_page.dart';
+import 'product_list_page.dart';
+import '../localization/app_language_provider.dart';
+import '../localization/app_language.dart';
+import '../localization/bilingual_text.dart';
 
 // ✅ 若你專案有這個 provider（泡泡庫在用），就能做「已購買/推播中」篩選。
 // 沒登入或不存在會自動 fallback，不會影響搜尋基本功能。
@@ -305,11 +311,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       isScrollControlled: true,
       builder: (_) {
         return Container(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          padding: const EdgeInsets.fromLTRB(kPageHorizontalPadding, 12, kPageHorizontalPadding, 16),
           decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF14182E)
-                : tokens.cardBg,
+            color: tokens.cardBg,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             border: Border.all(color: tokens.cardBorder),
           ),
@@ -444,6 +448,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     final query = ref.watch(searchQueryProvider);
     final results = ref.watch(searchResultsProvider);
     final tokens = context.tokens;
+    final lang = ref.watch(appLanguageProvider);
 
     final filter = ref.watch(_searchFilterProvider);
     final sort = ref.watch(_searchSortProvider);
@@ -536,11 +541,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
                   return ListView(
                     children: [
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(kPageHorizontalPadding, 4, kPageHorizontalPadding, 12),
+                        child: _SearchExploreCard(),
+                      ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                        child: SearchHistorySection(
-                          key: _historyKey,
-                          onTapQuery: (q) => _submitSearch(q),
+                        padding: const EdgeInsets.fromLTRB(kPageHorizontalPadding, 4, kPageHorizontalPadding, 12),
+                        child: AppCard(
+                          child: SearchHistorySection(
+                            key: _historyKey,
+                            onTapQuery: (q) => _submitSearch(q),
+                          ),
                         ),
                       ),
                       SearchForYouSection(
@@ -549,9 +560,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         onTap: (q) => _submitSearch(q),
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                        child: SearchSuggestionsSection(
-                          onTap: (q) => _submitSearch(q),
+                        padding: const EdgeInsets.fromLTRB(kPageHorizontalPadding, 4, kPageHorizontalPadding, 12),
+                        child: AppCard(
+                          child: SearchSuggestionsSection(
+                            onTap: (q) => _submitSearch(q),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -632,7 +645,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 Widget filtersBar() {
                   return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
                     child: Row(
                       children: [
                         FilterChip(
@@ -672,7 +685,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       !filter.isEmpty || sort != SearchSort.relevant;
 
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                    padding: const EdgeInsets.fromLTRB(kPageHorizontalPadding, 0, kPageHorizontalPadding, 12),
                     child: AppCard(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 10),
@@ -697,9 +710,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                 child: DropdownButton<SearchSort>(
                                   value: sort,
                                   // ✅ 修復深色主題下拉選單透明背景重疊問題
-                                  dropdownColor: Theme.of(context).brightness == Brightness.dark
-                                      ? const Color(0xFF14182E)
-                                      : null,
+                                  dropdownColor: tokens.cardBg,
                                   items: const [
                                     DropdownMenuItem(
                                       value: SearchSort.relevant,
@@ -771,12 +782,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                     const SizedBox(height: 10),
                     Expanded(
                       child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
                         itemCount: filtered.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (_, index) {
-                          final product = filtered[index] as dynamic;
-                          final pid = product.id as String;
+                          final product = filtered[index] as Product;
+                          final pid = product.id;
                           final isPurchased = purchasedSet.contains(pid);
                           final isPushing = pushingSet.contains(pid);
 
@@ -791,14 +802,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        (product.title ?? '').toString(),
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w800,
-                                          color: tokens.textPrimary,
-                                        ),
-                                      ),
+                                child: Text(
+                                  productTitle(product, lang),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                    color: tokens.textPrimary,
+                                  ),
+                                ),
                                     ),
                                     if (isPurchased)
                                       _pill(
@@ -821,7 +832,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                   '${product.topicId} · ${product.level}',
                                   style: TextStyle(color: tokens.textSecondary),
                                 ),
-                                finalLG(product, tokens),
+                                finalLG(product, tokens, lang),
                               ],
                             ),
                           );
@@ -864,9 +875,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget finalLG(dynamic product, AppTokens tokens) {
-    final lg = (product.levelGoal as String?)?.trim();
-    if (lg == null || lg.isEmpty) return const SizedBox.shrink();
+  Widget finalLG(Product product, AppTokens tokens, AppLanguage lang) {
+    final lg = productLevelGoal(product, lang).trim();
+    if (lg.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Text(
@@ -910,7 +921,7 @@ class SearchForYouSection extends StatelessWidget {
     final tokens = context.tokens;
     if (keywords.isEmpty) return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      padding: const EdgeInsets.fromLTRB(kPageHorizontalPadding, 4, kPageHorizontalPadding, 12),
       child: AppCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -953,6 +964,201 @@ class SearchForYouSection extends StatelessWidget {
       ),
     );
   }
+}
+
+class _SearchExploreCard extends ConsumerWidget {
+  const _SearchExploreCard();
+
+  AsyncValue<List<dynamic>> _safeLib(WidgetRef ref) {
+    try {
+      ref.read(v1.uidProvider);
+      return ref.watch(v1.libraryProductsProvider).whenData((l) => l.cast<dynamic>());
+    } catch (_) {
+      return const AsyncValue.data(<dynamic>[]);
+    }
+  }
+
+  AsyncValue<List<dynamic>> _safeWish(WidgetRef ref) {
+    try {
+      ref.read(v1.uidProvider);
+      return ref.watch(localWishlistProvider).whenData((l) => l.cast<dynamic>());
+    } catch (_) {
+      return const AsyncValue.data(<dynamic>[]);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tokens = context.tokens;
+    final productsMapAsync = ref.watch(allProductsMapProvider);
+    final libAsync = _safeLib(ref);
+    final wishAsync = _safeWish(ref);
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: productsMapAsync.when(
+        data: (productsMap) {
+          return libAsync.when(
+            data: (lib) {
+              return wishAsync.when(
+                data: (wish) {
+                  final recentTopics =
+                      _recentTopicIds(productsMap, lib).take(3).toList();
+                  final maybeTry =
+                      _maybeTryTopicIds(productsMap, lib, wish).take(3).toList();
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Recently viewed',
+                          style: TextStyle(
+                              color: tokens.textSecondary,
+                              fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 8),
+                      if (recentTopics.isEmpty)
+                        Text(
+                            'Open a few products and your top categories will show here',
+                            style: TextStyle(color: tokens.textSecondary))
+                      else
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: recentTopics
+                              .map((t) => _chip(context, t, onTap: () {
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (_) =>
+                                            ProductListPage(topicId: t)));
+                                  }))
+                              .toList(),
+                        ),
+                      const SizedBox(height: 14),
+                      Text('You might like',
+                          style: TextStyle(
+                              color: tokens.textSecondary,
+                              fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 8),
+                      if (maybeTry.isEmpty)
+                        Text(
+                            'Add more to wishlist and we\'ll expand your recommendations',
+                            style: TextStyle(color: tokens.textSecondary))
+                      else
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: maybeTry
+                              .map((t) => _chip(context, t, onTap: () {
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (_) =>
+                                            ProductListPage(topicId: t)));
+                                  }))
+                              .toList(),
+                        ),
+                    ],
+                  );
+                },
+                loading: () => const SizedBox(
+                    height: 60,
+                    child: Center(child: CircularProgressIndicator())),
+                error: (e, _) => Text('wishlist error: $e',
+                    style: TextStyle(color: tokens.textSecondary)),
+              );
+            },
+            loading: () => const SizedBox(
+                height: 60,
+                child: Center(child: CircularProgressIndicator())),
+            error: (e, _) => Text('library error: $e',
+                style: TextStyle(color: tokens.textSecondary)),
+          );
+        },
+        loading: () => const SizedBox(
+            height: 60, child: Center(child: CircularProgressIndicator())),
+        error: (e, _) => Text(
+          'Could not load suggestions right now.',
+          style: TextStyle(color: tokens.textSecondary),
+        ),
+      ),
+    );
+  }
+
+  Widget _chip(BuildContext context, String text, {required VoidCallback onTap}) {
+    final tokens = context.tokens;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: tokens.chipBg,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: tokens.cardBorder),
+        ),
+        child: Text(text,
+            style: TextStyle(color: tokens.textPrimary, fontSize: 12)),
+      ),
+    );
+  }
+}
+
+List<String> _recentTopicIds(Map<String, Product> productsMap, List<dynamic> lib) {
+  final items = lib.where((lp) {
+    try {
+      if ((lp as dynamic).isHidden == true) return false;
+      return productsMap.containsKey((lp as dynamic).productId.toString());
+    } catch (_) {
+      return false;
+    }
+  }).toList();
+
+  items.sort((a, b) {
+    DateTime ta;
+    DateTime tb;
+    try {
+      ta = ((a as dynamic).lastOpenedAt as DateTime?) ??
+          ((a as dynamic).purchasedAt as DateTime);
+    } catch (_) {
+      ta = DateTime.fromMillisecondsSinceEpoch(0);
+    }
+    try {
+      tb = ((b as dynamic).lastOpenedAt as DateTime?) ??
+          ((b as dynamic).purchasedAt as DateTime);
+    } catch (_) {
+      tb = DateTime.fromMillisecondsSinceEpoch(0);
+    }
+    return tb.compareTo(ta);
+  });
+
+  final seen = <String>{};
+  final out = <String>[];
+  for (final lp in items) {
+    final pid = (lp as dynamic).productId.toString();
+    final p = productsMap[pid];
+    if (p == null) continue;
+    final tid = p.topicId;
+    if (seen.add(tid)) out.add(tid);
+    if (out.length >= 6) break;
+  }
+  return out;
+}
+
+List<String> _maybeTryTopicIds(
+    Map<String, Product> productsMap, List<dynamic> lib, List<dynamic> wish) {
+  final recent = _recentTopicIds(productsMap, lib).toSet();
+  final count = <String, int>{};
+
+  for (final w in wish) {
+    try {
+      final pid = (w as dynamic).productId.toString();
+      final p = productsMap[pid];
+      if (p == null) continue;
+      final tid = p.topicId;
+      if (recent.contains(tid)) continue;
+      count[tid] = (count[tid] ?? 0) + 1;
+    } catch (_) {}
+  }
+
+  final list = count.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  return list.map((e) => e.key).toList();
 }
 
 class _LevelChip extends StatelessWidget {

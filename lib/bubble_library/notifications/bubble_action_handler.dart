@@ -4,6 +4,7 @@ import '../../notifications/push_exclusion_store.dart';
 import 'notification_service.dart';
 import 'notification_scheduler.dart';
 import '../providers/providers.dart';
+import '../../widgets/rich_sections/user_learning_store.dart';
 
 /// 泡泡動作類型
 enum BubbleAction {
@@ -199,6 +200,9 @@ class BubbleActionHandler {
           // 不回滾：setSavedItem 已標記，這是保底機制
         }
       }
+
+      // ✅ 以「標記學會」為準：更新 streak（當天有學習）
+      await UserLearningStore().markLearnedTodayAndGlobal(productId);
 
       // ✅ 4) 取消已排程的通知
       await ns.cancelByContentItemId(contentItemId);

@@ -45,3 +45,11 @@ app.*.map.json
 /android/app/release
 tools/keys/*.json
 *.json
+
+# Apple / 敏感檔勿上傳
+*.p8
+AuthKey_*.p8
+
+# Python
+.venv/
+venv/

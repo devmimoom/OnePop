@@ -5,6 +5,7 @@ import '../../collections/wishlist_provider.dart';
 import '../providers/providers.dart';
 import '../models/product.dart';
 import '../models/user_library.dart';
+import '../../localization/app_language_provider.dart';
 import 'product_library_page.dart';
 import '../../pages/product_page.dart';
 
@@ -13,6 +14,7 @@ class WishlistPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(appLanguageProvider);
     final productsAsync = ref.watch(productsMapProvider);
     final wishlistAsync = ref.watch(localWishlistProvider);
     final libraryAsync = ref.watch(libraryProductsProvider);
@@ -66,8 +68,8 @@ class WishlistPage extends ConsumerWidget {
                   final w = list[i]['item'] as WishlistItem;
                   final p = list[i]['product'] as Product;
                   final pid = p.id;
-                  final title = p.title;
-                  final subtitle = p.levelGoal ?? '';
+                  final title = p.displayTitle(lang);
+                  final subtitle = p.displayLevelGoal(lang);
 
                   return Card(
                     child: Padding(

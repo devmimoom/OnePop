@@ -1,3 +1,5 @@
+import '../../localization/app_language.dart';
+
 class ContentItem {
   final String id;
   final String productId;
@@ -11,6 +13,10 @@ class ContentItem {
   final int seq;
   final int isPreview; // 0/1
   final String deepAnalysis; // 深度解析（來自 Excel deepAnalysis 欄位）
+  final String? anchorGroupZh;
+  final String? anchorZh;
+  final String? contentZh;
+  final String? deepAnalysisZh;
 
   const ContentItem({
     required this.id,
@@ -25,10 +31,19 @@ class ContentItem {
     required this.seq,
     required this.isPreview,
     required this.deepAnalysis,
+    this.anchorGroupZh,
+    this.anchorZh,
+    this.contentZh,
+    this.deepAnalysisZh,
   });
 
+  static String? _str(dynamic v) {
+    if (v == null) return null;
+    final s = v.toString().trim();
+    return s.isEmpty ? null : s;
+  }
+
   factory ContentItem.fromMap(String id, Map<String, dynamic> m) {
-    // 處理 isPreview：Firebase 可能是 bool 或 int
     int isPreviewValue = 0;
     final isPreviewField = m['isPreview'];
     if (isPreviewField is bool) {
@@ -39,7 +54,6 @@ class ContentItem {
       isPreviewValue = (isPreviewField as num).toInt();
     }
 
-    // 處理 pushOrder：可能是 null
     int pushOrderValue = 0;
     final pushOrderField = m['pushOrder'];
     if (pushOrderField != null) {
@@ -59,6 +73,32 @@ class ContentItem {
       seq: (m['seq'] ?? 0) as int,
       isPreview: isPreviewValue,
       deepAnalysis: (m['deepAnalysis'] ?? '') as String,
+      anchorGroupZh: _str(m['anchorGroupZh']) ?? _str(m['anchorGroup_zh']),
+      anchorZh: _str(m['anchorZh']) ?? _str(m['anchor_zh']),
+      contentZh: _str(m['contentZh']) ?? _str(m['content_zh']),
+      deepAnalysisZh: _str(m['deepAnalysisZh']) ?? _str(m['deepAnalysis_zh']),
     );
+  }
+}
+
+extension ContentItemDisplay on ContentItem {
+  String displayAnchorGroup(AppLanguage lang) {
+    if (lang == AppLanguage.zhTw && anchorGroupZh != null && anchorGroupZh!.isNotEmpty) return anchorGroupZh!;
+    return anchorGroup;
+  }
+
+  String displayAnchor(AppLanguage lang) {
+    if (lang == AppLanguage.zhTw && anchorZh != null && anchorZh!.isNotEmpty) return anchorZh!;
+    return anchor;
+  }
+
+  String displayContent(AppLanguage lang) {
+    if (lang == AppLanguage.zhTw && contentZh != null && contentZh!.isNotEmpty) return contentZh!;
+    return content;
+  }
+
+  String displayDeepAnalysis(AppLanguage lang) {
+    if (lang == AppLanguage.zhTw && deepAnalysisZh != null && deepAnalysisZh!.isNotEmpty) return deepAnalysisZh!;
+    return deepAnalysis;
   }
 }
