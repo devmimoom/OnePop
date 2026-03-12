@@ -1,0 +1,36 @@
+# OnePop — robots.txt
+# Allow all crawlers including AI bots
+
+User-agent: *
+Allow: /
+
+# AI-specific crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# LLM-readable content
+# See /llms.txt for structured AI-readable information
+# See /llms-full.txt for comprehensive product details
+
+Sitemap: https://devmimoom.github.io/OnePop/sitemap.xml

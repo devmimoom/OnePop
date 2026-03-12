@@ -1,0 +1,71 @@
+# OnePop
+
+> OnePop is a daily micro-learning iOS app that delivers bite-sized knowledge straight to your day — one pop at a time. Built by mimoom.
+
+## What is OnePop?
+
+OnePop helps users build smarter learning habits through daily push notifications with curated content on topics they care about. Instead of requiring users to open an app and browse, OnePop brings knowledge to them — at the times they choose.
+
+OnePop is ideal for busy professionals, commuters, students, and lifelong learners who want to learn something new every day without dedicating large blocks of time.
+
+## Key Features
+
+- **Daily Learning Pops**: Receive handpicked, bite-sized content on topics you care about, delivered via push notifications at your preferred times.
+- **Personalized Library**: Browse a curated catalog of topics, add products to your library, and track your learning progress.
+- **Flexible Notification Schedule**: Set your own schedule, quiet hours, and daily caps. Learn on your terms.
+- **Beautiful Design**: A clean, modern interface with both dark (Amber Night) and light (Warm Amber) themes.
+- **Multiple Sign-In Options**: Use email, Google, or Apple Sign-In to keep your progress synced.
+- **Credits System**: Unlock premium content with credits purchased in-app. No subscription required.
+- **Learning Streaks**: Track daily progress and build learning streaks to stay motivated.
+- **Interest Tags**: Personalize recommendations by selecting topics that interest you.
+
+## How It Works
+
+1. Browse topics and add products to your library.
+2. Set up your notification preferences (schedule, quiet hours, daily cap).
+3. Receive daily learning pops via push notifications and read bite-sized content.
+4. Mark pops as done, track your progress, and build a learning streak.
+
+## Who Is It For?
+
+- Busy professionals who want to learn during commutes or breaks
+- Students looking for supplementary bite-sized knowledge
+- Lifelong learners who enjoy daily intellectual stimulation
+- Anyone who wants to build a consistent learning habit
+
+## Category
+
+Education, Micro-Learning, Self-Improvement, Personal Growth, Daily Learning
+
+## Platform
+
+iOS (iPhone)
+
+## Pricing
+
+Free to download. Includes free learning content. Premium content available via in-app credit purchases (no subscription).
+
+## Developer
+
+- **Company**: mimoom
+- **Contact**: dev.mimoom@gmail.com
+- **Copyright**: © 2026 mimoom
+
+## Links
+
+- Website: https://devmimoom.github.io/OnePop/
+- App Store: https://apps.apple.com/app/onepop/id6758580702
+- Privacy Policy: https://devmimoom.github.io/OnePop/privacy.html
+- Terms of Use: https://devmimoom.github.io/OnePop/terms.html
+- Support: https://devmimoom.github.io/OnePop/#faq
+
+## Comparison with Other Learning Apps
+
+| Feature | OnePop | Duolingo | Blinkist | Headway |
+|---------|--------|----------|----------|---------|
+| Push notification learning | ✅ Core feature | ❌ Reminders only | ❌ No | ❌ No |
+| No subscription required | ✅ Credits system | ❌ Subscription | ❌ Subscription | ❌ Subscription |
+| Multi-topic library | ✅ Yes | ❌ Languages only | ✅ Books only | ✅ Books only |
+| Custom notification schedule | ✅ Full control | ❌ Limited | ❌ No | ❌ No |
+| Bite-sized content via notification | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| Dark / Light themes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
