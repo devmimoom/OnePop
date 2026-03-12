@@ -98,6 +98,16 @@ Widget _buildHeader(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
+                  'BROWSE',
+                  style: TextStyle(
+                    color: tokens.textSecondary.withValues(alpha: 0.7),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
                   'Explore',
                   textAlign: TextAlign.left,
                   style: TextStyle(
@@ -127,6 +137,16 @@ Widget _buildHeader(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
+                'BROWSE',
+                style: TextStyle(
+                  color: tokens.textSecondary.withValues(alpha: 0.7),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
                 'Explore',
                 textAlign: TextAlign.left,
                 style: TextStyle(
@@ -149,14 +169,30 @@ Widget _buildHeader(
         padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.md, AppSpacing.md, 0),
         child: SizedBox(
           width: double.infinity,
-          child: Text(
-            'Explore',
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: tokens.textPrimary,
-              fontSize: 28,
-              fontWeight: FontWeight.w900,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'BROWSE',
+                style: TextStyle(
+                  color: tokens.textSecondary.withValues(alpha: 0.7),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Explore',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: tokens.textPrimary,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -196,13 +232,13 @@ Widget _buildChips(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                   decoration: BoxDecoration(
                     color: active
-                        ? tokens.primary.withValues(alpha: 0.12)
+                        ? tokens.primary.withValues(alpha: 0.16)
                         : tokens.chipBg,
                     borderRadius: BorderRadius.circular(48),
                     border: Border.all(
                       color: active
-                          ? tokens.primary.withValues(alpha: 0.5)
-                          : Colors.white.withValues(alpha: 0.08),
+                          ? tokens.primary
+                          : tokens.cardBorder,
                       width: active ? 1.5 : 1,
                     ),
                     boxShadow: active
