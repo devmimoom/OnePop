@@ -602,7 +602,7 @@ class _GreetingHeader extends StatelessWidget {
               Text(
                 uiString(lang, 'what_are_we_learning_today'),
                 style: TextStyle(
-                  color: tokens.primary,
+                  color: tokens.textPrimary,
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
                   height: 1.3,

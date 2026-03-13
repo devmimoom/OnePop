@@ -249,14 +249,15 @@ class _PlusFloatingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 無圓形外框：僅加號線條。未選中亦用 textOnPrimary 系以在 primary 條上可讀。
+    // 使用接近 warning 的橘紅色，讓「+」更醒目
+    const baseRed = Color(0xFFFF7043);
     final Color plusColor = selected
-        ? tokens.textOnPrimary
-        : tokens.textOnPrimary.withValues(alpha: 0.8);
+        ? baseRed
+        : baseRed.withValues(alpha: 0.8);
 
     return GestureDetector(
+      onTapDown: (_) => HapticFeedback.mediumImpact(),
       onTap: () {
-        HapticFeedback.lightImpact();
         onTap();
       },
       child: Container(
@@ -266,7 +267,7 @@ class _PlusFloatingButton extends StatelessWidget {
           color: Colors.transparent,
           boxShadow: [
             BoxShadow(
-              color: tokens.primary.withValues(alpha: 0.5),
+              color: baseRed.withValues(alpha: 0.5),
               blurRadius: 16,
               spreadRadius: 0,
             ),

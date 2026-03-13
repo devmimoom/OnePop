@@ -108,17 +108,6 @@ Widget _buildHeader(
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'Explore',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: tokens.textPrimary,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
                   '${ts.length} topics · $totalCards cards',
                   textAlign: TextAlign.left,
                   style: TextStyle(color: tokens.textSecondary, fontSize: 13),
@@ -143,16 +132,6 @@ Widget _buildHeader(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.8,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Explore',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  color: tokens.textPrimary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -182,16 +161,6 @@ Widget _buildHeader(
                   letterSpacing: 0.8,
                 ),
               ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Explore',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  color: tokens.textPrimary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
             ],
           ),
         ),
@@ -212,7 +181,7 @@ Widget _buildChips(
         if (list.isEmpty) return const SizedBox.shrink();
         final selectedId = selected?.id ?? list.first.id;
         return SizedBox(
-          height: 48,
+          height: 56,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, 0),

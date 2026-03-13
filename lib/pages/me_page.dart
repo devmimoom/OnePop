@@ -923,8 +923,7 @@ class _MeEntryCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        child: SizedBox(
-          height: 110,
+        child: SizedBox.expand(
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
             decoration: BoxDecoration(
@@ -1003,34 +1002,37 @@ class _AccountWithUnlockCard extends ConsumerWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _MeEntryCard(
-                      tokens: tokens,
-                      lang: lang,
-                      titleKey: 'my_library',
-                      subtitleKey: 'my_library_subtitle',
-                      emoji: '📚',
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const BubbleLibraryPage()),
+              child: SizedBox(
+                height: 130,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _MeEntryCard(
+                        tokens: tokens,
+                        lang: lang,
+                        titleKey: 'my_library',
+                        subtitleKey: 'my_library_subtitle',
+                        emoji: '📚',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const BubbleLibraryPage()),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Expanded(
-                    child: _MeEntryCard(
-                      tokens: tokens,
-                      lang: lang,
-                      titleKey: 'my_wallet',
-                      subtitleKey: 'my_wallet_subtitle',
-                      emoji: '💳',
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const WalletPage()),
+                    const SizedBox(width: AppSpacing.xs),
+                    Expanded(
+                      child: _MeEntryCard(
+                        tokens: tokens,
+                        lang: lang,
+                        titleKey: 'my_wallet',
+                        subtitleKey: 'my_wallet_subtitle',
+                        emoji: '💳',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const WalletPage()),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Divider(

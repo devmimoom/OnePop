@@ -711,19 +711,13 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     AppLanguage lang,
   ) {
     final tokens = context.tokens;
-    
-    // ✅ 获取已购买的产品ID集合
+
     final purchasedProductIds = visibleLib
         .map((lp) => lp.productId)
         .toSet();
-    
-    // ✅ 过滤：只显示未购买的产品
-    final visibleWish = <WishlistItem>[
-      ...wishItems.where((e) => 
-        productsMap.containsKey(e.productId) && 
-        !purchasedProductIds.contains(e.productId) // ✅ 排除已购买
-      )
-    ]..sort((a, b) => b.addedAt.compareTo(a.addedAt));
+
+    final visibleWish = [...wishItems]
+      ..sort((a, b) => b.addedAt.compareTo(a.addedAt));
 
     if (visibleWish.isEmpty) {
       return Center(
@@ -755,21 +749,24 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.xs),
       itemBuilder: (_, i) {
         final w = visibleWish[i];
-        final p = productsMap[w.productId]!;
-        final title = p.displayTitle(lang);
+        final p = productsMap[w.productId];
+        final title = p?.displayTitle(lang) ?? w.productId;
+        final isPurchased = purchasedProductIds.contains(w.productId);
 
-        Widget chip(String label) {
+        Widget chip(String label, {bool highlight = false}) {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xs),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(999),
-              color: tokens.chipBg,
+              color:
+                  highlight ? tokens.primary.withValues(alpha: 0.15) : tokens.chipBg,
               border: Border.all(
-                  color: tokens.cardBorder),
+                color: highlight ? tokens.primary : tokens.cardBorder,
+              ),
             ),
             child: Text(label,
                 style: TextStyle(
-                    color: tokens.textPrimary,
+                    color: highlight ? tokens.primary : tokens.textPrimary,
                     fontSize: 11,
                     fontWeight: FontWeight.w600)),
           );
@@ -780,23 +777,30 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
             Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => ProductLibraryPage(
                 productId: w.productId,
-                isWishlistPreview: true, // ✅ 試讀模式
+                isWishlistPreview: !isPurchased,
               ),
             ));
           },
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.lock_outline, size: 26),
+              Icon(
+                isPurchased ? Icons.check_circle_outline : Icons.lock_outline,
+                size: 26,
+                color: isPurchased ? tokens.primary : null,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Text(title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w800)),
                         ),
@@ -821,36 +825,72 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                     const SizedBox(height: AppSpacing.xs),
                     Wrap(
                       spacing: 8,
+                      runSpacing: 8,
                       children: [
-                        chip(uiString(lang, 'not_purchased')),
-                        chip(uiString(lang, 'preview_available')),
+                        if (isPurchased)
+                          chip(uiString(lang, 'purchased_label'), highlight: true)
+                        else if (p != null) ...[
+                          chip(uiString(lang, 'not_purchased')),
+                          chip(uiString(lang, 'preview_available')),
+                        ] else
+                          chip(w.productId),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.xs),
-                    Row(
-                      children: [
-                        OutlinedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => ProductLibraryPage(
-                                productId: w.productId,
-                                isWishlistPreview: true,
-                              ),
-                            ));
-                          },
-                          child: Text(uiString(lang, 'preview')),
+                    if (isPurchased)
+                      Wrap(
+                        spacing: AppSpacing.xs,
+                        runSpacing: AppSpacing.xs,
+                        children: [
+                          OutlinedButton.icon(
+                            icon: const Icon(Icons.menu_book, size: 16),
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => ProductLibraryPage(
+                                  productId: w.productId,
+                                  isWishlistPreview: false,
+                                ),
+                              ));
+                            },
+                            label: Text(uiString(lang, 'open_library')),
+                          ),
+                        ],
+                      )
+                    else if (p != null)
+                      Wrap(
+                        spacing: AppSpacing.xs,
+                        runSpacing: AppSpacing.xs,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => ProductLibraryPage(
+                                  productId: w.productId,
+                                  isWishlistPreview: true,
+                                ),
+                              ));
+                            },
+                            child: Text(uiString(lang, 'preview')),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) =>
+                                    ProductPage(productId: w.productId),
+                              ));
+                            },
+                            child: Text(uiString(lang, 'buy_now')),
+                          ),
+                        ],
+                      )
+                    else
+                      Text(
+                        w.productId,
+                        style: TextStyle(
+                          color: tokens.textSecondary,
+                          fontSize: 12,
                         ),
-                        const SizedBox(width: AppSpacing.xs),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => ProductPage(productId: w.productId),
-                            ));
-                          },
-                          child: Text(uiString(lang, 'buy_now')),
-                        ),
-                      ],
-                    ),
+                      ),
                   ],
                 ),
               ),

@@ -36,23 +36,17 @@ class WishlistPage extends ConsumerWidget {
         data: (productsMap) {
           return libraryAsync.when(
             data: (libraryProducts) {
-              // ✅ 获取已购买的产品ID集合
               final purchasedProductIds = libraryProducts
                   .where((lp) => !lp.isHidden)
                   .map((lp) => lp.productId)
                   .toSet();
-              
+
               return wishlistAsync.when(
                 data: (wishItems) {
-                  // ✅ 过滤：只显示未购买的产品
                   final list = wishItems
-                      .where((w) => 
-                        productsMap.containsKey(w.productId) &&
-                        !purchasedProductIds.contains(w.productId) // ✅ 排除已购买
-                      )
                       .map((w) => {
                         'item': w,
-                        'product': productsMap[w.productId]!,
+                        'product': productsMap[w.productId],
                       })
                       .toList()
                     ..sort((a, b) => (b['item'] as WishlistItem).addedAt
@@ -68,10 +62,11 @@ class WishlistPage extends ConsumerWidget {
                 separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.xs),
                 itemBuilder: (context, i) {
                   final w = list[i]['item'] as WishlistItem;
-                  final p = list[i]['product'] as Product;
-                  final pid = p.id;
-                  final title = p.displayTitle(lang);
-                  final subtitle = p.displayLevelGoal(lang);
+                  final p = list[i]['product'] as Product?;
+                  final pid = w.productId;
+                  final title = p?.displayTitle(lang) ?? pid;
+                  final subtitle = p?.displayLevelGoal(lang) ?? '';
+                  final isPurchased = purchasedProductIds.contains(pid);
 
                   return Card(
                     child: Padding(
@@ -80,12 +75,24 @@ class WishlistPage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
                                 child: Text(title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                         fontSize: 16, fontWeight: FontWeight.w900)),
                               ),
+                              if (isPurchased)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: AppSpacing.xs),
+                                  child: Icon(
+                                    Icons.check_circle,
+                                    size: 20,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
                               IconButton(
                                 tooltip: uiString(lang, 'favorite'),
                                 icon: Icon(w.isFavorite
@@ -106,35 +113,53 @@ class WishlistPage extends ConsumerWidget {
                             ),
                           ],
                           const SizedBox(height: AppSpacing.xs),
-                          Row(
+                          Wrap(
+                            spacing: AppSpacing.xs,
+                            runSpacing: AppSpacing.xs,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              OutlinedButton.icon(
-                                icon: const Icon(Icons.visibility),
-                                label: Text(uiString(lang, 'preview')),
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => ProductLibraryPage(
-                                        productId: pid,
-                                        isWishlistPreview: true,
+                              if (isPurchased)
+                                OutlinedButton.icon(
+                                  icon: const Icon(Icons.menu_book, size: 16),
+                                  label: Text(uiString(lang, 'open_library')),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => ProductLibraryPage(
+                                          productId: pid,
+                                          isWishlistPreview: false,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              const SizedBox(width: AppSpacing.xs),
-                              ElevatedButton.icon(
-                                icon: const Icon(Icons.shopping_bag_outlined),
-                                label: Text(uiString(lang, 'buy')),
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => ProductPage(productId: pid),
-                                    ),
-                                  );
-                                },
-                              ),
-                              const Spacer(),
+                                    );
+                                  },
+                                )
+                              else if (p != null) ...[
+                                OutlinedButton.icon(
+                                  icon: const Icon(Icons.visibility),
+                                  label: Text(uiString(lang, 'preview')),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => ProductLibraryPage(
+                                          productId: pid,
+                                          isWishlistPreview: true,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.shopping_bag_outlined),
+                                  label: Text(uiString(lang, 'buy')),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => ProductPage(productId: pid),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
                               IconButton(
                                 tooltip: uiString(lang, 'remove_from_wishlist'),
                                 icon: const Icon(Icons.delete_outline),
