@@ -10,6 +10,7 @@ import '../theme/app_spacing.dart';
 import '../theme/app_tokens.dart';
 import '../ui/glass.dart';
 import '../iap/credits_pack_store_sheet.dart';
+import '../widgets/login_required_sheet.dart';
 
 class WalletPage extends ConsumerWidget {
   const WalletPage({super.key});
@@ -18,12 +19,8 @@ class WalletPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = context.tokens;
     final lang = ref.watch(appLanguageProvider);
-    String? uid;
-    try {
-      uid = ref.watch(uidProvider);
-    } catch (_) {
-      uid = null;
-    }
+    final user = ref.watch(authStateProvider).valueOrNull;
+    final uid = user != null && !user.isAnonymous ? user.uid : null;
 
     if (uid == null) {
       return Scaffold(
@@ -33,29 +30,9 @@ class WalletPage extends ConsumerWidget {
           foregroundColor: tokens.textPrimary,
         ),
         body: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.account_balance_wallet_outlined,
-                    size: 64,
-                    color: tokens.textSecondary,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    uiString(lang, 'sign_in_to_view_wallet'),
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: tokens.textPrimary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
+          child: LoginRequiredPlaceholder(
+            icon: Icons.account_balance_wallet_outlined,
+            message: uiString(lang, 'sign_in_to_view_wallet'),
           ),
         ),
       );

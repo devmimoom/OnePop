@@ -179,17 +179,17 @@ class AppThemes {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.buttonMinHeight),
+          minimumSize: const Size(0, AppSpacing.buttonMinHeight),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.buttonMinHeight),
+          minimumSize: const Size(0, AppSpacing.buttonMinHeight),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.buttonMinHeight),
+          minimumSize: const Size(0, AppSpacing.buttonMinHeight),
         ),
       ),
     );
@@ -349,17 +349,17 @@ class AppThemes {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.buttonMinHeight),
+          minimumSize: const Size(0, AppSpacing.buttonMinHeight),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.buttonMinHeight),
+          minimumSize: const Size(0, AppSpacing.buttonMinHeight),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.buttonMinHeight),
+          minimumSize: const Size(0, AppSpacing.buttonMinHeight),
         ),
       ),
     );

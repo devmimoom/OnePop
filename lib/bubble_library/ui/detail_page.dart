@@ -17,6 +17,7 @@ import '../../../localization/app_strings.dart';
 import '../../notifications/favorite_sentences_store.dart';
 import '../../services/learning_progress_service.dart';
 import '../../../widgets/rich_sections/user_learning_store.dart';
+import '../../../widgets/login_required_sheet.dart';
 
 class DetailPage extends ConsumerWidget {
   final String contentItemId;
@@ -82,14 +83,10 @@ class DetailPage extends ConsumerWidget {
           return savedAsync.when(
             data: (savedMap) {
               final SavedContent? saved = savedMap[item.id];
-
-              // 檢查是否登入
-              String? uid;
-              try {
-                uid = ref.read(uidProvider);
-              } catch (_) {
-                return Center(
-                  child: Text(uiString(lang, 'sign_in_to_use_feature')),
+              final uid = ref.watch(signedInUidProvider);
+              if (uid == null) {
+                return LoginRequiredPlaceholder(
+                  message: uiString(lang, 'sign_in_to_use_feature'),
                 );
               }
 
@@ -205,7 +202,7 @@ class DetailPage extends ConsumerWidget {
                                 final newFavoriteState = !(saved?.favorite ?? false);
                                 
                                 // 更新 Firestore 的 favorite 欄位
-                                await repo.setSavedItem(uid!, item.id,
+                                await repo.setSavedItem(uid, item.id,
                                     {'favorite': newFavoriteState});
                                 
                                 // 同時更新本地收藏的「今日一句」
@@ -266,7 +263,7 @@ class DetailPage extends ConsumerWidget {
                         // ✅ 先保底寫 saved_items（與 bootstrapper 一致）
                         // 避免 markLearnedAndAdvance 的 early return 跳過 saved_items 寫入
                         try {
-                          await repo.setSavedItem(uid!, item.id, {'learned': true});
+                          await repo.setSavedItem(uid, item.id, {'learned': true});
                         } catch (e) {
                           debugPrint('⚠️ setSavedItem fallback error: $e');
                         }

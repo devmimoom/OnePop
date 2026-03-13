@@ -12,6 +12,7 @@ import 'credits_iap_service.dart';
 import '../localization/app_language_provider.dart';
 import '../localization/app_language.dart';
 import '../localization/app_strings.dart';
+import '../widgets/login_required_sheet.dart';
 
 /// 額度包商店：1 / 3 / 10 額度，購買後寫入 Firestore
 void showCreditsPackStoreSheet(BuildContext context, WidgetRef ref) {
@@ -60,6 +61,10 @@ class _CreditsPackStoreSheetState extends ConsumerState<_CreditsPackStoreSheet> 
   }
 
   Future<void> _load() async {
+    final user = widget.ref.read(authStateProvider).valueOrNull;
+    if (user != null && !user.isAnonymous) {
+      await CreditsIAPService.configure(user.uid);
+    }
     final products = await CreditsIAPService.getCreditProducts();
     // Sort by credits (1, 3, 10)
     products.sort((a, b) {
@@ -73,24 +78,18 @@ class _CreditsPackStoreSheetState extends ConsumerState<_CreditsPackStoreSheet> 
 
   Future<void> _purchase(StoreProduct product) async {
     final lang = widget.ref.read(appLanguageProvider);
-    String? uid;
-    try {
-      uid = widget.ref.read(uidProvider);
-    } catch (_) {
-      uid = null;
-    }
+    final uid = widget.ref.read(signedInUidProvider);
     if (uid == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(uiString(lang, 'sign_in_purchase_credits')),
-          ),
-        );
-      }
+      await showLoginRequiredSheet(
+        context,
+        ref,
+        message: uiString(lang, 'sign_in_purchase_credits'),
+      );
       return;
     }
     setState(() => _purchasingId = product.identifier);
     try {
+      await CreditsIAPService.configure(uid);
       if (kDebugMode) {
         debugPrint('[Store] Starting purchase: ${product.identifier}, uid=$uid');
       }

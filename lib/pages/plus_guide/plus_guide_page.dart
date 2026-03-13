@@ -1298,7 +1298,7 @@ class _Step3NotifyState extends ConsumerState<_Step3Notify> {
     final freq = widget.formState.freqPerDay;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final chipH = screenWidth < 360 ? 8.0 : 16.0;
-    final chipV = 8.0;
+    const chipV = 8.0;
     final chipFont = screenWidth < 360 ? 11.0 : 13.0;
 
     return _GuideCard(
@@ -1890,7 +1890,7 @@ class _NotificationExtensionSheet extends StatelessWidget {
                           child: Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              '・滑到右邊可以延後提醒\n・點一下即可直接進入 OnePop',
+                              '・今天的學習提醒已經送達，現在可以直接開始一次約 5 分鐘的 OnePop 任務\n・長按通知橫幅可以查看更多操作，再點一下即可直接進入 OnePop',
                               style: tt.bodySmall?.copyWith(
                                 color: c.bodyText,
                                 height: 1.5,
@@ -1917,29 +1917,6 @@ class _NotificationExtensionSheet extends StatelessWidget {
                                 '開始學習',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              style: OutlinedButton.styleFrom(
-                                minimumSize: const Size.fromHeight(AppSpacing.buttonMinHeight),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                                ),
-                                side: BorderSide(
-                                  color: c.accent,
-                                  width: 1.4,
-                                ),
-                              ),
-                              child: Text(
-                                '稍後提醒',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: c.accentDeep,
                                 ),
                               ),
                             ),

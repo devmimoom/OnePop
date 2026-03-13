@@ -5,17 +5,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models.dart';
 import '../providers/v2_providers.dart';
 import '../bubble_library/providers/providers.dart';
+import '../bubble_library/models/user_library.dart';
 import '../ui/glass.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_tokens.dart';
 import '../theme/layout_constants.dart';
-import '../notifications/coming_soon_remind_store.dart';
-import '../bubble_library/notifications/notification_service.dart';
 import '../bubble_library/ui/product_library_page.dart';
 import '../collections/wishlist_provider.dart';
 import '../iap/credits_pack_store_sheet.dart';
 import '../providers/analytics_provider.dart';
 import '../widgets/app_card.dart';
+import '../widgets/login_required_sheet.dart';
 import '../localization/app_language_provider.dart';
 import '../localization/bilingual_text.dart';
 import '../localization/app_strings.dart';
@@ -242,6 +242,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                           final it = items[i];
                           return SizedBox(
                             width: cardWidth,
+                            height: double.infinity,
                             child: GlassCard(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,12 +333,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                 const SizedBox(height: AppSpacing.sm),
                 localWishAsync.when(
                   data: (wish) {
-                    String? uid;
-                    try {
-                      uid = ref.read(uidProvider);
-                    } catch (_) {
-                      uid = null;
-                    }
+                    final uid = ref.read(signedInUidProvider);
 
                     final isWish = wish.any((w) => w.productId == widget.productId);
 
@@ -349,9 +345,15 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                             label: Text(isWish
                                 ? uiString(lang, 'bookmarked')
                                 : uiString(lang, 'add_to_bookmark')),
-                            onPressed: (uid == null)
-                                ? null
-                                : () async {
+                            onPressed: () async {
+                                    if (uid == null) {
+                                      await showLoginRequiredSheet(
+                                        context,
+                                        ref,
+                                        message: uiString(lang, 'sign_in_to_use_feature'),
+                                      );
+                                      return;
+                                    }
                                     if (isWish) {
                                       await ref.read(localWishlistNotifierProvider).remove(widget.productId);
                                       if (context.mounted) {
@@ -385,115 +387,6 @@ class _ProductPageState extends ConsumerState<ProductPage> {
                   error: (e, _) => Text('${uiString(lang, 'wishlist_error')}$e'),
                 ),
                 const SizedBox(height: AppSpacing.xs),
-
-                // ✅ 上架提醒
-                FutureBuilder<Map<String, int>>(
-                  future: (() async {
-                    String? uid;
-                    try {
-                      uid = ref.read(uidProvider);
-                    } catch (_) {
-                      uid = null;
-                    }
-                    if (uid == null) return <String, int>{};
-                    return ComingSoonRemindStore.load(uid);
-                  })(),
-                  builder: (context, snap) {
-                    String? uid;
-                    try {
-                      uid = ref.read(uidProvider);
-                    } catch (_) {
-                      uid = null;
-                    }
-
-                    final map = snap.data ?? <String, int>{};
-                    final hasRemind = uid != null && map.containsKey(widget.productId);
-
-                    final notifId = widget.productId.hashCode & 0x7fffffff;
-
-                    return OutlinedButton.icon(
-                      icon: Icon(hasRemind
-                          ? Icons.notifications_active
-                          : Icons.notifications_active_outlined),
-                      label: Text(hasRemind
-                          ? uiString(lang, 'reminder_set_label')
-                          : uiString(lang, 'notify_when_available')),
-                      onPressed: (uid == null)
-                          ? null
-                          : () async {
-                              final ns = NotificationService();
-
-                              if (hasRemind) {
-                                await ComingSoonRemindStore.remove(
-                                    uid: uid!, productId: widget.productId);
-                                await ns.cancel(notifId);
-
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content:
-                                        Text(uiString(lang, 'reminder_cancelled')),
-                                  ),
-                                );
-                                }
-                                // 讓 FutureBuilder 重新讀
-                                if (context.mounted) {
-                                  (context as Element).markNeedsBuild();
-                                }
-                                return;
-                              }
-
-                              // ✅ 有上架時間就用上架當天 09:00；沒有就退回明天 09:00（示意）
-                              final now = DateTime.now();
-                              final releaseAt = p.releaseAt;
-                              final remindAt = (releaseAt != null)
-                                  ? DateTime(releaseAt.year, releaseAt.month, releaseAt.day, 9)
-                                  : DateTime(now.year, now.month, now.day, 9)
-                                      .add(const Duration(days: 1));
-
-                              await ComingSoonRemindStore.set(
-                                uid: uid!,
-                                productId: widget.productId,
-                                remindAtMs: remindAt.millisecondsSinceEpoch,
-                              );
-
-                              await ns.schedule(
-                                id: notifId,
-                                when: remindAt,
-                                title: uiString(lang, 'coming_soon_available_title'),
-                                body: uiString(lang, 'coming_soon_available_body')
-                                    .replaceFirst('{title}', p.title),
-                                payload: {
-                                  'type': 'coming_soon_remind',
-                                  'productId': widget.productId,
-                                },
-                              );
-
-                              if (context.mounted) {
-                                final timeText =
-                                    '${remindAt.hour.toString().padLeft(2, '0')}:${remindAt.minute.toString().padLeft(2, '0')}';
-                                final dateText = (releaseAt != null)
-                                    ? '${remindAt.year}-${remindAt.month.toString().padLeft(2, '0')}-${remindAt.day.toString().padLeft(2, '0')} $timeText'
-                                    : uiString(lang, 'tomorrow_at_time')
-                                        .replaceFirst('{time}', timeText);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      uiString(lang, 'reminder_set')
-                                          .replaceFirst('{time}', dateText),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              // 讓 FutureBuilder 重新讀
-                              if (context.mounted) {
-                                (context as Element).markNeedsBuild();
-                              }
-                            },
-                    );
-                  },
-                ),
               ],
             ],
           );
@@ -567,21 +460,14 @@ class _ProductPageState extends ConsumerState<ProductPage> {
       };
 
   Future<void> Function() _onFreeAdded(WidgetRef ref) => () async {
-        String? uid;
         final lang = ref.read(appLanguageProvider);
-        try {
-          uid = ref.read(uidProvider);
-        } catch (_) {
-          uid = null;
-        }
+        final uid = ref.read(signedInUidProvider);
         if (uid == null) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(uiString(lang, 'sign_in_to_add_library')),
-              ),
-            );
-          }
+          await showLoginRequiredSheet(
+            context,
+            ref,
+            message: uiString(lang, 'sign_in_to_add_library'),
+          );
           return;
         }
         await ref.read(libraryRepoProvider).ensureLibraryProductExists(
@@ -624,6 +510,18 @@ class _ProductPageState extends ConsumerState<ProductPage> {
       };
 }
 
+/// Product 頁底部操作列用的安全 library 監聽。
+/// 只有在 auth 尚未建立 user 時才回空列表，避免底部 CTA 因 provider error 整塊不顯示。
+/// 匿名使用者仍保留 library 行為，避免免費產品的既有體驗被破壞。
+final _productPageLibraryProductsProvider =
+    StreamProvider<List<UserLibraryProduct>>((ref) {
+  final user = ref.watch(authStateProvider).valueOrNull;
+  if (user == null) {
+    return Stream.value(const <UserLibraryProduct>[]);
+  }
+  return ref.read(libraryRepoProvider).watchLibrary(user.uid);
+});
+
 /// Coming soon：無購買按鈕，僅顯示即將上架
 class _ComingSoonBar extends StatelessWidget {
   const _ComingSoonBar();
@@ -631,6 +529,7 @@ class _ComingSoonBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
+    final lang = ProviderScope.containerOf(context).read(appLanguageProvider);
 
     return GlassCard(
       radius: 22,
@@ -644,7 +543,7 @@ class _ComingSoonBar extends StatelessWidget {
                 Icon(Icons.schedule, size: 20, color: tokens.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Coming soon',
+                  uiString(lang, 'coming_soon_title'),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -655,7 +554,7 @@ class _ComingSoonBar extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              'This product is not yet available. Bookmark it or set a reminder below.',
+              uiString(lang, 'coming_soon_subtitle'),
               style: TextStyle(
                 fontSize: 13,
                 height: 1.25,
@@ -683,7 +582,7 @@ class _FreeProductBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final libAsync = ref.watch(libraryProductsProvider);
+    final libAsync = ref.watch(_productPageLibraryProductsProvider);
     final inLibrary = libAsync.valueOrNull?.any((lp) =>
             lp.productId == productId && !lp.isHidden) ??
         false;
@@ -761,15 +660,17 @@ class _CreditsProductBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authStateProvider).valueOrNull;
     final balanceAsync = ref.watch(creditsBalanceProvider);
-    final libAsync = ref.watch(libraryProductsProvider);
+    final libAsync = ref.watch(_productPageLibraryProductsProvider);
     final balance = balanceAsync.valueOrNull ?? 0;
     final inLibrary = libAsync.valueOrNull?.any((lp) =>
             lp.productId == productId && !lp.isHidden) ??
         false;
     final tokens = context.tokens;
     final lang = ref.watch(appLanguageProvider);
-    final canRedeem = !inLibrary && balance >= creditsRequired;
+    final isSignedIn = user != null && !user.isAnonymous;
+    final canRedeem = isSignedIn && !inLibrary && balance >= creditsRequired;
 
     return GlassCard(
       radius: 22,
@@ -808,6 +709,8 @@ class _CreditsProductBar extends ConsumerWidget {
                   Text(
                     inLibrary
                         ? uiString(lang, 'open_and_start')
+                        : !isSignedIn
+                            ? uiString(lang, 'sign_in_to_use_credits')
                         : balanceAsync.hasValue
                             ? '${uiString(lang, 'balance_credits').replaceFirst('{n}', '$balance')} ${canRedeem ? uiString(lang, 'unlock_this_product') : uiString(lang, creditsRequired > 1 ? 'product_costs_credits_plural' : 'product_costs_credits').replaceFirst('{n}', '$creditsRequired')}'
                             : uiString(lang, 'loading_label'),
@@ -836,21 +739,13 @@ class _CreditsProductBar extends ConsumerWidget {
                 : canRedeem
                     ? FilledButton(
                         onPressed: () async {
-                          String? uid;
-                          try {
-                            uid = ref.read(uidProvider);
-                          } catch (_) {
-                            uid = null;
-                          }
+                          final uid = ref.read(signedInUidProvider);
                           if (uid == null) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      uiString(lang, 'sign_in_to_use_credits')),
-                                ),
-                              );
-                            }
+                            await showLoginRequiredSheet(
+                              context,
+                              ref,
+                              message: uiString(lang, 'sign_in_to_use_credits'),
+                            );
                             return;
                           }
                           try {

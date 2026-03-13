@@ -105,7 +105,7 @@ class _CenterContent extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.w300,
-                  color: Colors.white,
+                  color: Color(0xFF5CCCD6),
                   letterSpacing: 6,
                   height: 1.1,
                   shadows: [
@@ -124,7 +124,7 @@ class _CenterContent extends StatelessWidget {
                 style: TextStyle(
                   fontSize: isZh ? 16 : 17,
                   fontWeight: FontWeight.w400,
-                  color: Colors.white.withValues(alpha: 0.65),
+                  color: Color(0xFF5CCCD6),
                   letterSpacing: 2,
                   shadows: const [
                     Shadow(

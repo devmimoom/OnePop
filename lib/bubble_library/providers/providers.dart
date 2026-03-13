@@ -28,6 +28,18 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(firebaseAuthProvider).userChanges();
 });
 
+/// 僅在「正式登入」時回傳使用者；匿名或未登入時為 null。
+final signedInUserProvider = Provider<User?>((ref) {
+  final user = ref.watch(authStateProvider).valueOrNull;
+  if (user == null || user.isAnonymous) return null;
+  return user;
+});
+
+/// 僅在「正式登入」時回傳 uid；匿名或未登入時為 null。
+final signedInUidProvider = Provider<String?>((ref) {
+  return ref.watch(signedInUserProvider)?.uid;
+});
+
 final firestoreProvider =
     Provider<FirebaseFirestore>((ref) => FirebaseFirestore.instance);
 
@@ -105,28 +117,27 @@ final globalPushSettingsProvider = StreamProvider<GlobalPushSettings>((ref) {
 /// 當前用戶額度餘額（未登入時為 0）
 /// 先 emit getBalance 再訂閱 watchBalance，讓 Me 頁盡快顯示餘額。
 final creditsBalanceProvider = StreamProvider<int>((ref) {
-  try {
-    final uid = ref.watch(uidProvider);
-    final repo = ref.read(creditsRepoProvider);
-    Stream<int> stream() async* {
-      yield await repo.getBalance(uid);
-      yield* repo.watchBalance(uid);
-    }
-    return stream();
-  } catch (_) {
+  final user = ref.watch(authStateProvider).valueOrNull;
+  if (user == null || user.isAnonymous) {
     return Stream.value(0);
   }
+  final uid = user.uid;
+  final repo = ref.read(creditsRepoProvider);
+  Stream<int> stream() async* {
+    yield await repo.getBalance(uid);
+    yield* repo.watchBalance(uid);
+  }
+  return stream();
 });
 
 /// 當前用戶額度交易紀錄（未登入時為空列表）
 final creditTransactionsProvider =
     StreamProvider<List<CreditTransaction>>((ref) {
-  try {
-    final uid = ref.watch(uidProvider);
-    return ref.read(creditsRepoProvider).watchTransactions(uid);
-  } catch (_) {
+  final user = ref.watch(authStateProvider).valueOrNull;
+  if (user == null || user.isAnonymous) {
     return Stream.value([]);
   }
+  return ref.read(creditsRepoProvider).watchTransactions(user.uid);
 });
 
 final contentByProductProvider =

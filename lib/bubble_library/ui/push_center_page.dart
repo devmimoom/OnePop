@@ -17,6 +17,7 @@ import '../../../notifications/push_timeline_provider.dart';
 import '../../../providers/analytics_provider.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_tokens.dart';
+import '../../widgets/login_required_sheet.dart';
 
 class PushCenterPage extends ConsumerWidget {
   const PushCenterPage({super.key});
@@ -30,6 +31,17 @@ class PushCenterPage extends ConsumerWidget {
       ref.read(analyticsProvider).logScreenView(screenName: 'push_center');
     }
     final lang = ref.watch(appLanguageProvider);
+    final signedInUid = ref.watch(signedInUidProvider);
+    if (signedInUid == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(uiString(lang, 'notifications')),
+        ),
+        body: LoginRequiredPlaceholder(
+          message: uiString(lang, 'sign_in_to_use_feature'),
+        ),
+      );
+    }
     final globalAsync = ref.watch(globalPushSettingsProvider);
     final libAsync = ref.watch(libraryProductsProvider);
     final productsAsync = ref.watch(productsMapProvider);

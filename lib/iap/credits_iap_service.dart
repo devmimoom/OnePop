@@ -18,19 +18,33 @@ int creditsForProductId(String productId) =>
 
 class CreditsIAPService {
   static bool _configured = false;
+  static String? _configuredAppUserId;
 
   static Future<void> configure(String? appUserId) async {
     if (_revenueCatAppleApiKey.isEmpty) return;
-    if (_configured) return;
+    final normalizedAppUserId =
+        appUserId != null && appUserId.isNotEmpty ? appUserId : null;
+    if (_configured) {
+      if (normalizedAppUserId != null &&
+          normalizedAppUserId != _configuredAppUserId) {
+        await Purchases.logIn(normalizedAppUserId);
+        _configuredAppUserId = normalizedAppUserId;
+        if (kDebugMode) {
+          debugPrint('[IAP] RevenueCat switched appUserId=$normalizedAppUserId');
+        }
+      }
+      return;
+    }
     await Purchases.setLogLevel(kDebugMode ? LogLevel.debug : LogLevel.warn);
     final config = PurchasesConfiguration(_revenueCatAppleApiKey);
-    if (appUserId != null && appUserId.isNotEmpty) {
-      config.appUserID = appUserId;
+    if (normalizedAppUserId != null) {
+      config.appUserID = normalizedAppUserId;
     }
     await Purchases.configure(config);
     _configured = true;
+    _configuredAppUserId = normalizedAppUserId;
     if (kDebugMode) {
-      debugPrint('[IAP] RevenueCat configured, appUserId=$appUserId');
+      debugPrint('[IAP] RevenueCat configured, appUserId=$normalizedAppUserId');
     }
   }
 

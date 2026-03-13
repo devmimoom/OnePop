@@ -18,6 +18,7 @@ import 'detail_page.dart';
 import 'widgets/bubble_card.dart';
 import '../../widgets/rich_sections/sections/library_rich_card.dart';
 import '../../widgets/rich_sections/user_learning_store.dart';
+import '../../widgets/login_required_sheet.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_tokens.dart';
 import '../../collections/wishlist_provider.dart';
@@ -53,12 +54,10 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final lang = ref.watch(appLanguageProvider);
+    final signedInUid = ref.watch(signedInUidProvider);
     final productsAsync = ref.watch(productsMapProvider);
 
-    // 檢查是否登入，未登入時顯示提示
-    try {
-      ref.read(uidProvider);
-    } catch (_) {
+    if (signedInUid == null) {
       return Scaffold(
         backgroundColor: tokens.bg,
         appBar: AppBar(
@@ -67,8 +66,8 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
           elevation: 0,
           scrolledUnderElevation: 0,
         ),
-        body: Center(
-          child: Text(uiString(lang, 'library_sign_in_hint')),
+        body: LoginRequiredPlaceholder(
+          message: uiString(lang, 'library_sign_in_hint'),
         ),
       );
     }
@@ -1705,13 +1704,12 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
   }
 
   Widget _buildFavoriteSentencesTab(BuildContext context) {
-    // 檢查是否登入
-    String? uid;
-    try {
-      uid = ref.read(uidProvider);
-    } catch (_) {
-      final lang = ref.watch(appLanguageProvider);
-      return Center(child: Text(uiString(lang, 'sign_in_to_use_feature')));
+    final lang = ref.watch(appLanguageProvider);
+    final uid = ref.watch(signedInUidProvider);
+    if (uid == null) {
+      return LoginRequiredPlaceholder(
+        message: uiString(lang, 'sign_in_to_use_feature'),
+      );
     }
 
     final productsAsync = ref.watch(productsMapProvider);
@@ -1719,7 +1717,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
     return productsAsync.when(
       data: (productsMap) {
         return FutureBuilder<List<FavoriteSentence>>(
-          future: FavoriteSentencesStore.loadAll(uid!),
+          future: FavoriteSentencesStore.loadAll(uid),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -1889,7 +1887,6 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
                           icon: const Icon(Icons.delete_outline, size: 20),
                           color: tokens.textSecondary.withValues(alpha: 0.6),
                           onPressed: () async {
-                            if (uid == null) return;
                             await FavoriteSentencesStore.remove(
                                 uid, sentence.contentItemId);
                             // 刷新列表

@@ -951,7 +951,7 @@ class _MeEntryCard extends StatelessWidget {
                     color: tokens.textSecondary,
                     fontSize: 11,
                   ),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const Spacer(),

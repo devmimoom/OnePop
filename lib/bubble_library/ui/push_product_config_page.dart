@@ -18,6 +18,7 @@ import '../../theme/app_spacing.dart';
 import '../../theme/app_tokens.dart';
 import '../../localization/app_language.dart';
 import '../../localization/app_strings.dart';
+import '../../widgets/login_required_sheet.dart';
 
 class PushProductConfigPage extends ConsumerWidget {
   final String productId;
@@ -32,14 +33,13 @@ class PushProductConfigPage extends ConsumerWidget {
       ref.read(analyticsProvider).logScreenView(screenName: 'push_config');
     }
     final lang = ref.watch(appLanguageProvider);
-    // 檢查是否登入
-    String? uid;
-    try {
-      uid = ref.read(uidProvider);
-    } catch (_) {
+    final uid = ref.watch(signedInUidProvider);
+    if (uid == null) {
       return Scaffold(
         appBar: AppBar(title: Text(uiString(lang, 'product_notifications_title'))),
-        body: Center(child: Text(uiString(lang, 'sign_in_to_use_feature'))),
+        body: LoginRequiredPlaceholder(
+          message: uiString(lang, 'sign_in_to_use_feature'),
+        ),
       );
     }
     final libAsync = ref.watch(libraryProductsProvider);
@@ -121,7 +121,7 @@ class PushProductConfigPage extends ConsumerWidget {
                           width: double.infinity,
                           child: OutlinedButton.icon(
                             onPressed: () => _showRestartDialog(
-                                context, ref, uid!, productId, title, lang),
+                                context, ref, uid, productId, title, lang),
                             icon: const Icon(Icons.restart_alt),
                             label: Text(uiString(lang, 'start_over')),
                             style: OutlinedButton.styleFrom(
@@ -137,7 +137,7 @@ class PushProductConfigPage extends ConsumerWidget {
                         onChanged: (v) async {
                           await ref
                               .read(libraryRepoProvider)
-                              .setPushEnabled(uid!, productId, v);
+                              .setPushEnabled(uid, productId, v);
                           ref.invalidate(libraryProductsProvider);
                           await ref.read(libraryProductsProvider.future);
                           await PushOrchestrator.rescheduleNextDays(
@@ -189,7 +189,7 @@ class PushProductConfigPage extends ConsumerWidget {
                           final newCfg = cfg.copyWith(timeMode: v);
                           await ref
                               .read(libraryRepoProvider)
-                              .setPushConfig(uid!, productId, newCfg.toMap());
+                              .setPushConfig(uid, productId, newCfg.toMap());
                           ref.invalidate(libraryProductsProvider);
                           await ref.read(libraryProductsProvider.future);
                           await PushOrchestrator.rescheduleNextDays(
@@ -198,7 +198,7 @@ class PushProductConfigPage extends ConsumerWidget {
                         title: Text(uiString(lang, 'preset_recommended')),
                       ),
                       if (cfg.timeMode == PushTimeMode.preset) ...[
-                        _presetSlots(ref, uid!, productId, cfg),
+                        _presetSlots(ref, uid, productId, cfg),
                         const SizedBox(height: 16),
                         Text(uiString(lang, 'frequency_label'),
                             style:
@@ -218,7 +218,7 @@ class PushProductConfigPage extends ConsumerWidget {
                             final newCfg = cfg.copyWith(freqPerDay: v);
                             await ref
                                 .read(libraryRepoProvider)
-                                .setPushConfig(uid!, productId, newCfg.toMap());
+                                .setPushConfig(uid, productId, newCfg.toMap());
                             ref.invalidate(libraryProductsProvider);
                             await ref.read(libraryProductsProvider.future);
                             await PushOrchestrator.rescheduleNextDays(
@@ -293,7 +293,7 @@ class PushProductConfigPage extends ConsumerWidget {
                           
                           await ref
                               .read(libraryRepoProvider)
-                              .setPushConfig(uid!, productId, newCfg.toMap());
+                              .setPushConfig(uid, productId, newCfg.toMap());
                           ref.invalidate(libraryProductsProvider);
                           await ref.read(libraryProductsProvider.future);
                           await PushOrchestrator.rescheduleNextDays(
@@ -302,7 +302,7 @@ class PushProductConfigPage extends ConsumerWidget {
                         title: Text(uiString(lang, 'custom_times_title')),
                       ),
                       if (cfg.timeMode == PushTimeMode.custom)
-                        _customTimes(context, ref, uid!, productId, cfg, lang),
+                        _customTimes(context, ref, uid, productId, cfg, lang),
                     ],
                   ),
                 ),

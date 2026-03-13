@@ -18,6 +18,7 @@ import 'widgets/timeline_widgets.dart';
 import 'widgets/push_hint.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_tokens.dart';
+import '../widgets/login_required_sheet.dart';
 
 class PushTimelineList extends ConsumerWidget {
   final bool showTopBar; // Sheet 用 false, Page 用 true
@@ -37,11 +38,11 @@ class PushTimelineList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = context.tokens;
     final lang = ref.watch(appLanguageProvider);
-    String uid;
-    try {
-      uid = ref.read(uidProvider);
-    } catch (_) {
-      return Center(child: Text(uiString(lang, 'sign_in_to_use_feature')));
+    final uid = ref.watch(signedInUidProvider);
+    if (uid == null) {
+      return LoginRequiredPlaceholder(
+        message: uiString(lang, 'sign_in_to_use_feature'),
+      );
     }
 
     final metaMode = ref.watch(timelineMetaModeProvider);
