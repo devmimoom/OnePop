@@ -64,16 +64,12 @@ class HomePage extends ConsumerWidget {
 
           // ── Banner Carousel ───────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(kPageHorizontalPadding, 0, kPageHorizontalPadding, 0),
+            padding: const EdgeInsets.fromLTRB(
+                kPageHorizontalPadding, 0, kPageHorizontalPadding, 0),
             child: banners.when(
               data: (items) => items.isEmpty
-                  ? AppCard(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                            uiString(lang, 'no_banner_data'),
-                            style: TextStyle(color: tokens.textSecondary)),
-                      ),
+                  ? _PlainSectionNotice(
+                      message: uiString(lang, 'no_banner_data'),
                     )
                   : AspectRatio(
                       aspectRatio: kHomeHeroAspectRatio,
@@ -82,25 +78,9 @@ class HomePage extends ConsumerWidget {
               loading: () => const AspectRatio(
                   aspectRatio: kHomeHeroAspectRatio,
                   child: Center(child: CircularProgressIndicator())),
-              error: (err, stack) => AppCard(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(uiString(lang, 'banner_error'),
-                          style: TextStyle(
-                              color: tokens.textPrimary,
-                              fontWeight: FontWeight.bold)),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text('$err',
-                          style: TextStyle(
-                              color: tokens.textSecondary, fontSize: 12),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis),
-                    ],
-                  ),
-                ),
+              error: (err, stack) => _PlainSectionNotice(
+                title: uiString(lang, 'banner_error'),
+                detail: '$err',
               ),
             ),
           ),
@@ -109,148 +89,127 @@ class HomePage extends ConsumerWidget {
           // ── Top Picks ─────────────────────────────────
           _Section(title: uiString(lang, 'top_picks'), emoji: '🔥'),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
+            padding:
+                const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
             child: hot.when(
-            data: (ps) => ps.isEmpty
-                ? AppCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(uiString(lang, 'no_data_top_picks'),
-                          style: TextStyle(color: tokens.textSecondary)),
+              data: (ps) => ps.isEmpty
+                  ? _PlainSectionNotice(
+                      message: uiString(lang, 'no_data_top_picks'),
+                    )
+                  : ProductRail(
+                      products: ps,
+                      size: ProductRailSize.large,
+                      ctaText: uiString(lang, 'view'),
+                      lang: lang,
+                      useCardFrame: false,
                     ),
-                  )
-                : ProductRail(
-                    products: ps,
-                    size: ProductRailSize.large,
-                    ctaText: uiString(lang, 'view'),
-                    lang: lang,
-                  ),
-            loading: () => SizedBox(
-                height: lgLoadingH,
-                child: const Center(child: CircularProgressIndicator())),
-            error: (err, stack) => AppCard(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(uiString(lang, 'top_picks_error'),
-                        style: TextStyle(
-                            color: tokens.textPrimary,
-                            fontWeight: FontWeight.bold)),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '$err',
-                      style:
-                          TextStyle(color: tokens.textSecondary, fontSize: 12),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+              loading: () => SizedBox(
+                  height: lgLoadingH,
+                  child: const Center(child: CircularProgressIndicator())),
+              error: (err, stack) => _PlainSectionNotice(
+                title: uiString(lang, 'top_picks_error'),
+                detail: '$err',
               ),
             ),
-          ),
           ),
           const SizedBox(height: AppSpacing.md),
 
           // ── New Arrivals ──────────────────────────────
           _Section(title: uiString(lang, 'new_arrivals'), emoji: '✨'),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
+            padding:
+                const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
             child: newArrivals.when(
-            data: (ps) => ps.isEmpty
-                ? AppCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                          uiString(lang, 'no_new_arrivals'),
-                          style: TextStyle(color: tokens.textSecondary)),
+              data: (ps) => ps.isEmpty
+                  ? AppCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(uiString(lang, 'no_new_arrivals'),
+                            style: TextStyle(color: tokens.textSecondary)),
+                      ),
+                    )
+                  : ProductRail(
+                      products: ps,
+                      size: ProductRailSize.compact,
+                      lang: lang,
                     ),
-                  )
-                : ProductRail(
-                    products: ps,
-                    size: ProductRailSize.large,
-                    ctaText: uiString(lang, 'view'),
-                    lang: lang,
-                  ),
-            loading: () => SizedBox(
-                height: lgLoadingH,
-                child: const Center(child: CircularProgressIndicator())),
-            error: (err, stack) => AppCard(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(uiString(lang, 'new_arrivals_error'),
+              loading: () => const SizedBox(
+                  height: 312,
+                  child: Center(child: CircularProgressIndicator())),
+              error: (err, stack) => AppCard(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(uiString(lang, 'new_arrivals_error'),
+                          style: TextStyle(
+                              color: tokens.textPrimary,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        '$err',
                         style: TextStyle(
-                            color: tokens.textPrimary,
-                            fontWeight: FontWeight.bold)),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '$err',
-                      style:
-                          TextStyle(color: tokens.textSecondary, fontSize: 12),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                            color: tokens.textSecondary, fontSize: 12),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
           ),
           const SizedBox(height: AppSpacing.md),
 
           // ── Coming Soon ───────────────────────────────
           _Section(title: uiString(lang, 'coming_soon'), emoji: '🔮'),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
+            padding:
+                const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
             child: comingSoon.when(
-            data: (ps) => ps.isEmpty
-                ? AppCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                          uiString(lang, 'no_coming_soon'),
-                          style: TextStyle(color: tokens.textSecondary)),
+              data: (ps) => ps.isEmpty
+                  ? AppCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(uiString(lang, 'no_coming_soon'),
+                            style: TextStyle(color: tokens.textSecondary)),
+                      ),
+                    )
+                  : ProductRail(
+                      products: ps,
+                      size: ProductRailSize.small,
+                      badgeText: 'SOON',
+                      dim: true,
+                      showReleaseDate: true,
+                      lang: lang,
                     ),
-                  )
-                : ProductRail(
-                    products: ps,
-                    size: ProductRailSize.small,
-                    badgeText: 'SOON',
-                    dim: true,
-                    showReleaseDate: true,
-                    lang: lang,
-                  ),
-            loading: () => SizedBox(
-                height: smLoadingH,
-                child: const Center(child: CircularProgressIndicator())),
-            error: (err, stack) => AppCard(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(uiString(lang, 'coming_soon_error'),
+              loading: () => SizedBox(
+                  height: smLoadingH,
+                  child: const Center(child: CircularProgressIndicator())),
+              error: (err, stack) => AppCard(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(uiString(lang, 'coming_soon_error'),
+                          style: TextStyle(
+                              color: tokens.textPrimary,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        '$err',
                         style: TextStyle(
-                            color: tokens.textPrimary,
-                            fontWeight: FontWeight.bold)),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '$err',
-                      style:
-                          TextStyle(color: tokens.textSecondary, fontSize: 12),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                            color: tokens.textSecondary, fontSize: 12),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
           ),
           const SizedBox(height: AppSpacing.md),
 
@@ -264,46 +223,26 @@ class HomePage extends ConsumerWidget {
           // ── Featured ──────────────────────────────────
           _Section(title: uiString(lang, 'featured'), emoji: '🌟'),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
+            padding:
+                const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
             child: weekly.when(
-            data: (ps) => ps.isEmpty
-                ? AppCard(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(uiString(lang, 'no_featured'),
-                          style: TextStyle(color: tokens.textSecondary)),
+              data: (ps) => ps.isEmpty
+                  ? _PlainSectionNotice(
+                      message: uiString(lang, 'no_featured'),
+                    )
+                  : ProductRail(
+                      products: ps,
+                      size: ProductRailSize.large,
+                      ctaText: uiString(lang, 'view'),
+                      lang: lang,
+                      useCardFrame: false,
                     ),
-                  )
-                : ProductRail(
-                    products: ps,
-                    size: ProductRailSize.large,
-                    ctaText: uiString(lang, 'view'),
-                    lang: lang,
-                  ),
-            loading: () => SizedBox(
-                height: lgLoadingH,
-                child: const Center(child: CircularProgressIndicator())),
-            error: (err, stack) => AppCard(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(uiString(lang, 'featured_error'),
-                        style: TextStyle(
-                            color: tokens.textPrimary,
-                            fontWeight: FontWeight.bold)),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '$err',
-                      style:
-                          TextStyle(color: tokens.textSecondary, fontSize: 12),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-                ),
+              loading: () => SizedBox(
+                  height: lgLoadingH,
+                  child: const Center(child: CircularProgressIndicator())),
+              error: (err, stack) => _PlainSectionNotice(
+                title: uiString(lang, 'featured_error'),
+                detail: '$err',
               ),
             ),
           ),
@@ -319,11 +258,11 @@ class HomePage extends ConsumerWidget {
   }
 }
 
-Future<void> _launchUrl(BuildContext context, String url, AppLanguage lang) async {
+Future<void> _launchUrl(
+    BuildContext context, String url, AppLanguage lang) async {
   try {
     final uri = Uri.parse(url);
-    final launched =
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${uiString(lang, 'could_not_open')}$url')),
@@ -395,7 +334,8 @@ class _WishlistRequestSection extends StatefulWidget {
   final AppLanguage lang;
 
   @override
-  State<_WishlistRequestSection> createState() => _WishlistRequestSectionState();
+  State<_WishlistRequestSection> createState() =>
+      _WishlistRequestSectionState();
 }
 
 class _WishlistRequestSectionState extends State<_WishlistRequestSection> {
@@ -424,8 +364,7 @@ class _WishlistRequestSectionState extends State<_WishlistRequestSection> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(uiString(widget.lang, 'wishlist_request_empty_name')),
+          content: Text(uiString(widget.lang, 'wishlist_request_empty_name')),
         ),
       );
       return;
@@ -441,8 +380,7 @@ class _WishlistRequestSectionState extends State<_WishlistRequestSection> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(uiString(widget.lang, 'wishlist_request_success')),
+          content: Text(uiString(widget.lang, 'wishlist_request_success')),
         ),
       );
       _nameController.clear();
@@ -468,99 +406,109 @@ class _WishlistRequestSectionState extends State<_WishlistRequestSection> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: kPageHorizontalPadding),
-      child: AppCard(
-        child: Focus(
-          skipTraversal: true,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-            Text(
-              uiString(widget.lang, 'wishlist_request_subtitle'),
-              style: TextStyle(
-                color: tokens.textSecondary,
-                fontSize: 13,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              uiString(widget.lang, 'wishlist_request_name_label'),
-              style: TextStyle(
-                color: tokens.textPrimary,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            TextField(
-              controller: _nameController,
-              focusNode: _nameFocusNode,
-              decoration: InputDecoration(
-                hintText:
-                    uiString(widget.lang, 'wishlist_request_name_hint'),
-              ),
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              uiString(widget.lang, 'wishlist_request_desc_label'),
-              style: TextStyle(
-                color: tokens.textPrimary,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            TextField(
-              controller: _descController,
-              focusNode: _descFocusNode,
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText:
-                    uiString(widget.lang, 'wishlist_request_desc_hint'),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerRight,
-              child: FilledButton(
-                onPressed: _isSubmitting ? null : _submit,
-                style: FilledButton.styleFrom(
-                  backgroundColor: tokens.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.xs,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            child: Focus(
+              skipTraversal: true,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    uiString(widget.lang, 'wishlist_request_subtitle'),
+                    style: TextStyle(
+                      color: tokens.textSecondary,
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999),
+                  const SizedBox(height: 16),
+                  Text(
+                    uiString(widget.lang, 'wishlist_request_name_label'),
+                    style: TextStyle(
+                      color: tokens.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                child: _isSubmitting
-                    ? SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            tokens.textOnPrimary,
-                          ),
+                  const SizedBox(height: AppSpacing.xs),
+                  TextField(
+                    controller: _nameController,
+                    focusNode: _nameFocusNode,
+                    decoration: InputDecoration(
+                      hintText:
+                          uiString(widget.lang, 'wishlist_request_name_hint'),
+                    ),
+                    textInputAction: TextInputAction.next,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    uiString(widget.lang, 'wishlist_request_desc_label'),
+                    style: TextStyle(
+                      color: tokens.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  TextField(
+                    controller: _descController,
+                    focusNode: _descFocusNode,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText:
+                          uiString(widget.lang, 'wishlist_request_desc_hint'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton(
+                      onPressed: _isSubmitting ? null : _submit,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: tokens.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.xs,
                         ),
-                      )
-                    : Text(
-                        uiString(
-                            widget.lang, 'wishlist_request_submit'),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(999),
                         ),
                       ),
+                      child: _isSubmitting
+                          ? SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  tokens.textOnPrimary,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              uiString(widget.lang, 'wishlist_request_submit'),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
           ),
-        ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: tokens.cardBorder.withValues(alpha: 0.4),
+          ),
+        ],
       ),
     );
   }
@@ -583,7 +531,8 @@ class _GreetingHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(kPageHorizontalPadding, 16, kPageHorizontalPadding, 0),
+      padding: const EdgeInsets.fromLTRB(
+          kPageHorizontalPadding, 16, kPageHorizontalPadding, 0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -637,7 +586,8 @@ class _Section extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(kPageHorizontalPadding, 0, kPageHorizontalPadding, AppSpacing.xs),
+      padding: const EdgeInsets.fromLTRB(
+          kPageHorizontalPadding, 0, kPageHorizontalPadding, AppSpacing.xs),
       child: Row(
         children: [
           Container(
@@ -671,6 +621,60 @@ class _Section extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PlainSectionNotice extends StatelessWidget {
+  const _PlainSectionNotice({
+    this.title,
+    this.message,
+    this.detail,
+  });
+
+  final String? title;
+  final String? message;
+  final String? detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (title != null) ...[
+          Text(
+            title!,
+            style: TextStyle(
+              color: tokens.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+        ],
+        if (message != null)
+          Text(
+            message!,
+            style: TextStyle(color: tokens.textSecondary),
+          ),
+        if (detail != null)
+          Text(
+            detail!,
+            style: TextStyle(
+              color: tokens.textSecondary,
+              fontSize: 12,
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        const SizedBox(height: AppSpacing.sm),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: tokens.cardBorder.withValues(alpha: 0.4),
+        ),
+      ],
     );
   }
 }
@@ -723,7 +727,9 @@ class _BannerCarouselState extends State<_BannerCarousel> {
               lang: widget.lang,
               onTap: () {
                 final b = items[i];
-                if (b.products.isEmpty) return; // 理論上不應發生（repository 不建空 BannerItem）
+                if (b.products.isEmpty) {
+                  return; // 理論上不應發生（repository 不建空 BannerItem）
+                }
                 if (b.products.length == 1) {
                   Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) => ProductPage(productId: b.products.first.id),
@@ -741,7 +747,8 @@ class _BannerCarouselState extends State<_BannerCarousel> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.xs, bottom: AppSpacing.xs),
+          padding:
+              const EdgeInsets.only(top: AppSpacing.xs, bottom: AppSpacing.xs),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -785,16 +792,19 @@ class _BannerCard extends StatelessWidget {
     final title = lang == AppLanguage.zhTw
         ? (item.titleZhOverride?.isNotEmpty == true
             ? item.titleZhOverride!
-            : (product?.titleZh?.isNotEmpty == true ? product!.titleZh! : product?.title ?? ''))
+            : (product?.titleZh?.isNotEmpty == true
+                ? product!.titleZh!
+                : product?.title ?? ''))
         : (item.titleOverride?.isNotEmpty == true
             ? item.titleOverride!
-            : (product?.titleEn?.isNotEmpty == true ? product!.titleEn! : product?.title ?? ''));
+            : (product?.titleEn?.isNotEmpty == true
+                ? product!.titleEn!
+                : product?.title ?? ''));
     // 繁中介面不再顯示「精華速讀」副標
     final String? subtitle =
         lang == AppLanguage.zhTw ? null : uiString(lang, 'quick_read');
 
-    return AppCard(
-      padding: EdgeInsets.zero,
+    return GestureDetector(
       onTap: onTap,
       child: SizedBox.expand(
         child: ClipRRect(
@@ -876,13 +886,16 @@ class _BannerCard extends StatelessWidget {
                     Center(
                       child: Material(
                         color: tokens.primary,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusSm),
                         child: InkWell(
                           onTap: onTap,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radiusSm),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                                horizontal: AppSpacing.md,
+                                vertical: AppSpacing.sm),
                             child: Text(
                               uiString(lang, 'open'),
                               style: const TextStyle(
@@ -905,4 +918,3 @@ class _BannerCard extends StatelessWidget {
     );
   }
 }
-
