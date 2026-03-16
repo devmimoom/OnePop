@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,6 +40,26 @@ class _MainScaffold4TabsState extends ConsumerState<MainScaffold4Tabs> {
   double? _coffeeTop;
   bool _showCoffeeHint = false;
   int _coffeeHintStep = 0;
+  Timer? _coffeeHintTimer;
+
+  void _startCoffeeHintTimer(int stackIndex) {
+    _coffeeHintTimer?.cancel();
+    _coffeeHintTimer = Timer(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      setState(() {
+        _showCoffeeHint = false;
+        if (stackIndex == 0 || stackIndex == 2) {
+          _coffeeHintStep = (_coffeeHintStep + 1) % 2;
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _coffeeHintTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,14 +146,19 @@ class _MainScaffold4TabsState extends ConsumerState<MainScaffold4Tabs> {
                       }
                     }(),
                   ),
-                  onCoffeeTap: () => setState(() => _showCoffeeHint = true),
+                  onCoffeeTap: () => setState(() {
+                    _showCoffeeHint = true;
+                    _startCoffeeHintTimer(stackIndex);
+                  }),
                   onBubbleTap: () => setState(() {
+                    _coffeeHintTimer?.cancel();
                     _showCoffeeHint = false;
                     if (stackIndex == 0 || stackIndex == 2) {
                       _coffeeHintStep = (_coffeeHintStep + 1) % 2;
                     }
                   }),
                   onPanUpdate: (delta) => setState(() {
+                    _coffeeHintTimer?.cancel();
                     _showCoffeeHint = false;
                     if (stackIndex == 0 || stackIndex == 2) {
                       _coffeeHintStep = (_coffeeHintStep + 1) % 2;

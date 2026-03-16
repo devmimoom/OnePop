@@ -36,7 +36,8 @@ final Map<String, String> _en = {
   'interest_tags_save': 'Save',
   'edit': '✏️ Edit',
   'delete_account': 'Delete account',
-  'delete_account_subtitle': 'Permanently delete your account and all associated data.',
+  'delete_account_subtitle':
+      'Permanently delete your account and all associated data.',
   'my_library': 'My Library',
   'my_library_subtitle': 'Purchased cards & progress',
   'my_wallet': 'My Wallet',
@@ -62,12 +63,13 @@ final Map<String, String> _en = {
       '• All scheduled notifications\n\n'
       'This cannot be undone. Continue?',
   'delete_account_title': 'Delete account?',
-  'delete_account_content': 'This will permanently delete your account and all data, including:\n'
-      '• Your learning progress\n'
-      '• All settings and preferences\n'
-      '• Purchase history (credits are non-refundable)\n'
-      '• All local data and notifications\n\n'
-      'This action cannot be undone.',
+  'delete_account_content':
+      'This will permanently delete your account and all data, including:\n'
+          '• Your learning progress\n'
+          '• All settings and preferences\n'
+          '• Purchase history (credits are non-refundable)\n'
+          '• All local data and notifications\n\n'
+          'This action cannot be undone.',
   'delete_permanently': 'Delete permanently',
   'preparing_reset': 'Preparing reset...',
   'clearing_cloud_data': 'Clearing cloud data...',
@@ -77,7 +79,8 @@ final Map<String, String> _en = {
   'deleting_account': 'Deleting account...',
   'signing_in_as_guest': 'Signing in as guest...',
   'account_deleted_guest': 'Account deleted. You are now signed in as a guest.',
-  'delete_account_requires_recent_login': 'For security, please sign out and sign in again, then try deleting your account.',
+  'delete_account_requires_recent_login':
+      'For security, please sign out and sign in again, then try deleting your account.',
   'failed_to_delete_account': 'Failed to delete account: ',
   'about_title': 'About',
   'about_content': 'OnePop\nVersion 1.0.2',
@@ -91,10 +94,14 @@ final Map<String, String> _en = {
   'coffee_hint_explore':
       'Every step you explore brings you closer!\n\nDouble-tap the coffee to open banner learning setup.',
   'coffee_hint_explore_1': 'Every step you explore brings you closer!',
-  'coffee_hint_double_tap': 'Double-tap the coffee to open banner learning setup.',
-  'coffee_hint_me': 'In My Library you can view your purchased topics and progress.',
-  'library_hint_1': 'Use the bell (top right) for global notification settings.',
-  'library_hint_2': 'Use the ⋯ on each card for that topic\'s notification settings.',
+  'coffee_hint_double_tap':
+      'Double-tap the coffee to open banner learning setup.',
+  'coffee_hint_me':
+      'In My Library you can view your purchased topics and progress.',
+  'library_hint_1':
+      'Use the bell (top right) for global notification settings.',
+  'library_hint_2':
+      'Use the ⋯ on each card for that topic\'s notification settings.',
   'coffee_hint_plus':
       'This is your banner learning setup—adjust it to your pace.',
   'could_not_open': 'Could not open: ',
@@ -108,7 +115,8 @@ final Map<String, String> _en = {
   'good_afternoon': 'Good afternoon 🌤',
   'good_evening': 'Good evening 🌙',
   'what_are_we_learning_today': 'One pop. Which topic?',
-  'no_banner_data': 'No banner data. Check Firestore featured_lists/home_banners.',
+  'no_banner_data':
+      'No banner data. Check Firestore featured_lists/home_banners.',
   'banner_error': 'Banner error:',
   'top_picks': 'Top Picks',
   'no_data_top_picks': 'No data for Top Picks.',
@@ -132,14 +140,16 @@ final Map<String, String> _en = {
   'open': 'Open',
   'quick_read': 'Quick Read',
   'signed_out_guest': 'Signed out. You are now signed in as a new guest.',
-  'signed_out_guest_failed': 'Signed out, but could not continue as guest. Please try again.',
+  'signed_out_guest_failed':
+      'Signed out, but could not continue as guest. Please try again.',
   'sign_in_to_view_wallet': 'Sign in to view your wallet',
   'balance': 'Balance',
   'credits': 'credits',
   'buy_credits': 'Buy credits',
   'transaction_history': 'Transaction history',
   'dashboard': 'Dashboard',
-  'dashboard_sign_in_hint': 'Sign in to see: purchased, favorites, notifications, recent opens, and preferences',
+  'dashboard_sign_in_hint':
+      'Sign in to see: purchased, favorites, notifications, recent opens, and preferences',
   'no_transactions_yet': 'No transactions yet.',
   'could_not_load_transactions': 'Could not load transactions.',
   'transaction_added': 'Added',
@@ -157,15 +167,18 @@ final Map<String, String> _en = {
   'push_off': 'Push off',
   'last': 'Last',
   'purchased_label': 'Purchased',
-  'notification_settings_error': "We couldn't load your notification settings. Please try again later.",
-  'content_summary_error': "We couldn't load your content summary right now. Please try again later.",
+  'notification_settings_error':
+      "We couldn't load your notification settings. Please try again later.",
+  'content_summary_error':
+      "We couldn't load your content summary right now. Please try again later.",
   'wishlist_error': 'wishlist error: ',
   'library_error': 'library error: ',
   // Detail / content page
   'detail_title': 'Detail',
   'sign_in_to_use_feature': 'Sign in to use this feature.',
   'login_required_title': 'Sign in required',
-  'login_required_subtitle': 'Sign in or create an account to use this feature.',
+  'login_required_subtitle':
+      'Sign in or create an account to use this feature.',
   'login_required_sign_in': 'Sign in',
   'login_required_register': 'Create account',
   'login_required_cta': 'Sign in to continue',
@@ -178,6 +191,8 @@ final Map<String, String> _en = {
   'could_not_load_product_info': 'Could not load product info.',
   'marked_as_complete': 'Marked as complete.',
   'deep_dive': 'Deep dive',
+  'detail_previous_page': 'Previous page',
+  'detail_next_page': 'Next page',
   'no_content': 'No content',
   'further_reading': 'Further reading',
   'no_links': 'No links',
@@ -253,8 +268,7 @@ final Map<String, String> _en = {
   'badge_pending_tooltip':
       'Pending: Higher priority for notification scheduling.',
   'remove_from_saved': 'Remove from saved',
-  'favorite_sentences_hint':
-      'Tap the star to save your favorite bites.',
+  'favorite_sentences_hint': 'Tap the star to save your favorite bites.',
   'wishlist_request_title': 'Wishlist request',
   'wishlist_request_subtitle':
       'Tell us what topics or products you hope to see next.',
@@ -372,8 +386,7 @@ final Map<String, String> _en = {
       'Notifications are off. Cannot schedule.',
   'rescheduled_none':
       'Rescheduled but no notifications generated. Check product settings.',
-  'rescheduled_count':
-      'Rescheduled {n} notifications for the next 3 days.',
+  'rescheduled_count': 'Rescheduled {n} notifications for the next 3 days.',
   'reschedule_failed': 'Reschedule failed: {error}',
   'test_notification_sent': 'Test notification sent.',
   'push_active_title': 'Active',
@@ -400,10 +413,14 @@ final Map<String, String> _en = {
   'skip': 'Skip',
   'skipped_and_rescheduled': 'Skipped and rescheduled.',
   'push_timeline_empty': 'Not scheduled. Tap refresh to reschedule.',
-  'timeline_empty_global_off': 'Global notifications off.\nEnable them in Notification settings.',
-  'timeline_empty_no_products': 'No products with notifications on.\nEnable them in Notification settings.',
-  'timeline_empty_no_scheduled': 'No scheduled notifications.\nCheck quiet hours or date settings.',
-  'timeline_load_error': "We couldn't load your upcoming notifications. Please try again later.",
+  'timeline_empty_global_off':
+      'Global notifications off.\nEnable them in Notification settings.',
+  'timeline_empty_no_products':
+      'No products with notifications on.\nEnable them in Notification settings.',
+  'timeline_empty_no_scheduled':
+      'No scheduled notifications.\nCheck quiet hours or date settings.',
+  'timeline_load_error':
+      "We couldn't load your upcoming notifications. Please try again later.",
   'day_number': ' · Day {n}',
   'day_label': 'Day {n}',
   'today_label': 'Today',
@@ -424,8 +441,7 @@ final Map<String, String> _en = {
   'coming_soon_subtitle':
       'This product is not yet available. You can bookmark it now and come back when it’s released.',
   'tomorrow_at_time': 'Tomorrow {time}',
-  'unlocked_enable_banner':
-      'Unlocked. You can enable banner notifications.',
+  'unlocked_enable_banner': 'Unlocked. You can enable banner notifications.',
   'sign_in_to_add_library': 'Sign in to add to your library.',
   'added_to_library': 'Added to your library.',
   'action_failed': 'Failed: {error}',
@@ -489,8 +505,10 @@ final Map<String, String> _en = {
   'search_products_or_topics_placeholder': 'Search products or topics…',
   'search_history_title': 'History',
   'search_history_empty': 'No search history yet',
-  'search_recent_empty_hint': 'Open a few products and your top categories will show here',
-  'search_wishlist_hint': 'Add more to wishlist and we\'ll expand your recommendations',
+  'search_recent_empty_hint':
+      'Open a few products and your top categories will show here',
+  'search_wishlist_hint':
+      'Add more to wishlist and we\'ll expand your recommendations',
   'search_suggested_title': 'Suggested',
   'search_trending_title': 'Trending',
   'sort_relevance': 'Sort: Relevance',
@@ -528,7 +546,8 @@ final Map<String, String> _en = {
   'receipt_invalid':
       'Receipt could not be verified. Try again or use a different payment method.',
   'purchase_failed_code': 'Purchase failed ({code}). Try again later.',
-  'purchase_failed_generic': 'Purchase could not be completed. Try again later.',
+  'purchase_failed_generic':
+      'Purchase could not be completed. Try again later.',
   'sign_in_to_use_credits': 'Sign in to use credits.',
   'or_sign_with': 'Or sign up / sign in with',
   'donot_have_account': "Don't have an account?",
@@ -569,13 +588,15 @@ final Map<String, String> _en = {
   'notif_channel_test_name': 'OnePop Test',
   'notif_channel_test_desc': 'Test OnePop notifications',
   // Auth error messages (from AuthService)
-  'auth_err_email_in_use': 'This email is already in use. Sign in or use another email.',
+  'auth_err_email_in_use':
+      'This email is already in use. Sign in or use another email.',
   'auth_err_invalid_email': 'Please enter a valid email.',
   'auth_err_operation_not_allowed': 'This sign-in method is not enabled.',
   'auth_err_weak_password': 'Password must be at least 6 characters.',
   'auth_err_user_disabled': 'This account has been disabled.',
   'auth_err_invalid_credential': 'Invalid email or password. Please try again.',
-  'auth_err_credential_in_use': 'This email is linked to another account. Use sign in instead.',
+  'auth_err_credential_in_use':
+      'This email is linked to another account. Use sign in instead.',
   'auth_err_requires_recent_login': 'Please sign in again to continue.',
   'auth_err_too_many_requests': 'Too many attempts. Please try again later.',
   'auth_err_network': 'Network error. Please check your connection.',
@@ -591,7 +612,8 @@ final Map<String, String> _en = {
   'balance_credits': 'Balance: {n}.',
   'unlock_this_product': 'Unlock this product.',
   'product_costs_credits': 'This product costs {n} credit. Get more to unlock.',
-  'product_costs_credits_plural': 'This product costs {n} credits. Get more to unlock.',
+  'product_costs_credits_plural':
+      'This product costs {n} credits. Get more to unlock.',
   'loading_label': 'Loading…',
   'release_date_label': 'Release: {date}',
 
@@ -599,15 +621,18 @@ final Map<String, String> _en = {
   'onboard_welcome_title': 'Welcome to\nOnePop',
   'onboard_welcome_sub': 'Useful stuff delivered\nright when you need it',
   'onboard_slide2_title': 'Info comes to you',
-  'onboard_slide2_sub': 'No need to remember to open an app. We send you bite-sized insights at just the right moments throughout your day.',
+  'onboard_slide2_sub':
+      'No need to remember to open an app. We send you bite-sized insights at just the right moments throughout your day.',
   'onboard_slide3_title': 'Made for busy people',
   'onboard_slide3_sub': 'Built on what actually works',
   'onboard_feature1_title': 'Quick reads',
   'onboard_feature1_desc': '60-80 words. Get the key idea in under a minute',
   'onboard_feature2_title': 'Smart timing',
-  'onboard_feature2_desc': 'Sent when you\'re most likely to remember and use it',
+  'onboard_feature2_desc':
+      'Sent when you\'re most likely to remember and use it',
   'onboard_feature3_title': 'Real topics',
-  'onboard_feature3_desc': 'Sleep, stress, focus, AI—stuff you can actually use',
+  'onboard_feature3_desc':
+      'Sleep, stress, focus, AI—stuff you can actually use',
   'onboard_notif_title': 'Turn on notifications',
   'onboard_notif_sub': 'Let OnePop send you helpful stuff throughout the day',
   'onboard_benefit1': 'Get 3-5 quick tips daily',
@@ -621,8 +646,10 @@ final Map<String, String> _en = {
   'onboard_next': 'Next',
   'onboard_demo_time_now': 'now',
   'onboard_demo_time_2h': '2h ago',
-  'onboard_demo_notif1': '💡 Quick Stress Relief\nBreathe in for 4 seconds, hold for 7, breathe out for 8. This simple trick activates your body\'s natural calm response.',
-  'onboard_demo_notif2': '🧠 Better Focus\nWork in 25-minute blocks, then take a 5-minute break...',
+  'onboard_demo_notif1':
+      '💡 Quick Stress Relief\nBreathe in for 4 seconds, hold for 7, breathe out for 8. This simple trick activates your body\'s natural calm response.',
+  'onboard_demo_notif2':
+      '🧠 Better Focus\nWork in 25-minute blocks, then take a 5-minute break...',
   // category_dynamic_rails
   'cat_for_you': 'For you',
   'cat_new': 'New',
@@ -654,12 +681,14 @@ final Map<String, String> _en = {
   'signed_in_existing_msg': 'Signed in with existing account.',
   'signed_in_msg': 'Signed in.',
   'signed_up_msg': 'Signed up successfully.',
-  'forgot_password_desc': 'Enter the exact email you used to sign up. We will send a reset link. Check your spam folder if you don\'t see it.',
+  'forgot_password_desc':
+      'Enter the exact email you used to sign up. We will send a reset link. Check your spam folder if you don\'t see it.',
   'forgot_password_email_hint': 'example@email.com',
   'send_reset_link': 'Send reset link',
   'sent_label': 'Sent',
   'back_to_sign_in': 'Back to sign in',
-  'reset_link_sent_msg': 'If this email is registered, we sent a reset link. Check your inbox and spam folder; it may take a few minutes.',
+  'reset_link_sent_msg':
+      'If this email is registered, we sent a reset link. Check your inbox and spam folder; it may take a few minutes.',
   // Home / rails
   'for_you_section_title': 'For you',
   'no_recommendations_yet': 'No recommendations yet.',
@@ -745,11 +774,9 @@ final Map<String, String> _zhTw = {
   'ok': '確定',
   'hint': '提示',
   'coffee_tab_plus_hint': '按 Tab＋ 鍵就能快速設定橫幅通知學習主題。',
-  'coffee_hint_home':
-      '歡迎回來！今天也想充電一下嗎？\n\n雙擊咖啡可快速開啟橫幅學習設定～',
+  'coffee_hint_home': '歡迎回來！今天也想充電一下嗎？\n\n雙擊咖啡可快速開啟橫幅學習設定～',
   'coffee_hint_home_1': '歡迎回來！今天也想充電一下嗎？',
-  'coffee_hint_explore':
-      '每一步探索都讓你更靠近目標！\n\n雙擊咖啡可快速開啟橫幅學習設定～',
+  'coffee_hint_explore': '每一步探索都讓你更靠近目標！\n\n雙擊咖啡可快速開啟橫幅學習設定～',
   'coffee_hint_explore_1': '每一步探索都讓你更靠近目標！',
   'coffee_hint_double_tap': '雙擊咖啡可快速開啟橫幅學習設定～',
   'coffee_hint_me': '在「我的圖書館」可查看已購買主題與進度。',
@@ -837,6 +864,8 @@ final Map<String, String> _zhTw = {
   'could_not_load_product_info': '無法載入產品資訊。',
   'marked_as_complete': '已標記為完成。',
   'deep_dive': '深度解析',
+  'detail_previous_page': '上一頁',
+  'detail_next_page': '下一頁',
   'no_content': '目前沒有內容',
   'further_reading': '延伸閱讀',
   'no_links': '目前沒有連結',
@@ -924,20 +953,16 @@ final Map<String, String> _zhTw = {
       'OnePop 會在最佳時機推播。請將傳遞方式設為「立即傳送」，通知才會即時顯示，不會被系統彙整延遲。',
   'ios_guide_step_open_settings': '1. 開啟「設定」App。',
   'ios_guide_step_tap_notifications': '2. 點「通知」，再點「OnePop」。',
-  'ios_guide_step_immediately':
-      '3. 確認已選擇「立即傳送」（不要選「排程摘要」）。',
+  'ios_guide_step_immediately': '3. 確認已選擇「立即傳送」（不要選「排程摘要」）。',
   'ios_guide_badge_important': '重要',
   'ios_guide_banner_title': '橫幅樣式 → 選擇「持續」',
-  'ios_guide_banner_desc':
-      '橫幅會停留在畫面頂端直到你點擊或關閉，不會一閃而過。',
+  'ios_guide_banner_desc': '橫幅會停留在畫面頂端直到你點擊或關閉，不會一閃而過。',
   'ios_guide_banner_step1': '1. 在「通知」→「OnePop」中，點「橫幅樣式」。',
   'ios_guide_banner_step2': '2. 選擇「持續」（不要選「暫時」）。',
   'ios_guide_badge_recommended': '建議',
   'ios_guide_previews_title': '顯示預覽 → 選擇「永遠」',
-  'ios_guide_previews_desc':
-      '鎖定畫面上會顯示完整訊息，一眼就能讀到內容。',
-  'ios_guide_previews_step1':
-      '1. 在「通知」→「OnePop」中，找到「顯示預覽」。',
+  'ios_guide_previews_desc': '鎖定畫面上會顯示完整訊息，一眼就能讀到內容。',
+  'ios_guide_previews_step1': '1. 在「通知」→「OnePop」中，找到「顯示預覽」。',
   'ios_guide_previews_step2': '2. 選擇「永遠」。',
   'ios_guide_badge_handy': '實用',
   'ios_guide_why_immediately_title': '為什麼要選「立即傳送」？',
@@ -948,8 +973,7 @@ final Map<String, String> _zhTw = {
   'ios_guide_open_settings_title': '開啟設定',
   'ios_guide_open_settings_subtitle': '點下方按鈕可直接跳轉到 iOS 設定。',
   'ios_guide_open_settings_btn': '開啟設定',
-  'ios_guide_footer_note':
-      '之後可隨時在「設定」→「通知」→「OnePop」中修改。',
+  'ios_guide_footer_note': '之後可隨時在「設定」→「通知」→「OnePop」中修改。',
   'ios_guide_get_started': '開始使用',
 
   // Plus Guide multi-step form (zh-TW)
@@ -959,8 +983,7 @@ final Map<String, String> _zhTw = {
   'plus_guide_step_notify': '設定通知',
   'plus_guide_step_done': '完成',
   'plus_guide_welcome_title': '開始你的學習訂閱',
-  'plus_guide_welcome_body':
-      '只需幾步驟，選好主題、設定推播，就能每天收到你訂閱的內容。',
+  'plus_guide_welcome_body': '只需幾步驟，選好主題、設定推播，就能每天收到你訂閱的內容。',
   'plus_guide_start_btn': '馬上開始',
   'plus_guide_back': '上一步',
   'plus_guide_next': '下一步',
@@ -1008,8 +1031,7 @@ final Map<String, String> _zhTw = {
   // Notification & banner extras
   'push_timeline_tooltip': '未來 3 天排程',
   'send_test_notification_tooltip': '發送測試通知',
-  'notifications_over_cap':
-      '總推播數超過每日上限（{total} > {cap}），部分可能被略過。',
+  'notifications_over_cap': '總推播數超過每日上限（{total} > {cap}），部分可能被略過。',
   'notifications_off_cannot_schedule': '通知已關閉，無法排程。',
   'rescheduled_none': '已重新排程，但沒有產生任何通知。請檢查產品設定。',
   'rescheduled_count': '已為未來 3 天重新排程 {n} 則通知。',
@@ -1080,8 +1102,7 @@ final Map<String, String> _zhTw = {
   'product_load_error': '目前無法載入此產品，請稍後再試。',
   'add_time_btn': '新增時段（最多 5 個）',
   'start_over_title': '重新開始？',
-  'start_over_content':
-      '這會清除「{product}」的所有進度並重新啟用通知。\n\n要繼續嗎？',
+  'start_over_content': '這會清除「{product}」的所有進度並重新啟用通知。\n\n要繼續嗎？',
   'start_over_confirm': '重新開始',
   'started_over_toast': '已重新開始，通知已重新排程並清除歷史。',
   'reset_failed_with_reason': '重設失敗：{error}',

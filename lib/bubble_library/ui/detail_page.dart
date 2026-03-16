@@ -9,6 +9,7 @@ import '../models/user_library.dart';
 import '../models/product.dart';
 import '../models/content_item.dart';
 import 'widgets/bubble_card.dart';
+import 'widgets/deep_dive_pager.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_tokens.dart';
 import '../../../providers/analytics_provider.dart';
@@ -43,7 +44,9 @@ class DetailPage extends ConsumerWidget {
     final savedAsync = ref.watch(savedItemsProvider);
     final tokens = context.tokens;
 
-    if (itemAsync.hasValue && itemAsync.value != null && !_loggedDetailIds.contains(contentItemId)) {
+    if (itemAsync.hasValue &&
+        itemAsync.value != null &&
+        !_loggedDetailIds.contains(contentItemId)) {
       _loggedDetailIds.add(contentItemId);
       final item = itemAsync.value!;
       ref.read(analyticsProvider).logScreenView(screenName: 'detail');
@@ -75,10 +78,12 @@ class DetailPage extends ConsumerWidget {
           final urls = _parseUrls(item.sourceUrl);
           final productsMap = productsAsync.valueOrNull;
           final product = productsMap?[item.productId];
-          final headerTitle = product?.displayTitle(lang) ?? item.displayAnchorGroup(lang);
-          final headerSubtitle = [item.displayAnchor(lang), item.displayAnchorGroup(lang)]
-              .where((s) => s.isNotEmpty)
-              .join(' · ');
+          final headerTitle =
+              product?.displayTitle(lang) ?? item.displayAnchorGroup(lang);
+          final headerSubtitle = [
+            item.displayAnchor(lang),
+            item.displayAnchorGroup(lang)
+          ].where((s) => s.isNotEmpty).join(' · ');
 
           return savedAsync.when(
             data: (savedMap) {
@@ -96,29 +101,27 @@ class DetailPage extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 children: [
                   // 0) Header：主標=product.title，副標=anchor + anchorGroup
-                  BubbleCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(headerTitle,
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w900)),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(headerSubtitle,
-                            style: TextStyle(color: tokens.textSecondary)),
-                        const SizedBox(height: AppSpacing.xs),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            _chip('intent：${item.displayIntent(lang)}'),
-                            _chip('◆${item.difficulty}'),
-                          ],
-                        ),
-                      ],
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(headerTitle,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w900)),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(headerSubtitle,
+                          style: TextStyle(color: tokens.textSecondary)),
+                      const SizedBox(height: AppSpacing.xs),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _chip('intent：${item.displayIntent(lang)}'),
+                          _chip('◆${item.difficulty}'),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.md),
 
                   // 1) 今日一句（移除「精華速讀」標題，直接顯示內容）
                   BubbleCard(
@@ -135,8 +138,8 @@ class DetailPage extends ConsumerWidget {
                           children: [
                             TextButton.icon(
                               onPressed: () async {
-                                await Clipboard.setData(
-                                    ClipboardData(text: item.displayContent(lang)));
+                                await Clipboard.setData(ClipboardData(
+                                    text: item.displayContent(lang)));
                                 // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -158,9 +161,11 @@ class DetailPage extends ConsumerWidget {
                                       item.displayContent(lang),
                                     ].join('\n');
                                     try {
-                                      final box = ctx.findRenderObject() as RenderBox?;
+                                      final box =
+                                          ctx.findRenderObject() as RenderBox?;
                                       final origin = box != null
-                                          ? box.localToGlobal(Offset.zero) & box.size
+                                          ? box.localToGlobal(Offset.zero) &
+                                              box.size
                                           : const Rect.fromLTWH(0, 0, 1, 1);
                                       await Share.share(
                                         text,
@@ -168,7 +173,8 @@ class DetailPage extends ConsumerWidget {
                                         sharePositionOrigin: origin,
                                       );
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           SnackBar(
                                             content:
                                                 Text(uiString(lang, 'shared')),
@@ -178,7 +184,8 @@ class DetailPage extends ConsumerWidget {
                                     } catch (e, st) {
                                       debugPrint('Share: $e\n$st');
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           SnackBar(
                                             content: Text(
                                               '${uiString(lang, 'share_not_available')}${e.toString()}',
@@ -199,20 +206,22 @@ class DetailPage extends ConsumerWidget {
                                   ? Icons.star
                                   : Icons.star_border),
                               onPressed: () async {
-                                final newFavoriteState = !(saved?.favorite ?? false);
-                                
+                                final newFavoriteState =
+                                    !(saved?.favorite ?? false);
+
                                 // 更新 Firestore 的 favorite 欄位
                                 await repo.setSavedItem(uid, item.id,
                                     {'favorite': newFavoriteState});
-                                
+
                                 // 同時更新本地收藏的「今日一句」
                                 if (newFavoriteState) {
                                   // 收藏：獲取產品名稱並保存到本地
-                                  final productsMap = await ref.read(productsMapProvider.future);
+                                  final productsMap = await ref
+                                      .read(productsMapProvider.future);
                                   final product = productsMap[item.productId];
-                                  final productName =
-                                      product?.title ?? uiString(lang, 'unknown_product');
-                                  
+                                  final productName = product?.title ??
+                                      uiString(lang, 'unknown_product');
+
                                   await FavoriteSentencesStore.add(
                                     uid,
                                     FavoriteSentence(
@@ -227,9 +236,10 @@ class DetailPage extends ConsumerWidget {
                                   );
                                 } else {
                                   // 取消收藏：從本地移除
-                                  await FavoriteSentencesStore.remove(uid, item.id);
+                                  await FavoriteSentencesStore.remove(
+                                      uid, item.id);
                                 }
-                                
+
                                 ref.invalidate(savedItemsProvider);
                               },
                             ),
@@ -245,7 +255,8 @@ class DetailPage extends ConsumerWidget {
                     child: FilledButton.icon(
                       onPressed: () async {
                         // 獲取 product 和 topicId
-                        final productsMap = await ref.read(productsMapProvider.future);
+                        final productsMap =
+                            await ref.read(productsMapProvider.future);
                         final product = productsMap[item.productId];
                         if (product == null) {
                           if (context.mounted) {
@@ -259,11 +270,12 @@ class DetailPage extends ConsumerWidget {
                           }
                           return;
                         }
-                        
+
                         // ✅ 先保底寫 saved_items（與 bootstrapper 一致）
                         // 避免 markLearnedAndAdvance 的 early return 跳過 saved_items 寫入
                         try {
-                          await repo.setSavedItem(uid, item.id, {'learned': true});
+                          await repo
+                              .setSavedItem(uid, item.id, {'learned': true});
                         } catch (e) {
                           debugPrint('⚠️ setSavedItem fallback error: $e');
                         }
@@ -278,14 +290,16 @@ class DetailPage extends ConsumerWidget {
                           );
                         } catch (e) {
                           // 已有 setSavedItem 保底，忽略即可
-                          debugPrint('⚠️ markLearnedAndAdvance failed (fallback used): $e');
+                          debugPrint(
+                              '⚠️ markLearnedAndAdvance failed (fallback used): $e');
                         }
                         ref.read(analyticsProvider).logEvent('mark_learned', {
                           'content_id': item.id,
                           'topic_id': product.topicId,
                         });
                         // 以「標記學會」為準：更新 streak（當天有學習）
-                        await UserLearningStore().markLearnedTodayAndGlobal(item.productId);
+                        await UserLearningStore()
+                            .markLearnedTodayAndGlobal(item.productId);
                         ref.invalidate(savedItemsProvider);
                         ref.invalidate(libraryProductsProvider);
                         if (context.mounted) {
@@ -304,81 +318,80 @@ class DetailPage extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.sm),
 
                   // 2) 深度解析（Excel deepAnalysis 欄位）
-                  BubbleCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          uiString(lang, 'deep_dive'),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                          ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        uiString(lang, 'deep_dive'),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        if (item.displayDeepAnalysis(lang).isEmpty)
-                          Text(
-                            uiString(lang, 'no_content'),
-                            style: TextStyle(color: tokens.textSecondary),
-                          )
-                        else
-                          Text(item.displayDeepAnalysis(lang),
-                              style: const TextStyle(
-                                  height: 1.35,
-                                  fontSize: 15)),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      if (item.displayDeepAnalysis(lang).isEmpty)
+                        Text(
+                          uiString(lang, 'no_content'),
+                          style: TextStyle(color: tokens.textSecondary),
+                        )
+                      else
+                        DeepDivePager(
+                          deepAnalysis: item.displayDeepAnalysis(lang),
+                          emptyLabel: uiString(lang, 'no_content'),
+                          previousPageTooltip:
+                              uiString(lang, 'detail_previous_page'),
+                          nextPageTooltip: uiString(lang, 'detail_next_page'),
+                        ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.md),
 
                   // 3) 延伸閱讀
-                  BubbleCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          uiString(lang, 'further_reading'),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                          ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        uiString(lang, 'further_reading'),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
                         ),
-                        const SizedBox(height: AppSpacing.xs),
-                        if (urls.isEmpty)
-                          Text(
-                            uiString(lang, 'no_links'),
-                            style: TextStyle(color: tokens.textSecondary),
-                          )
-                        else
-                          ...urls.map((u) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: InkWell(
-                                  onTap: () async {
-                                    if (await canLaunchUrl(u)) {
-                                      await launchUrl(u,
-                                          mode: LaunchMode.externalApplication);
-                                    } else {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              uiString(
-                                                  lang, 'could_not_open_link'),
-                                            ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      if (urls.isEmpty)
+                        Text(
+                          uiString(lang, 'no_links'),
+                          style: TextStyle(color: tokens.textSecondary),
+                        )
+                      else
+                        ...urls.map((u) => Padding(
+                              padding:
+                                  const EdgeInsets.only(bottom: AppSpacing.sm),
+                              child: InkWell(
+                                onTap: () async {
+                                  if (await canLaunchUrl(u)) {
+                                    await launchUrl(u,
+                                        mode: LaunchMode.externalApplication);
+                                  } else {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            uiString(
+                                                lang, 'could_not_open_link'),
                                           ),
-                                        );
-                                      }
+                                        ),
+                                      );
                                     }
-                                  },
-                                  child: Text(u.toString(),
-                                      style: const TextStyle(
-                                          decoration:
-                                              TextDecoration.underline)),
-                                ),
-                              )),
-                      ],
-                    ),
+                                  }
+                                },
+                                child: Text(u.toString(),
+                                    style: const TextStyle(
+                                        decoration: TextDecoration.underline)),
+                              ),
+                            )),
+                    ],
                   ),
                 ],
               );
@@ -401,12 +414,12 @@ class DetailPage extends ConsumerWidget {
         builder: (context) {
           final tokens = context.tokens;
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xs),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs, vertical: AppSpacing.xs),
             decoration: BoxDecoration(
               gradient: tokens.chipGradient,
               color: tokens.chipGradient == null ? tokens.chipBg : null,
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: tokens.cardBorder),
             ),
             child: Text(
               text,
