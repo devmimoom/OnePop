@@ -124,7 +124,7 @@ class _CenterContent extends StatelessWidget {
                 style: TextStyle(
                   fontSize: isZh ? 16 : 17,
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF5CCCD6),
+                  color: Colors.white.withValues(alpha: 0.45),
                   letterSpacing: 2,
                   shadows: const [
                     Shadow(
@@ -140,7 +140,7 @@ class _CenterContent extends StatelessWidget {
               Text(
                 uiString(lang, 'one_pop_one_moment'),
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: isZh ? 15 : 14,
                   fontWeight: FontWeight.w300,
                   color: Colors.white.withValues(alpha: 0.45),
                   letterSpacing: 1.5,

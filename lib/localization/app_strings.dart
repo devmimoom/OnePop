@@ -82,6 +82,21 @@ final Map<String, String> _en = {
   'about_title': 'About',
   'about_content': 'OnePop\nVersion 1.0.2',
   'ok': 'OK',
+  'hint': 'Hint',
+  'coffee_tab_plus_hint':
+      'Press Tab+ to quickly set up banner notification learning topics.',
+  'coffee_hint_home':
+      'Welcome back! Ready to learn a little today?\n\nDouble-tap the coffee to open banner learning setup.',
+  'coffee_hint_home_1': 'Welcome back! Ready to learn a little today?',
+  'coffee_hint_explore':
+      'Every step you explore brings you closer!\n\nDouble-tap the coffee to open banner learning setup.',
+  'coffee_hint_explore_1': 'Every step you explore brings you closer!',
+  'coffee_hint_double_tap': 'Double-tap the coffee to open banner learning setup.',
+  'coffee_hint_me': 'In My Library you can view your purchased topics and progress.',
+  'library_hint_1': 'Use the bell (top right) for global notification settings.',
+  'library_hint_2': 'Use the ⋯ on each card for that topic\'s notification settings.',
+  'coffee_hint_plus':
+      'This is your banner learning setup—adjust it to your pace.',
   'could_not_open': 'Could not open: ',
   'could_not_open_link': 'Could not open link: ',
   'english': 'English',
@@ -728,6 +743,19 @@ final Map<String, String> _zhTw = {
   'about_title': '關於',
   'about_content': 'OnePop\n版本 1.0.2',
   'ok': '確定',
+  'hint': '提示',
+  'coffee_tab_plus_hint': '按 Tab＋ 鍵就能快速設定橫幅通知學習主題。',
+  'coffee_hint_home':
+      '歡迎回來！今天也想充電一下嗎？\n\n雙擊咖啡可快速開啟橫幅學習設定～',
+  'coffee_hint_home_1': '歡迎回來！今天也想充電一下嗎？',
+  'coffee_hint_explore':
+      '每一步探索都讓你更靠近目標！\n\n雙擊咖啡可快速開啟橫幅學習設定～',
+  'coffee_hint_explore_1': '每一步探索都讓你更靠近目標！',
+  'coffee_hint_double_tap': '雙擊咖啡可快速開啟橫幅學習設定～',
+  'coffee_hint_me': '在「我的圖書館」可查看已購買主題與進度。',
+  'library_hint_1': '右上方鈴鐺可設定「全域通知」。',
+  'library_hint_2': '主題卡右側「⋯」可設定該主題的通知。',
+  'coffee_hint_plus': '這裡就是橫幅學習設定，隨心調整吧～',
   'could_not_open': '無法開啟：',
   'could_not_open_link': '無法開啟連結：',
   'english': 'English',

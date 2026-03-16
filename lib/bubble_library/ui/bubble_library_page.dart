@@ -24,7 +24,6 @@ import '../../../theme/app_tokens.dart';
 import '../../collections/wishlist_provider.dart';
 import '../../pages/product_page.dart';
 import '../../notifications/favorite_sentences_store.dart';
-
 enum LibraryView { purchased, wishlist, favorites, history, favoriteSentences }
 
 enum PurchasedPushFilter { all, pushing, off }
@@ -97,6 +96,7 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
           ),
           IconButton(
             icon: const Icon(Icons.notifications_active_outlined),
+            tooltip: uiString(lang, 'global_settings_title'),
             onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const PushCenterPage())),
           ),
@@ -104,55 +104,55 @@ class _BubbleLibraryPageState extends ConsumerState<BubbleLibraryPage> {
       ),
       drawer: _buildDrawer(lang),
       body: productsAsync.when(
-        data: (productsMap) {
-          return libAsync.when(
-            data: (lib) {
-              return wishAsync.when(
-                data: (wishItems) {
-                  final visibleLib = lib
-                      .where((e) =>
-                          !e.isHidden &&
-                          productsMap.containsKey(e.productId))
-                      .toList();
+                data: (productsMap) {
+                  return libAsync.when(
+                    data: (lib) {
+                      return wishAsync.when(
+                        data: (wishItems) {
+                          final visibleLib = lib
+                              .where((e) =>
+                                  !e.isHidden &&
+                                  productsMap.containsKey(e.productId))
+                              .toList();
 
-                  // 取得排程快取（純本機，不影響資料流）
-                  final scheduled = scheduledAsync.asData?.value ??
-                      <ScheduledPushEntry>[];
+                          // 取得排程快取（純本機，不影響資料流）
+                          final scheduled = scheduledAsync.asData?.value ??
+                              <ScheduledPushEntry>[];
 
-                  return _buildBody(
-                    context,
-                    visibleLib,
-                    wishItems,
-                    productsMap,
-                    scheduled,
-                    lang,
+                          return _buildBody(
+                            context,
+                            visibleLib,
+                            wishItems,
+                            productsMap,
+                            scheduled,
+                            lang,
+                          );
+                        },
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => Center(
+                          child: Text('${uiString(lang, 'wishlist_error')}$e'),
+                        ),
+                      );
+                    },
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(
+                      child: Text(
+                        uiString(lang, 'library_load_error'),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   );
                 },
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Center(
-                  child: Text('${uiString(lang, 'wishlist_error')}$e'),
+                  child: Text(
+                    uiString(lang, 'content_load_error'),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              );
-            },
-            loading: () =>
-                const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(
-              child: Text(
-                uiString(lang, 'library_load_error'),
-                textAlign: TextAlign.center,
               ),
-            ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
-          child: Text(
-            uiString(lang, 'content_load_error'),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
     );
   }
 

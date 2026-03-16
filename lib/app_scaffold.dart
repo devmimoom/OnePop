@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'pages/home_page.dart';
@@ -15,19 +14,33 @@ import 'providers/analytics_provider.dart';
 import 'notifications/notification_bootstrapper.dart';
 import 'localization/app_language_provider.dart';
 import 'localization/app_strings.dart';
+import 'widgets/floating_coffee_hint.dart';
 
 final themeControllerProvider = Provider<ThemeController>((ref) {
   throw UnimplementedError('themeControllerProvider must be overridden');
 });
 
 const _stackScreenNames = ['home', 'plus', 'explore', 'me'];
+const _coffeeSize = 180.0;
+const _coffeeMargin = 0.0;
+const _coffeeEdgeOverflow = 72.0;
 
-class MainScaffold4Tabs extends ConsumerWidget {
+class MainScaffold4Tabs extends ConsumerStatefulWidget {
   final ThemeController themeController;
   const MainScaffold4Tabs({super.key, required this.themeController});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainScaffold4Tabs> createState() => _MainScaffold4TabsState();
+}
+
+class _MainScaffold4TabsState extends ConsumerState<MainScaffold4Tabs> {
+  double? _coffeeLeft;
+  double? _coffeeTop;
+  bool _showCoffeeHint = false;
+  int _coffeeHintStep = 0;
+
+  @override
+  Widget build(BuildContext context) {
     final stackIndex = ref.watch(bottomTabIndexProvider);
     final tokens = context.tokens;
     final lang = ref.watch(appLanguageProvider);
@@ -36,36 +49,115 @@ class MainScaffold4Tabs extends ConsumerWidget {
     final meLabel = uiString(lang, 'me');
 
     return NotificationBootstrapper(
-        child: AppBackground(
-          child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: IndexedStack(
-            index: stackIndex,
-            children: const [
-              HomePage(),
-              PlusGuidePage(),
-              ExplorePage(),
-              MePage(),
-            ],
-          ),
-          bottomNavigationBar: _MainBottomBar(
-            currentIndex: stackIndex,
-            tokens: tokens,
-            homeLabel: homeLabel,
-            exploreLabel: exploreLabel,
-            meLabel: meLabel,
-            onItemSelected: (index) {
-              ref.read(bottomTabIndexProvider.notifier).state = index;
-              if (index >= 0 && index < _stackScreenNames.length) {
-                ref
-                    .read(analyticsProvider)
-                    .logScreenView(screenName: _stackScreenNames[index]);
-              }
-            },
-          ),
-          ),
+      child: AppBackground(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final mediaQuery = MediaQuery.of(context);
+            final size = mediaQuery.size;
+            final bottomInset =
+                mediaQuery.padding.bottom + AppSpacing.navItemHeight + 24;
+            final minLeft = -_coffeeEdgeOverflow;
+            final maxLeft = size.width - _coffeeSize + _coffeeEdgeOverflow;
+            final minTop = mediaQuery.padding.top - _coffeeEdgeOverflow;
+            final maxTop =
+                size.height - _coffeeSize - bottomInset + _coffeeEdgeOverflow;
+
+            final cloudButtonLeft = (_coffeeLeft ??
+                    size.width - _coffeeSize - _coffeeMargin)
+                .clamp(minLeft, maxLeft);
+            final cloudButtonTop = (_coffeeTop ??
+                    size.height - _coffeeSize - bottomInset)
+                .clamp(minTop, maxTop);
+
+            return Stack(
+              children: [
+                Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: IndexedStack(
+                    index: stackIndex,
+                    children: const [
+                      HomePage(),
+                      PlusGuidePage(),
+                      ExplorePage(),
+                      MePage(),
+                    ],
+                  ),
+                  bottomNavigationBar: _MainBottomBar(
+                    currentIndex: stackIndex,
+                    tokens: tokens,
+                    homeLabel: homeLabel,
+                    exploreLabel: exploreLabel,
+                    meLabel: meLabel,
+                    onItemSelected: (index) {
+                      ref.read(bottomTabIndexProvider.notifier).state = index;
+                      if (index >= 0 && index < _stackScreenNames.length) {
+                        ref
+                            .read(analyticsProvider)
+                            .logScreenView(screenName: _stackScreenNames[index]);
+                      }
+                    },
+                  ),
+                ),
+                FloatingCoffeeHint(
+                  coffeeLeft: cloudButtonLeft,
+                  coffeeTop: cloudButtonTop,
+                  maxWidth: size.width,
+                  showBubble: _showCoffeeHint,
+                  message: uiString(
+                    lang,
+                    () {
+                      switch (stackIndex) {
+                        case 0:
+                          return _coffeeHintStep == 0
+                              ? 'coffee_hint_home_1'
+                              : 'coffee_hint_double_tap';
+                        case 1:
+                          return 'coffee_hint_plus';
+                        case 2:
+                          return _coffeeHintStep == 0
+                              ? 'coffee_hint_explore_1'
+                              : 'coffee_hint_double_tap';
+                        case 3:
+                          return 'coffee_hint_me';
+                        default:
+                          return 'coffee_hint_home_1';
+                      }
+                    }(),
+                  ),
+                  onCoffeeTap: () => setState(() => _showCoffeeHint = true),
+                  onBubbleTap: () => setState(() {
+                    _showCoffeeHint = false;
+                    if (stackIndex == 0 || stackIndex == 2) {
+                      _coffeeHintStep = (_coffeeHintStep + 1) % 2;
+                    }
+                  }),
+                  onPanUpdate: (delta) => setState(() {
+                    _showCoffeeHint = false;
+                    if (stackIndex == 0 || stackIndex == 2) {
+                      _coffeeHintStep = (_coffeeHintStep + 1) % 2;
+                    }
+                    _coffeeLeft = (cloudButtonLeft + delta.dx)
+                        .clamp(minLeft, maxLeft);
+                    _coffeeTop =
+                        (cloudButtonTop + delta.dy).clamp(minTop, maxTop);
+                  }),
+                  tokens: tokens,
+                  onDoubleTap: () {
+                    setState(() => _showCoffeeHint = false);
+                    ref.read(bottomTabIndexProvider.notifier).state = 1;
+                    ref
+                        .read(analyticsProvider)
+                        .logScreenView(screenName: _stackScreenNames[1]);
+                  },
+                  size: _coffeeSize,
+                  margin: _coffeeMargin,
+                ),
+              ],
+            );
+          },
         ),
-      );
+      ),
+    );
   }
 }
 
@@ -117,7 +209,7 @@ class _MainBottomBar extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _NavItemButton(
                         index: 0,
@@ -128,7 +220,6 @@ class _MainBottomBar extends StatelessWidget {
                         tokens: tokens,
                         onTap: () => onItemSelected(0),
                       ),
-                      const SizedBox(width: AppSpacing.xxl),
                       _NavItemButton(
                         index: 2,
                         currentIndex: currentIndex,
@@ -149,16 +240,6 @@ class _MainBottomBar extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-              ),
-            ),
-            Positioned.fill(
-              child: Align(
-                alignment: const Alignment(-0.25, 0.0),
-                child: _PlusFloatingButton(
-                  tokens: tokens,
-                  selected: currentIndex == 1,
-                  onTap: () => onItemSelected(1),
                 ),
               ),
             ),
@@ -236,54 +317,3 @@ class _NavItemButton extends StatelessWidget {
   }
 }
 
-class _PlusFloatingButton extends StatelessWidget {
-  const _PlusFloatingButton({
-    required this.tokens,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final AppTokens tokens;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    // 使用接近 warning 的橘紅色，讓「+」更醒目
-    const baseRed = Color(0xFFFF7043);
-    final Color plusColor = selected
-        ? baseRed
-        : baseRed.withValues(alpha: 0.8);
-
-    return GestureDetector(
-      onTapDown: (_) => HapticFeedback.mediumImpact(),
-      onTap: () {
-        onTap();
-      },
-      child: Container(
-        width: AppSpacing.xxl,
-        height: AppSpacing.xxl,
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          boxShadow: [
-            BoxShadow(
-              color: baseRed.withValues(alpha: 0.5),
-              blurRadius: 16,
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          '+',
-          style: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.w800,
-            color: plusColor,
-            height: 1,
-          ),
-        ),
-      ),
-    );
-  }
-}
