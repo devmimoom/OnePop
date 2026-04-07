@@ -50,6 +50,8 @@ String formatTimeRange(TimeRange r) {
 }
 
 class PushConfig {
+  static const List<int> presetMinIntervalOptions = [3, 30, 60, 120, 240];
+
   final int freqPerDay; // 1..5
   final PushTimeMode timeMode;
   final List<String> presetSlots; // 7-9, 9-11, 11-13, 13-15, 15-17, 17-19, 19-21, 21-23
@@ -77,6 +79,16 @@ class PushConfig {
         minIntervalMinutes: 120,
         contentMode: PushContentMode.seq,
       );
+
+  static int normalizePresetMinInterval(int value) {
+    if (presetMinIntervalOptions.contains(value)) return value;
+    if (value <= 3) return 3;
+
+    for (final option in presetMinIntervalOptions) {
+      if (value <= option) return option;
+    }
+    return presetMinIntervalOptions.last;
+  }
 
   Map<String, dynamic> toMap() => {
         'freqPerDay': freqPerDay,
@@ -131,7 +143,9 @@ class PushConfig {
           .map((e) => (e as num).toInt())
           .toSet(),
       minIntervalMinutes:
-          ((m['minIntervalMinutes'] ?? 120) as num).toInt().clamp(30, 24 * 60),
+          normalizePresetMinInterval(
+            ((m['minIntervalMinutes'] ?? 120) as num).toInt(),
+          ),
       contentMode: PushContentMode.values
           .firstWhere((e) => e.name == cm, orElse: () => PushContentMode.seq),
     );

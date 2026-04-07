@@ -67,10 +67,10 @@ class PushScheduler {
       DateTime(date.year, date.month, date.day, tod.hour, tod.minute);
 
   /// 在时间范围内完全随机生成时间点
-  /// 确保间隔至少 minIntervalMinutes（硬编码为3分钟）
+  /// 确保候選時間彼此至少相隔 minIntervalMinutes
   static List<TimeOfDay> _generateTimesInRange(
     TimeRange range,
-    int minIntervalMinutes, // 固定为3
+    int minIntervalMinutes,
   ) {
     final startMin = _todToMin(range.start);
     final endMin = _todToMin(range.end);
@@ -89,7 +89,7 @@ class PushScheduler {
       return [range.start];
     }
     
-    // 计算理论上最多可以生成多少个时间点（以3分钟间隔）
+    // 计算理论上最多可以生成多少个时间点
     final maxPossibleTimes = (rangeMinutes / minIntervalMinutes).floor();
     
     // 生成尽可能多的时间点（但不超过50个），确保有足够的候选点
@@ -128,7 +128,7 @@ class PushScheduler {
       
       if (!inRange) continue;
       
-      // 检查与已选时间点的间隔（必须至少3分钟）
+      // 检查与已选时间点的间隔
       bool canAdd = true;
       for (final selected in selectedTimes) {
         final selectedMin = _todToMin(selected);
@@ -203,8 +203,8 @@ class PushScheduler {
     for (final slot in slots) {
       final range = presetSlotRanges[slot];
       if (range != null) {
-        // ✅ 在范围内生成时间点，使用硬编码3分钟间隔
-        final timesInRange = _generateTimesInRange(range, 3);
+        // preset 模式的候選時間要先遵守商品設定的最短間隔
+        final timesInRange = _generateTimesInRange(range, cfg.minIntervalMinutes);
         allTimes.addAll(timesInRange);
       } else {
         // ✅ 忽略旧的预设值（morning, noon, evening, night）和未知的时间段
@@ -242,7 +242,7 @@ class PushScheduler {
     // ✅ 预设模式：如果 times 为空，使用默认时间段 21-23 生成时间点
     if (times.isEmpty && timeMode == PushTimeMode.preset) {
       final defaultRange = presetSlotRanges['21-23']!;
-      times = _generateTimesInRange(defaultRange, 3); // 硬编码3分钟间隔
+      times = _generateTimesInRange(defaultRange, minIntervalMinutes);
     }
     
     if (times.isEmpty) {
@@ -267,7 +267,7 @@ class PushScheduler {
       final shuffled = List<TimeOfDay>.from(times)..shuffle(Random());
       final selected = shuffled.take(freq).toList();
       
-      // ✅ 确保选中的时间点之间至少间隔3分钟
+      // ✅ 确保选中的时间点之间至少间隔設定值
       final enforced = <TimeOfDay>[];
       TimeOfDay? lastTime;
       
@@ -479,10 +479,10 @@ class PushScheduler {
 
         final dts = filtered.map((t) => _at(date, t)).toList()..sort();
         
-        // ✅ 预设模式：使用硬编码3分钟间隔；自訂時間模式：即使小於最短間隔，仍以自訂時間為主
+        // ✅ preset 模式遵守商品設定的最短間隔；custom 模式仍以使用者自訂時間為主
         final enforced = lp.pushConfig.timeMode == PushTimeMode.custom
             ? dts.take(5).toList() // 自訂時間模式：不強制執行最短間隔
-            : _enforceMinInterval(dts, 3) // ✅ 预设模式：硬编码3分钟间隔
+            : _enforceMinInterval(dts, lp.pushConfig.minIntervalMinutes)
                 .take(5)
                 .toList();
         

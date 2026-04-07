@@ -225,6 +225,43 @@ class PushProductConfigPage extends ConsumerWidget {
                                 ref: ref, days: 3);
                           },
                         ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          lang == AppLanguage.zhTw ? '最短間隔' : 'Minimum interval',
+                          style: const TextStyle(fontWeight: FontWeight.w900),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        DropdownButton<int>(
+                          value: PushConfig.normalizePresetMinInterval(
+                            cfg.minIntervalMinutes,
+                          ),
+                          dropdownColor: context.tokens.cardBg,
+                          items: PushConfig.presetMinIntervalOptions
+                              .map(
+                                (minutes) => DropdownMenuItem(
+                                  value: minutes,
+                                  child: Text(
+                                    lang == AppLanguage.zhTw
+                                        ? '$minutes 分鐘'
+                                        : '$minutes min',
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (v) async {
+                            if (v == null) return;
+                            final newCfg = cfg.copyWith(minIntervalMinutes: v);
+                            await ref
+                                .read(libraryRepoProvider)
+                                .setPushConfig(uid, productId, newCfg.toMap());
+                            ref.invalidate(libraryProductsProvider);
+                            await ref.read(libraryProductsProvider.future);
+                            await PushOrchestrator.rescheduleNextDays(
+                              ref: ref,
+                              days: 3,
+                            );
+                          },
+                        ),
                         if (totalFreq > global.dailyTotalCap) ...[
                           const SizedBox(height: AppSpacing.sm),
                           Container(
