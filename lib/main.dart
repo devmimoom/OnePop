@@ -25,6 +25,7 @@ void main() async {
       overrides: [
         themeControllerProvider.overrideWithValue(themeController),
         appLanguageProvider.overrideWith((ref) {
+          // ignore: deprecated_member_use — 待遷移至 Riverpod 3.0 時改用 Notifier.listenSelf
           ref.listenSelf((_, next) {
             saveLanguage(next);
             // 語言切換時，同步更新 NotificationService 使用的語言

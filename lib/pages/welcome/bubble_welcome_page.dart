@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,9 +39,11 @@ class _BubbleWelcomePageState extends State<BubbleWelcomePage>
     return Consumer(
       builder: (context, ref, _) {
         final lang = ref.watch(appLanguageProvider);
-        debugPrint(
-          'BubbleWelcomePage build — lang=$lang, fadeValue=${_fadeController.value}',
-        );
+        if (kDebugMode) {
+          debugPrint(
+            'BubbleWelcomePage build — lang=$lang, fadeValue=${_fadeController.value}',
+          );
+        }
         return Scaffold(
           body: GestureDetector(
             behavior: HitTestBehavior.translucent,
@@ -179,7 +182,7 @@ class _TapHintState extends State<_TapHint>
       duration: const Duration(milliseconds: 2000),
     )
       ..repeat(reverse: true);
-    debugPrint('TapHint animation started — lang=${widget.lang}');
+    if (kDebugMode) debugPrint('TapHint animation started — lang=${widget.lang}');
   }
 
   @override

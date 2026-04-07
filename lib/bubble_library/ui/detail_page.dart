@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -182,7 +183,7 @@ class DetailPage extends ConsumerWidget {
                                         );
                                       }
                                     } catch (e, st) {
-                                      debugPrint('Share: $e\n$st');
+                                      if (kDebugMode) debugPrint('Share: $e\n$st');
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
@@ -277,7 +278,7 @@ class DetailPage extends ConsumerWidget {
                           await repo
                               .setSavedItem(uid, item.id, {'learned': true});
                         } catch (e) {
-                          debugPrint('⚠️ setSavedItem fallback error: $e');
+                          if (kDebugMode) debugPrint('⚠️ setSavedItem fallback error: $e');
                         }
 
                         final progress = LearningProgressService();
@@ -290,8 +291,10 @@ class DetailPage extends ConsumerWidget {
                           );
                         } catch (e) {
                           // 已有 setSavedItem 保底，忽略即可
-                          debugPrint(
-                              '⚠️ markLearnedAndAdvance failed (fallback used): $e');
+                          if (kDebugMode) {
+                            debugPrint(
+                                '⚠️ markLearnedAndAdvance failed (fallback used): $e');
+                          }
                         }
                         ref.read(analyticsProvider).logEvent('mark_learned', {
                           'content_id': item.id,

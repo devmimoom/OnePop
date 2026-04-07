@@ -78,7 +78,7 @@ class _MainScaffold4TabsState extends ConsumerState<MainScaffold4Tabs> {
             final size = mediaQuery.size;
             final bottomInset =
                 mediaQuery.padding.bottom + AppSpacing.navItemHeight + 24;
-            final minLeft = -_coffeeEdgeOverflow;
+            const minLeft = -_coffeeEdgeOverflow;
             final maxLeft = size.width - _coffeeSize + _coffeeEdgeOverflow;
             final minTop = mediaQuery.padding.top - _coffeeEdgeOverflow;
             final maxTop =

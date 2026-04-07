@@ -1,0 +1,8 @@
+# 複製此檔為 key.properties 並填入實際值
+# key.properties 已加入 .gitignore，請勿提交
+#
+# 建立 keystore: keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+storePassword=你的_keystore_密碼
+keyPassword=你的_key_密碼
+keyAlias=upload
+storeFile=../upload-keystore.jks

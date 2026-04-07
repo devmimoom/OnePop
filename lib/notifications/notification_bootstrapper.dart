@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,7 +43,7 @@ class _NotificationBootstrapperState extends ConsumerState<NotificationBootstrap
     // ✅ 當 app 從背景恢復到前景時，立即執行 sweepMissed
     // 這可以處理用戶在 app 背景時滑掉通知的情況
     if (state == AppLifecycleState.resumed && _currentUid != null) {
-      debugPrint('📱 App 恢復前景，執行 sweepMissed...');
+      if (kDebugMode) debugPrint('📱 App 恢復前景，執行 sweepMissed...');
       _sweepAndRefresh();
     }
   }
@@ -60,9 +61,9 @@ class _NotificationBootstrapperState extends ConsumerState<NotificationBootstrap
         ref.invalidate(upcomingTimelineProvider);
         ref.invalidate(scheduledCacheProvider);
       }
-      debugPrint('✅ sweepMissed 完成');
+      if (kDebugMode) debugPrint('✅ sweepMissed 完成');
     } catch (e) {
-      debugPrint('❌ sweepMissed error: $e');
+      if (kDebugMode) debugPrint('❌ sweepMissed error: $e');
     }
   }
 
@@ -118,7 +119,7 @@ class _NotificationBootstrapperState extends ConsumerState<NotificationBootstrap
                 source: 'notification_bootstrapper',
               );
             } catch (e) {
-              debugPrint('❌ onReschedule error: $e');
+              if (kDebugMode) debugPrint('❌ onReschedule error: $e');
             }
           },
         );
@@ -130,7 +131,7 @@ class _NotificationBootstrapperState extends ConsumerState<NotificationBootstrap
           try {
             await PushExclusionStore.sweepExpired(_currentUid!);
           } catch (e) {
-            debugPrint('❌ sweepExpired error: $e');
+            if (kDebugMode) debugPrint('❌ sweepExpired error: $e');
           }
         });
 
@@ -140,7 +141,7 @@ class _NotificationBootstrapperState extends ConsumerState<NotificationBootstrap
           try {
             await PushExclusionStore.sweepExpired(uid);
           } catch (e) {
-            debugPrint('❌ Initial sweepExpired error: $e');
+            if (kDebugMode) debugPrint('❌ Initial sweepExpired error: $e');
           }
         });
       });

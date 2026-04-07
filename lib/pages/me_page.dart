@@ -932,29 +932,37 @@ class _MeEntryCard extends StatelessWidget {
             ),
             child: Column(
               mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(emoji, style: const TextStyle(fontSize: 22)),
-                const SizedBox(height: 8),
-                Text(
-                  uiString(lang, titleKey),
-                  style: TextStyle(
-                    color: tokens.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(emoji, style: const TextStyle(fontSize: 22)),
+                    const SizedBox(height: 4),
+                    Text(
+                      uiString(lang, titleKey),
+                      style: TextStyle(
+                        color: tokens.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      uiString(lang, subtitleKey),
+                      style: TextStyle(
+                        color: tokens.textSecondary,
+                        fontSize: 11,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  uiString(lang, subtitleKey),
-                  style: TextStyle(
-                    color: tokens.textSecondary,
-                    fontSize: 11,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const Spacer(),
                 Align(
                   alignment: Alignment.centerRight,
                   child: Icon(Icons.arrow_forward_ios_rounded, size: 12, color: tokens.textSecondary),
@@ -1003,7 +1011,7 @@ class _AccountWithUnlockCard extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
               child: SizedBox(
-                height: 130,
+                height: 200,
                 child: Row(
                   children: [
                     Expanded(

@@ -115,7 +115,7 @@ class _HintBubble extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
-                color: Color(0xFFFFC0EE).withValues(alpha: 0.52),
+                color: const Color(0xFFFFC0EE).withValues(alpha: 0.52),
                 width: 1,
               ),
               boxShadow: [
@@ -131,13 +131,13 @@ class _HintBubble extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               child: Text(
                 '"$message"',
-                style: TextStyle(
-                    color: tokens.textPrimary,
-                    fontSize: 15,
-                    height: 1.4,
-                    letterSpacing: 0.2,
-                    decoration: TextDecoration.none,
-                  ),
+                style: const TextStyle(
+                  color: Color(0xFF222222),
+                  fontSize: 15,
+                  height: 1.4,
+                  letterSpacing: 0.2,
+                  decoration: TextDecoration.none,
+                ),
                 maxLines: 6,
                 overflow: TextOverflow.ellipsis,
               ),

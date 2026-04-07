@@ -113,7 +113,7 @@ class _DeepDivePagerState extends State<DeepDivePager> {
     final maxBodyLength =
         pages.map((page) => page.body.length).fold<int>(0, math.max);
     final pageHeight =
-        (384 + (maxBodyLength * 0.24)).clamp(440.0, 648.0).toDouble();
+        ((384 + (maxBodyLength * 0.24)).clamp(440.0, 648.0) * 1.3).toDouble();
     final safeCurrentPage = _currentPage.clamp(0, pages.length - 1);
 
     return Column(

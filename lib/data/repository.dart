@@ -51,7 +51,7 @@ class DataRepository {
           .map((doc) => Segment.fromMap({...doc.data(), 'id': doc.id}))
           .toList();
     } catch (e) {
-      debugPrint('Error getting segments: $e');
+      if (kDebugMode) debugPrint('Error getting segments: $e');
       return [];
     }
   }
@@ -69,7 +69,7 @@ class DataRepository {
           .map((doc) => Topic.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error getting topics: $e');
+      if (kDebugMode) debugPrint('Error getting topics: $e');
       return [];
     }
   }
@@ -88,7 +88,7 @@ class DataRepository {
           .map((doc) => Topic.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error getting topics by tag: $e');
+      if (kDebugMode) debugPrint('Error getting topics by tag: $e');
       return [];
     }
   }
@@ -106,7 +106,7 @@ class DataRepository {
           .map((doc) => FeaturedList.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error getting featured lists: $e');
+      if (kDebugMode) debugPrint('Error getting featured lists: $e');
       return [];
     }
   }
@@ -120,7 +120,7 @@ class DataRepository {
       }
       return null;
     } catch (e) {
-      debugPrint('Error getting featured list by id: $e');
+      if (kDebugMode) debugPrint('Error getting featured list by id: $e');
       return null;
     }
   }
@@ -138,7 +138,7 @@ class DataRepository {
           .map((doc) => Product.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error getting products: $e');
+      if (kDebugMode) debugPrint('Error getting products: $e');
       return [];
     }
   }
@@ -157,7 +157,7 @@ class DataRepository {
           .map((doc) => Product.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error getting products by topic id: $e');
+      if (kDebugMode) debugPrint('Error getting products by topic id: $e');
       return [];
     }
   }
@@ -171,7 +171,7 @@ class DataRepository {
       }
       return null;
     } catch (e) {
-      debugPrint('Error getting product by id: $e');
+      if (kDebugMode) debugPrint('Error getting product by id: $e');
       return null;
     }
   }
@@ -191,7 +191,7 @@ class DataRepository {
           .map((doc) => Product.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error getting products by ids: $e');
+      if (kDebugMode) debugPrint('Error getting products by ids: $e');
       return [];
     }
   }
@@ -209,7 +209,7 @@ class DataRepository {
           .map((doc) => ContentItem.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error getting content items by product id: $e');
+      if (kDebugMode) debugPrint('Error getting content items by product id: $e');
       return [];
     }
   }
@@ -229,7 +229,7 @@ class DataRepository {
           .map((doc) => ContentItem.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error getting preview content items: $e');
+      if (kDebugMode) debugPrint('Error getting preview content items: $e');
       return [];
     }
   }
@@ -243,7 +243,7 @@ class DataRepository {
       }
       return null;
     } catch (e) {
-      debugPrint('Error getting content item by id: $e');
+      if (kDebugMode) debugPrint('Error getting content item by id: $e');
       return null;
     }
   }
@@ -281,7 +281,7 @@ class V2Repository {
       segments.sort((a, b) => a.order.compareTo(b.order));
       return segments;
     } catch (e) {
-      debugPrint('Error fetching segments: $e');
+      if (kDebugMode) debugPrint('Error fetching segments: $e');
       return [];
     }
   }
@@ -333,7 +333,7 @@ class V2Repository {
         trendingZh: trendingZh,
       );
     } catch (e) {
-      debugPrint('Error fetching search suggestions: $e');
+      if (kDebugMode) debugPrint('Error fetching search suggestions: $e');
       return const SearchSuggestionsData(
         suggested: fallbackSuggested,
         trending: fallbackTrending,
@@ -359,7 +359,7 @@ class V2Repository {
           .map((doc) => Topic.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error fetching topics for segment: $e');
+      if (kDebugMode) debugPrint('Error fetching topics for segment: $e');
       return [];
     }
   }
@@ -377,7 +377,7 @@ class V2Repository {
       }
       return null;
     } catch (e) {
-      debugPrint('Error fetching featured list: $e');
+      if (kDebugMode) debugPrint('Error fetching featured list: $e');
       return null;
     }
   }
@@ -405,7 +405,7 @@ class V2Repository {
             productsMap[doc.id] = Product.fromDoc(doc.id, doc.data());
           }
         } catch (e) {
-          debugPrint('Error fetching products batch: $e');
+          if (kDebugMode) debugPrint('Error fetching products batch: $e');
           // 繼續處理下一批
         }
       }
@@ -413,7 +413,7 @@ class V2Repository {
       // 按照原始順序返回產品
       return ids.map((id) => productsMap[id]).whereType<Product>().toList();
     } catch (e) {
-      debugPrint('Error fetching products by ids ordered: $e');
+      if (kDebugMode) debugPrint('Error fetching products by ids ordered: $e');
       return [];
     }
   }
@@ -432,7 +432,7 @@ class V2Repository {
           .map((doc) => Product.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error fetching products by topic: $e');
+      if (kDebugMode) debugPrint('Error fetching products by topic: $e');
       return [];
     }
   }
@@ -509,7 +509,7 @@ class V2Repository {
       }
       return null;
     } catch (e) {
-      debugPrint('Error fetching product: $e');
+      if (kDebugMode) debugPrint('Error fetching product: $e');
       return null;
     }
   }
@@ -530,7 +530,7 @@ class V2Repository {
           .map((doc) => ContentItem.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error fetching preview items: $e');
+      if (kDebugMode) debugPrint('Error fetching preview items: $e');
       return [];
     }
   }
@@ -555,7 +555,7 @@ class V2Repository {
           .map((doc) => Product.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error searching products: $e');
+      if (kDebugMode) debugPrint('Error searching products: $e');
       return [];
     }
   }
@@ -615,14 +615,14 @@ class V2Repository {
           
           publishedProductIds.addAll(productsSnapshot.docs.map((doc) => doc.id));
         } catch (e) {
-          debugPrint('Error fetching products batch: $e');
+          if (kDebugMode) debugPrint('Error fetching products batch: $e');
           // 繼續處理下一批
         }
       }
 
       return publishedProductIds;
     } catch (e) {
-      debugPrint('Error searching products by content: $e');
+      if (kDebugMode) debugPrint('Error searching products by content: $e');
       return [];
     }
   }
@@ -641,7 +641,7 @@ class V2Repository {
       }
       return map;
     } catch (e) {
-      debugPrint('Error fetching all products map: $e');
+      if (kDebugMode) debugPrint('Error fetching all products map: $e');
       return {};
     }
   }
@@ -660,7 +660,7 @@ class V2Repository {
           .map((doc) => Product.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error fetching new arrivals: $e');
+      if (kDebugMode) debugPrint('Error fetching new arrivals: $e');
       return [];
     }
   }
@@ -679,7 +679,7 @@ class V2Repository {
           .map((doc) => Product.fromDoc(doc.id, doc.data()))
           .toList();
     } catch (e) {
-      debugPrint('Error fetching upcoming products: $e');
+      if (kDebugMode) debugPrint('Error fetching upcoming products: $e');
       return [];
     }
   }
